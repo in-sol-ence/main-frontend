@@ -33,7 +33,7 @@ export function initializeDemoPage(onAdvance) {
   }
 
   function _start() {
-    if (page.inert || phase !== 'waiting') return
+    if ((page.inert && !page.dataset.entering) || phase !== 'waiting') return
     phase = 'typing'
     navigation.disconnect()
     if (motion.matches) {
@@ -47,10 +47,11 @@ export function initializeDemoPage(onAdvance) {
       autoInsertCss: false, contentType: 'null', onComplete: _complete,
     })
   }
-  // Observe the existing navigation's page activation without changing it.
+  // Prepare text while the existing wipe reveals it; interaction stays inert.
   const navigation = new MutationObserver(_start)
-  navigation.observe(page, { attributes: true, attributeFilter: ['inert'] })
+  navigation.observe(page, { attributes: true, attributeFilter: ['inert', 'data-entering'] })
   _start()
+  page.dataset.ready = 'true'
 
   function _erased() {
     phase = 'empty'

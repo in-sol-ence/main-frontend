@@ -353,3 +353,55 @@ Production build, syntax and diff checks pass. DOM tests preserve canvas identit
 and no navigation throughout the full Typed.js sequence. GPU appearance and
 interactive camera persistence have not been browser-verified due to the
 previously reported unavailable browser security-policy check.
+
+
+## Cinematic traversal and synchronized reveal (2026-09-22)
+
+This supersedes the rigid orthographic sweep described above. The same OBJ,
+textures, materials, lights, composer, and render loop remain. Navigation still
+uses `createSkateboardTransition`; Demo changes pages and Next only advances the
+existing concept sequence. No routes, history entries, dependencies, or models
+were added. The original checkout remains untouched.
+
+- The current perspective camera freezes for each sweep, including its orbit
+  position, quaternion, FOV and framing offset. Only responsive aspect/framing
+  updates occur if the viewport itself changes.
+- One riding parent holds the centered original board. A fixed +90-degree Y
+  correction maps its length to screen-right. The parent supplies a 12-degree
+  viewing tilt plus a deterministic carve: about 14 degrees peak yaw and 2.3
+  degrees peak bank. Position remains independent of rotation.
+- The existing 1400ms clock drives smooth acceleration/deceleration over the
+  first/last 15 percent, with constant cruising velocity between them. The
+  board is uniformly fitted to at most 40 percent viewport width, starts fully
+  offscreen, and exits fully before cleanup. Home transforms are restored.
+- Each frame projects the original mesh vertices through the unchanged camera.
+  Their minimum screen X controls both page clips; offscreen values clamp at the
+  viewport edges. The persistent knowledge canvas receives the matching local
+  clip so it cannot cover the outgoing page or leak into Home on return.
+- Demo remains disabled until its existing initialization reports ready. The
+  coordinator marks the incoming section `data-entering` to start intro typing
+  during the wipe, while retaining inert/focus protection until completion.
+  The phrase-triggered knowledge reveal and subsequent Next sequence remain.
+
+Changed files: `dist/skateboard.js`, `dist/transition.js`, `src/demo-page.js`,
+its regenerated `dist/knowledge/knowledge.js`, and the two relevant test files.
+`.gitignore` also excludes local `.pi/` debugging artifacts from version control.
+The user-supplied React View Transitions, R3F patterns, Three.js animation,
+GSAP timeline, MathUtils, and clip-path references were reviewed. Their shared
+progress/persistent-scene guidance is applied to the existing plain JS viewer;
+React/GSAP animation controllers were not added. The router demo could not be
+visually inspected because browser access was blocked.
+
+Verification: production build, all 13 Node tests, the three required JavaScript
+syntax checks, and `git diff --check` pass. The geometry test executes the actual
+viewer against the original OBJ at 1440×900, 390×844, and 2560×1080, sampling 61
+poses each. It checks projected trailing-edge accuracy, monotonic motion,
+horizontal orientation, yaw/bank limits, fully offscreen endpoints, midpoint
+reveal, stationary camera, and restoration across repeat navigation. Existing
+reduced-motion, clipping, resize, text, and Next-sequence checks pass.
+
+Browser acceptance remains outstanding: two attempts were denied because the
+browser tool could not verify its admin-enforced security policy. No workaround
+was used and no visual/GPU verification is claimed. Preview for manual review:
+`http://localhost:4176` (Python static server serving this worktree's `dist/`).
+Nothing was deployed.

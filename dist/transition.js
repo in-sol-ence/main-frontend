@@ -9,6 +9,7 @@ export function createSkateboardTransition({ pages, viewer, duration = 1400 }) {
     const { incoming, outgoing, resolve } = flight;
     outgoing.style.clipPath = 'inset(0 100% 0 0)';
     incoming.style.clipPath = 'inset(0)';
+    delete incoming.dataset.entering;
     incoming.inert = false;
     incoming.removeAttribute('aria-hidden');
     current = incoming;
@@ -28,6 +29,7 @@ export function createSkateboardTransition({ pages, viewer, duration = 1400 }) {
         current.setAttribute('aria-hidden', 'true');
         incoming.style.clipPath = 'inset(0 100% 0 0)';
         document.body.classList.add('is-transitioning');
+        incoming.dataset.entering = 'true';
         viewer.begin();
         if (motion.matches) _finish();
       });
@@ -35,10 +37,15 @@ export function createSkateboardTransition({ pages, viewer, duration = 1400 }) {
     tick(time) {
       if (!flight) return false;
       const progress = Math.min(1, Math.max(0, (time - flight.start) / duration));
-      const eased = progress * progress * (3 - 2 * progress);
+      // Integrate a smooth velocity ramp at either end; cruise through the middle.
+      const ramp = .15;
+      const edge = Math.min(progress, 1 - progress) / ramp;
+      const distance = ramp * (edge ** 3 - .5 * edge ** 4) / (1 - ramp);
+      const eased = progress < ramp ? distance : progress > 1 - ramp ? 1 - distance
+        : (progress - ramp / 2) / (1 - ramp);
       // The projected trailing edge returned by the viewer is the only boundary.
-      const x = viewer.move(eased);
       const width = document.documentElement.clientWidth;
+      const x = Math.max(0, Math.min(width, viewer.move(eased)));
       flight.incoming.style.clipPath = `inset(0 ${Math.max(0, width - x)}px 0 0)`;
       flight.outgoing.style.clipPath = `inset(0 0 0 ${x}px)`;
       if (progress === 1 || motion.matches) _finish();

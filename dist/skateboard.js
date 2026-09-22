@@ -100,18 +100,24 @@ async function _createSkateboard() {
   board.scale.setScalar(6.35 / size.z * 1.06);
   board.position.set(0, -.45, 0);
   board.rotation.set(-1.8151424220741028, 2.478367537831948, 0.06981317007977318, 'XYZ');
-  scene.add(board);
+  const ride = new THREE.Group();
+  ride.add(board);
+  scene.add(ride);
 
   // Fixed framing and motion from the supplied scene export. No tuning UI.
   let resumeSpinTimer;
 
   const homePosition = board.position.clone();
   const homeRotation = board.quaternion.clone();
-  const wipeCamera = new THREE.OrthographicCamera(-4, 4, 4, -4, .1, 30);
-  wipeCamera.position.set(0, -8, 0);
-  wipeCamera.up.set(0, 0, 1);
-  wipeCamera.lookAt(0, 0, 0);
-  const wipeBounds = new THREE.Box3();
+  const homeScale = board.scale.clone();
+  // The fixed OBJ correction is separate from the riding pivot's yaw/bank.
+  const ridingPose = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+  const cameraPose = new THREE.Quaternion();
+  const carve = new THREE.Euler(0, 0, 0, 'YXZ');
+  const projected = new THREE.Vector3();
+  const projection = new THREE.Matrix4();
+  const meshes = [];
+  model.traverse(child => { if (child.isMesh) meshes.push(child); });
   let page = 'home';
   const transition = createSkateboardTransition({
     pages: [...document.querySelectorAll('.page')],
@@ -120,27 +126,56 @@ async function _createSkateboard() {
         clearTimeout(resumeSpinTimer);
         controls.enabled = controls.autoRotate = false;
         board.visible = true;
-        // Model +Z points right; +Y points up, placing the wheels below the deck.
-        board.rotation.set(Math.PI / 2, Math.PI / 2, 0);
+        camera.updateMatrixWorld();
+        cameraPose.copy(camera.quaternion);
+        board.position.set(0, 0, 0);
+        board.quaternion.copy(ridingPose);
+        this.move(0);
       },
       move(progress) {
         const width = container.clientWidth;
-        const halfWidth = 4 * width / container.clientHeight;
-        wipeCamera.left = -halfWidth;
-        wipeCamera.right = halfWidth;
-        wipeCamera.updateProjectionMatrix();
-        board.position.set(0, 0, 0);
-        // Precise transformed vertex bounds, not a separately timed CSS offset.
-        wipeBounds.setFromObject(board, true);
-        const x = progress * width;
-        board.position.x = -halfWidth + progress * halfWidth * 2 - wipeBounds.min.x;
-        renderer.render(scene, wipeCamera);
-        return x;
+        const depth = 5.9;
+        const lens = camera.projectionMatrix.elements;
+        // Fit the same board uniformly; the camera and its perspective stay fixed.
+        const length = Math.min(3, .4 * 2 * depth / lens[0]);
+        board.scale.setScalar(length / size.z);
+        const radius = size.length() * board.scale.x / 2;
+        const margin = radius * (lens[0] + Math.abs(lens[8]) + 1) / (depth - radius) + .02;
+        const x = THREE.MathUtils.lerp(-1 - margin, 1 + margin, progress);
+        ride.position.set((x + lens[8]) * depth / lens[0], lens[9] * depth / lens[5], -depth)
+          .applyMatrix4(camera.matrixWorld);
+        // Straight → toward camera → straight → away → straight, with soft endpoints.
+        const turn = Math.sin(2 * Math.PI * progress) * Math.sin(Math.PI * progress);
+        carve.set(THREE.MathUtils.degToRad(12 + 3 * turn), THREE.MathUtils.degToRad(-18 * turn), 0);
+        ride.quaternion.setFromEuler(carve).premultiply(cameraPose);
+        ride.updateMatrixWorld(true);
+        let trailing = Infinity;
+        for (const mesh of meshes) {
+          projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse).multiply(mesh.matrixWorld);
+          const vertices = mesh.geometry.attributes.position;
+          for (let index = 0; index < vertices.count; index++) {
+            projected.fromBufferAttribute(vertices, index).applyMatrix4(projection);
+            trailing = Math.min(trailing, (projected.x + 1) * width / 2);
+          }
+        }
+        // The persistent knowledge canvas lives outside the clipped page sections.
+        const volume = document.querySelector('#knowledge-volume');
+        const rect = volume.getBoundingClientRect();
+        const boundary = THREE.MathUtils.clamp(trailing, 0, width);
+        volume.style.clipPath = page === 'home'
+          ? `inset(0 ${Math.max(0, rect.right - boundary)}px 0 0)`
+          : `inset(0 0 0 ${Math.max(0, boundary - rect.left)}px)`;
+        composer.render();
+        return trailing;
       },
       finish(id) {
         page = id;
         document.body.dataset.page = id;
+        document.querySelector('#knowledge-volume').style.clipPath = id === 'demo' ? 'inset(0)' : 'inset(0 100% 0 0)';
         board.visible = id === 'home';
+        ride.position.set(0, 0, 0);
+        ride.quaternion.identity();
+        board.scale.copy(homeScale);
         board.position.copy(homePosition);
         board.quaternion.copy(homeRotation);
         controls.enabled = id === 'home';
@@ -152,8 +187,17 @@ async function _createSkateboard() {
   for (const actions of document.querySelectorAll('.actions')) {
     actions.addEventListener('pointerdown', event => event.stopPropagation());
   }
-  // Compile the sweep's direct-render shader before navigation can start.
-  await renderer.compileAsync(scene, wipeCamera);
+  // Compile the existing model before navigation can start.
+  await renderer.compileAsync(scene, camera);
+  const demoPage = document.querySelector('#demo');
+  if (!demoPage.dataset.ready) await new Promise(resolve => {
+    const ready = new MutationObserver(() => {
+      if (!demoPage.dataset.ready) return;
+      ready.disconnect();
+      resolve();
+    });
+    ready.observe(demoPage, { attributes: true, attributeFilter: ['data-ready'] });
+  });
   const demoButton = document.querySelector('#demo-button');
   demoButton.disabled = false;
   demoButton.addEventListener('click', () => transition.navigate(document.querySelector('#demo')));

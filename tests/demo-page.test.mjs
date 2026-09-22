@@ -51,6 +51,7 @@ function _fixture(reducedMotion = false, sequence = false) {
   return {
     page, text, volume, canvas, next, motion, pending, navigations, advances, selections,
     sentence: heading.getAttribute('aria-label'),
+    async enter() { page.dataset.entering = 'true'; await Promise.resolve(); await Promise.resolve() },
     async activate() { page.inert = false; await Promise.resolve(); await Promise.resolve() },
     async step() {
       const entry = [...pending.entries()].sort((a, b) => a[1].at - b[1].at)[0]
@@ -157,3 +158,14 @@ test('Next runs the whole demonstration in the original page with no navigation 
   assert.equal(f.next.hidden, true)
   assert.equal(f.pending.size, 0)
 })
+
+test('incoming intro starts during the wipe while its page remains inert', async () => {
+  const f = _fixture();
+  await f.enter();
+  assert.equal(f.page.inert, true);
+  for (let i = 0; i < 12; i++) await f.step();
+  assert.ok(f.text.textContent.length > 0);
+  const prefix = f.text.textContent;
+  await f.activate();
+  assert.equal(f.text.textContent, prefix, 'completion does not restart the intro');
+});

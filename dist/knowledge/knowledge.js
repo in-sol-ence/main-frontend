@@ -56850,7 +56850,7 @@ function ZP(r) {
     x(), g = "ready", u.hidden = !1, S.disconnect();
   }
   function E() {
-    if (!(e.inert || g !== "waiting")) {
+    if (!(e.inert && !e.dataset.entering || g !== "waiting")) {
       if (g = "typing", N.disconnect(), m.matches) {
         t.textContent = f, M();
         return;
@@ -56870,7 +56870,7 @@ function ZP(r) {
     }
   }
   const N = new MutationObserver(E);
-  N.observe(e, { attributes: !0, attributeFilter: ["inert"] }), E();
+  N.observe(e, { attributes: !0, attributeFilter: ["inert", "data-entering"] }), E(), e.dataset.ready = "true";
   function w() {
     g = "empty", r();
   }
