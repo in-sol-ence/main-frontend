@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createSkateboardTransition } from './transition.js';
 import { OBJLoader } from './vendor/three/OBJLoader.js';
 import { RoomEnvironment } from './vendor/three/RoomEnvironment.js';
 import { OrbitControls } from './vendor/three/OrbitControls.js';
@@ -12,44 +13,48 @@ async function _createSkateboard() {
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(52, 1, .1, 30);
-  camera.position.set(-1.2, -1.1, -4.8);
+  camera.position.set(0.1328305864251409, 2.077583808205999, 6.044717163173346);
   const cameraTarget = new THREE.Vector3(0, 0, .7);
-  const viewDirection = cameraTarget.clone().sub(camera.position).normalize();
-  camera.up.applyAxisAngle(viewDirection, 1.35);
+  camera.up.set(-0.9042679616674021, 0.24773014936104823, 0.3477487981279509);
   camera.lookAt(cameraTarget);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setClearColor(0xEDE8D0, 1);
+  renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.5;
   container.append(renderer.domElement);
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
   const bokehPass = new BokehPass(scene, camera, {
-    focus: 5.2,
-    aperture: .003,
+    focus: 5.9,
+    aperture: .002,
     maxblur: .009
   });
+  // Preserve transparent pixels instead of the stock shader's opaque backdrop.
+  bokehPass.materialBokeh.fragmentShader = bokehPass.materialBokeh.fragmentShader
+    .replace('gl_FragColor.a = 1.0;', '');
+  bokehPass.enabled = true;
   composer.addPass(bokehPass);
   composer.addPass(new OutputPass());
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = new OrbitControls(camera, document.querySelector('#pages'));
   controls.target.copy(cameraTarget);
   controls.enableDamping = true;
-  controls.dampingFactor = .07;
+  controls.dampingFactor = .02;
   controls.enablePan = false;
   controls.enableZoom = false;
   controls.zoomToCursor = true;
-  controls.rotateSpeed = .9;
+  controls.zoomSpeed = 1;
+  controls.rotateSpeed = .7;
   controls.minDistance = 3.8;
   controls.maxDistance = 8;
   controls.minPolarAngle = 1.15;
   controls.maxPolarAngle = 1.95;
   controls.autoRotate = !reducedMotion.matches;
-  controls.autoRotateSpeed = 6;
+  controls.autoRotateSpeed = 3.5;
   controls.saveState();
 
   // Light the actual object without adding a floor, backdrop, or visible props.
@@ -57,7 +62,7 @@ async function _createSkateboard() {
   const pmrem = new THREE.PMREMGenerator(renderer);
   const environmentTarget = pmrem.fromScene(environment, .04);
   scene.environment = environmentTarget.texture;
-  scene.environmentIntensity = .8;
+  scene.environmentIntensity = .35;
   environment.dispose();
   pmrem.dispose();
   scene.add(new THREE.HemisphereLight(0xffffff, 0xc6b9a5, 1.3));
@@ -92,167 +97,80 @@ async function _createSkateboard() {
   model.position.sub(bounds.getCenter(new THREE.Vector3()));
   const board = new THREE.Group();
   board.add(model);
-  board.scale.setScalar(6.35 / size.z);
+  board.scale.setScalar(6.35 / size.z * 1.06);
+  board.position.set(0, -.45, 0);
+  board.rotation.set(-1.8151424220741028, 2.478367537831948, 0.06981317007977318, 'XYZ');
   scene.add(board);
 
-  const tuning = {
-    pageColor: '#ede8d0', textColor: '#3d2412', cursorColor: '#000000', accentColor: '#3d2412',
-    idle: !reducedMotion.matches, resumeDelay: 900, limitTilt: true,
-    fov: container.clientWidth / container.clientHeight < .8 ? 72 : 52,
-    horizontal: .18, vertical: .26, scale: 1, pitch: 0, yaw: 0, roll: 0
-  };
-  const fields = document.querySelector('#tuning-fields');
-  fields.replaceChildren();
-  const bindings = [];
+  // Fixed framing and motion from the supplied scene export. No tuning UI.
   let resumeSpinTimer;
 
-  function _syncTuning() {
-    for (const { object, key, input, range } of bindings) {
-      if (input.type === 'checkbox') input.checked = object[key];
-      else if (input.type === 'color') input.value = object[key];
-      else if (document.activeElement !== input && document.activeElement !== range) {
-        input.value = Number(object[key].toFixed(6));
-        range.value = object[key];
-      }
-    }
-  }
-
-  function _control(parent, label, object, key, min, max, step, change) {
-    const row = document.createElement('label');
-    row.className = 'tune-row';
-    const name = document.createElement('span');
-    name.textContent = label;
-    const input = document.createElement('input');
-    const checkbox = typeof object[key] === 'boolean';
-    const color = typeof object[key] === 'string';
-    input.type = checkbox ? 'checkbox' : color ? 'color' : 'number';
-    input.setAttribute('aria-label', label);
-    row.append(name, input);
-    let range;
-    if (!checkbox && !color) {
-      range = document.createElement('input');
-      range.type = 'range';
-      range.setAttribute('aria-label', label);
-      for (const element of [input, range]) Object.assign(element, { min, max, step });
-      row.append(range);
-    }
-    for (const element of [input, range].filter(Boolean)) {
-      element.addEventListener('input', () => {
-        if (!checkbox && !color && !Number.isFinite(element.valueAsNumber)) return;
-        object[key] = checkbox ? input.checked : color ? input.value : THREE.MathUtils.clamp(element.valueAsNumber, min, max);
-        if (range) { range.value = object[key]; input.value = object[key]; }
-        change?.();
-        composer.render();
-      });
-    }
-    parent.append(row);
-    bindings.push({ object, key, input, range });
-  }
-
-  for (const title of ['Colors', 'Motion & scrolling', 'Board position', 'Board angle', 'Camera', 'Focus & light']) {
-    const section = document.createElement('fieldset');
-    const legend = document.createElement('legend');
-    legend.textContent = title;
-    section.append(legend);
-    fields.append(section);
-    if (title === 'Colors') {
-      for (const [label, key, property] of [
-        ['Page background', 'pageColor', '--page-color'],
-        ['Text', 'textColor', '--text-color'],
-        ['Cursor', 'cursorColor', '--cursor-color'],
-        ['Panel accent', 'accentColor', '--accent-color']
-      ]) {
-        _control(section, label, tuning, key, null, null, null, () => {
-          document.documentElement.style.setProperty(property, tuning[key]);
-          if (key === 'pageColor') {
-            renderer.setClearColor(tuning.pageColor, 1);
-            document.querySelector('meta[name="theme-color"]').content = tuning.pageColor;
-          }
-        });
-      }
-    } else if (title === 'Motion & scrolling') {
-      _control(section, 'Idle spin', tuning, 'idle', null, null, null, () => {
+  const homePosition = board.position.clone();
+  const homeRotation = board.quaternion.clone();
+  const wipeCamera = new THREE.OrthographicCamera(-4, 4, 4, -4, .1, 30);
+  wipeCamera.position.set(0, -8, 0);
+  wipeCamera.up.set(0, 0, 1);
+  wipeCamera.lookAt(0, 0, 0);
+  const wipeBounds = new THREE.Box3();
+  let page = 'home';
+  const transition = createSkateboardTransition({
+    pages: [...document.querySelectorAll('.page')],
+    viewer: {
+      begin() {
         clearTimeout(resumeSpinTimer);
-        controls.autoRotate = tuning.idle;
-      });
-      _control(section, 'Idle speed / direction', controls, 'autoRotateSpeed', -20, 20, .1);
-      _control(section, 'Resume delay (ms)', tuning, 'resumeDelay', 0, 5000, 100);
-      _control(section, 'Drag speed', controls, 'rotateSpeed', .1, 3, .05);
-      _control(section, 'Drag smoothing', controls, 'dampingFactor', .01, 1, .01);
-      _control(section, 'Scroll / pinch zoom', controls, 'enableZoom');
-      _control(section, 'Scroll sensitivity', controls, 'zoomSpeed', .1, 3, .05);
-      _control(section, 'Limit tilt', tuning, 'limitTilt', null, null, null, () => {
-        controls.minPolarAngle = tuning.limitTilt ? 1.15 : .01;
-        controls.maxPolarAngle = tuning.limitTilt ? 1.95 : Math.PI - .01;
-      });
-    } else if (title === 'Board position') {
-      for (const axis of ['x', 'y', 'z']) _control(section, axis.toUpperCase(), board.position, axis, -8, 8, .05);
-      _control(section, 'Size', tuning, 'scale', .2, 3, .01, () => board.scale.setScalar(6.35 / size.z * tuning.scale));
-    } else if (title === 'Board angle') {
-      for (const [key, axis] of [['pitch', 'x'], ['yaw', 'y'], ['roll', 'z']]) {
-        _control(section, `${key} (degrees)`, tuning, key, -180, 180, 1, () => {
-          board.rotation[axis] = THREE.MathUtils.degToRad(tuning[key]);
-        });
-      }
-    } else if (title === 'Camera') {
-      for (const [name, object] of [['Position', camera.position], ['Look at', controls.target]]) {
-        for (const axis of ['x', 'y', 'z']) _control(section, `${name} ${axis.toUpperCase()}`, object, axis, -12, 12, .05, () => {
-          tuning.idle = controls.autoRotate = false;
-          clearTimeout(resumeSpinTimer);
-          camera.lookAt(controls.target);
-          _syncTuning();
-        });
-      }
-      _control(section, 'Field of view', tuning, 'fov', 20, 100, 1);
-      _control(section, 'Minimum camera distance', controls, 'minDistance', .2, 8, .1);
-      _control(section, 'Maximum camera distance', controls, 'maxDistance', 8, 30, .1);
-      _control(section, 'Frame left / right', tuning, 'horizontal', -.7, .7, .01);
-      _control(section, 'Frame down / up', tuning, 'vertical', -.7, .7, .01);
-      section.addEventListener('input', () => {
-        const width = container.clientWidth, height = container.clientHeight;
-        camera.fov = tuning.fov;
-        camera.setViewOffset(width, height, -width * tuning.horizontal, height * tuning.vertical, width, height);
-        camera.updateProjectionMatrix();
+        controls.enabled = controls.autoRotate = false;
+        board.visible = true;
+        // Model +Z points right; +Y points up, placing the wheels below the deck.
+        board.rotation.set(Math.PI / 2, Math.PI / 2, 0);
+      },
+      move(progress) {
+        const width = container.clientWidth;
+        const halfWidth = 4 * width / container.clientHeight;
+        wipeCamera.left = -halfWidth;
+        wipeCamera.right = halfWidth;
+        wipeCamera.updateProjectionMatrix();
+        board.position.set(0, 0, 0);
+        // Precise transformed vertex bounds, not a separately timed CSS offset.
+        wipeBounds.setFromObject(board, true);
+        const x = progress * width;
+        board.position.x = -halfWidth + progress * halfWidth * 2 - wipeBounds.min.x;
+        renderer.render(scene, wipeCamera);
+        return x;
+      },
+      finish(id) {
+        page = id;
+        document.body.dataset.page = id;
+        board.visible = id === 'home';
+        board.position.copy(homePosition);
+        board.quaternion.copy(homeRotation);
+        controls.enabled = id === 'home';
+        controls.autoRotate = id === 'home' && !reducedMotion.matches;
         composer.render();
-      });
-    } else {
-      _control(section, 'Depth of field', bokehPass, 'enabled');
-      _control(section, 'Focus distance', bokehPass.uniforms.focus, 'value', .1, 20, .1);
-      _control(section, 'Aperture', bokehPass.uniforms.aperture, 'value', 0, .02, .0001);
-      _control(section, 'Maximum blur', bokehPass.uniforms.maxblur, 'value', 0, .03, .001);
-      _control(section, 'Exposure', renderer, 'toneMappingExposure', .2, 3, .05);
-      _control(section, 'Environment light', scene, 'environmentIntensity', 0, 3, .05);
+      }
     }
-  }
-  _syncTuning();
-  document.querySelector('#reset-tuning').addEventListener('click', () => location.reload());
-  document.querySelector('#copy-tuning').addEventListener('click', async event => {
-    const settings = { tuning, wordColors: JSON.parse(document.querySelector('#word-text').dataset.colors || '[]'),
-      position: board.position.toArray(), rotation: board.rotation.toArray(),
-      camera: camera.position.toArray(), up: camera.up.toArray(), target: controls.target.toArray(),
-      idleSpeed: controls.autoRotateSpeed, dragSpeed: controls.rotateSpeed, smoothing: controls.dampingFactor,
-      zoom: controls.enableZoom, scrollSpeed: controls.zoomSpeed, depthOfField: bokehPass.enabled,
-      focus: bokehPass.uniforms.focus.value, aperture: bokehPass.uniforms.aperture.value,
-      blur: bokehPass.uniforms.maxblur.value, exposure: renderer.toneMappingExposure, light: scene.environmentIntensity };
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(settings, null, 2));
-      event.target.textContent = 'Copied';
-    } catch { event.target.textContent = 'Copy unavailable'; }
-    setTimeout(() => { event.target.textContent = 'Copy settings'; }, 1800);
   });
+  for (const actions of document.querySelectorAll('.actions')) {
+    actions.addEventListener('pointerdown', event => event.stopPropagation());
+  }
+  // Compile the sweep's direct-render shader before navigation can start.
+  await renderer.compileAsync(scene, wipeCamera);
+  const demoButton = document.querySelector('#demo-button');
+  demoButton.disabled = false;
+  demoButton.addEventListener('click', () => transition.navigate(document.querySelector('#demo')));
+  document.querySelector('#back-button').addEventListener('click', () => transition.navigate(document.querySelector('#home')));
 
   const resize = new ResizeObserver(() => {
     const width = container.clientWidth;
     const height = container.clientHeight;
     if (!width || !height) return;
     camera.aspect = width / height;
-    camera.fov = tuning.fov;
+    camera.fov = 52;
     camera.clearViewOffset();
-    camera.setViewOffset(width, height, -width * tuning.horizontal, height * tuning.vertical, width, height);
+    camera.setViewOffset(width, height, -width * .23, height * .04, width, height);
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
     composer.setSize(width, height);
-    composer.render();
+    if (!transition.active) composer.render();
   });
   resize.observe(container);
 
@@ -263,29 +181,30 @@ async function _createSkateboard() {
   controls.addEventListener('end', () => {
     clearTimeout(resumeSpinTimer);
     resumeSpinTimer = setTimeout(() => {
-      controls.autoRotate = tuning.idle;
-    }, tuning.resumeDelay);
+      controls.autoRotate = !reducedMotion.matches;
+    }, 900);
   });
-  renderer.domElement.addEventListener('dblclick', () => {
+  document.querySelector('#pages').addEventListener('dblclick', event => {
+    if (page !== 'home' || transition.active || event.target.closest('.actions')) return;
     controls.reset();
-    controls.autoRotate = tuning.idle;
+    controls.autoRotate = !reducedMotion.matches;
   });
 
   const clock = new THREE.Clock();
-  let lastSync = 0;
-  const render = time => {
+  const render = (time = performance.now()) => {
+    if (transition.tick(time)) return;
+    if (page !== 'home') return;
     controls.update(Math.min(clock.getDelta(), .05));
-    if (time - lastSync > 150) { _syncTuning(); lastSync = time; }
     composer.render();
   };
   const updateMotion = () => {
-    controls.autoRotate = tuning.idle;
+    controls.autoRotate = page === 'home' && !transition.active && !reducedMotion.matches;
     renderer.setAnimationLoop(document.hidden ? null : render);
     clock.getDelta();
     render(performance.now());
   };
   updateMotion();
-  const updatePreference = () => { tuning.idle = !reducedMotion.matches; updateMotion(); };
+  const updatePreference = () => { clearTimeout(resumeSpinTimer); updateMotion(); };
   reducedMotion.addEventListener('change', updatePreference);
   document.addEventListener('visibilitychange', updateMotion);
   window.addEventListener('pagehide', event => {

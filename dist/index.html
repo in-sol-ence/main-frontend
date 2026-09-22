@@ -3,232 +3,42 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#EDE8D0">
-  <meta name="description" content="A skateboard and a little conversation, one letter at a time.">
-  <title>hello world</title>
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="skatebored — an adaptive learning platform.">
+  <title>skatebored</title>
   <link rel="icon" href="data:,">
-  <style>
-    :root {
-      color-scheme: light;
-      --page-color: #EDE8D0;
-      --text-color: #3D2412;
-      --cursor-color: #000000;
-      --accent-color: #3D2412;
-      background: var(--page-color);
-      color: var(--text-color);
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; }
-    main {
-      display: flex;
-      align-items: center;
-      position: relative;
-      min-height: 100svh;
-      padding: 5vw;
-      overflow: clip;
-    }
-    h1 {
-      margin: 0;
-      min-height: 4.32em;
-      max-width: 1440px;
-      font-size: clamp(2.5rem, 7.3vw, 8rem);
-      font-weight: 600;
-      line-height: 1.08;
-      letter-spacing: -.065em;
-      overflow-wrap: break-word;
-      position: relative;
-      z-index: 2;
-      width: min(43vw, 44rem);
-      pointer-events: none;
-    }
-    #typed { white-space: pre-wrap; }
-    .typed-cursor {
-      display: inline-block;
-      width: .045em;
-      height: .78em;
-      margin-left: .07em;
-      vertical-align: -.025em;
-      background: var(--cursor-color);
-      letter-spacing: 0;
-    }
-    .typed-cursor--blink { animation: blink 1.05s step-end infinite; }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-      border: 0;
-    }
-    #skateboard {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-    #skateboard canvas { display: block; width: 100%; height: 100%; }
-    #skateboard canvas { cursor: grab; }
-    #skateboard canvas:active { cursor: grabbing; }
-    #tuning {
-      position: fixed; top: 16px; right: 16px; z-index: 4;
-      width: 290px; max-width: calc(100vw - 32px); max-height: calc(100svh - 32px);
-      overflow: auto; overscroll-behavior: contain;
-      padding: 16px; background: var(--page-color); border: 1px solid var(--accent-color);
-      font-size: 14px; line-height: 1.4;
-    }
-    #tuning > summary { cursor: pointer; font-size: 18px; font-weight: 600; }
-    #tuning p { margin: 10px 0; }
-    #word-text { white-space: pre-wrap; max-height: 240px; overflow: auto; user-select: text; cursor: text; padding: 8px; border: 1px solid var(--accent-color); }
-    #tuning fieldset { border: 0; padding: 12px 0; margin: 0; border-top: 1px solid color-mix(in srgb, var(--accent-color) 20%, transparent); }
-    #tuning legend { padding-top: 12px; font-weight: 600; }
-    .tune-row { display: grid; grid-template-columns: 1fr 66px; gap: 6px 10px; margin: 9px 0; }
-    .tune-row input[type=range] { grid-column: 1 / -1; width: 100%; margin: 0; }
-    #tuning input { accent-color: var(--accent-color); min-width: 0; }
-    #tuning input[type=number] { width: 66px; background: transparent; color: inherit; border: 1px solid color-mix(in srgb, var(--accent-color) 33%, transparent); padding: 3px; }
-    #tuning input[type=color] { width: 66px; height: 28px; padding: 2px; background: transparent; border: 1px solid var(--accent-color); cursor: pointer; }
-    #tuning input[type=checkbox] { justify-self: end; }
-    #tuning button { font: inherit; color: inherit; background: transparent; border: 1px solid var(--accent-color); padding: 7px 10px; cursor: pointer; }
-    #tuning :focus-visible { outline: 2px solid var(--accent-color); outline-offset: 3px; }
-    @media (max-width: 760px) {
-      main { padding: 7vw; align-items: flex-end; }
-      h1 { width: 68vw; font-size: clamp(2.5rem, 11.5vw, 5.5rem); min-height: 3.24em; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .typed-cursor { animation: none; }
-    }
-  </style>
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <main>
-    <h1 aria-label="hello world"><span aria-hidden="true"><span id="typed">hello world</span></span></h1>
-    <div id="skateboard" role="img" aria-label="Interactive Globe Down in Flames skateboard. Drag to rotate and double-click to reset."></div>
+  <main id="pages">
+    <section id="home" class="page">
+    <div class="intro">
+      <h1 aria-label="skatebored" data-page-heading tabindex="-1"><span aria-hidden="true"><span id="typed">skatebored</span></span></h1>
+      <div class="actions">
+        <button id="demo-button" type="button" disabled>Demo</button>
+        <a href="mailto:sol.mahajan@utexas.edu">Contact us</a>
+      </div>
+    </div>
+
     <div class="sr-only" id="transcript"></div>
+    </section>
+    <section id="demo" class="page demo-page" inert aria-hidden="true">
+      <div class="intro demo-intro">
+        <h1 class="demo-heading" data-page-heading tabindex="-1" aria-label="Our platform embeds math in an N-dimensional space. We have restricted this space to three dimensions so you can visualize it."><span aria-hidden="true" id="demo-typed"></span></h1>
+      </div>
+      <div id="knowledge-slot" class="knowledge-slot" aria-hidden="true"></div>
+      <button id="demo-next" class="demo-next" type="button" hidden>Next</button>
+      <button id="back-button" type="button" hidden>Back to skatebored</button>
+    </section>
+    <div id="knowledge-volume" class="knowledge-volume" aria-label="Interactive knowledge space. Drag to orbit and scroll to zoom." aria-hidden="true" inert></div>
   </main>
-  <details id="tuning" open>
-    <summary>Scene tuning</summary>
-    <p>Adjust live. Pause idle spin to set an exact view.</p>
-    <fieldset>
-      <legend>Word colors</legend>
-      <p>Highlight any text below, then choose its color. Typing restarts to preview.</p>
-      <div id="word-text" tabindex="0" aria-label="Select words to color"></div>
-      <label class="tune-row">Selected text color <input id="word-color" type="color" value="#3d2412" disabled></label>
-      <button id="clear-word-color" type="button" disabled>Use default color</button>
-    </fieldset>
-    <div id="tuning-fields">Loading skateboard…</div>
-    <button id="reset-tuning" type="button">Reset</button>
-    <button id="copy-tuning" type="button">Copy settings</button>
-  </details>
+  <div id="skateboard" role="img" aria-label="Interactive Globe Down in Flames skateboard. Drag to rotate and double-click to reset."></div>
   <script type="importmap">
     { "imports": { "three": "./vendor/three/three.module.js" } }
   </script>
   <script type="module" src="./skateboard.js"></script>
   <script src="./vendor/typed.umd.js"></script>
-  <script>
-    const messages = [
-      'hello world',
-      "oh,^650 you're here.",
-      'give me a second^350...',
-      'i had a thought.',
-      'what if we made^500\nsomething?',
-      'not sure what yet.',
-      "maybe that's^400\nthe fun part.",
-      'start with a word.',
-      'then^350 another.',
-      'make a mess.',
-      'change your mind.',
-      'wait.^650\ntry that again.',
-      'there you go.',
-      'look at us,^600\nmaking something.',
-      'anyway,^700\nhello again.'
-    ];
-    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-    const text = document.querySelector('#typed');
-    let typing;
-    const wordText = document.querySelector('#word-text');
-    const wordColor = document.querySelector('#word-color');
-    const clearWordColor = document.querySelector('#clear-word-color');
-    const plainText = messages.map(message => message.replace(/\^\d+/g, '')).join('\n');
-    const wordColors = Array(plainText.length).fill(null);
-    let selectedWords;
-    wordText.textContent = plainText;
-
-    document.addEventListener('selectionchange', () => {
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
-      const range = selection.getRangeAt(0);
-      if (!wordText.contains(range.startContainer) || !wordText.contains(range.endContainer)) return;
-      const prefix = range.cloneRange();
-      prefix.selectNodeContents(wordText);
-      prefix.setEnd(range.startContainer, range.startOffset);
-      selectedWords = [prefix.toString().length, prefix.toString().length + range.toString().length];
-      wordColor.disabled = clearWordColor.disabled = false;
-      wordColor.value = wordColors[selectedWords[0]] || getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim();
-    });
-
-    function _applyWordColor(color) {
-      if (!selectedWords) return;
-      wordColors.fill(color, ...selectedWords);
-      wordText.replaceChildren();
-      for (let index = 0; index < plainText.length; index++) {
-        const span = document.createElement('span');
-        span.textContent = plainText[index];
-        if (wordColors[index]) span.style.color = wordColors[index];
-        wordText.append(span);
-      }
-      wordText.dataset.colors = JSON.stringify(wordColors);
-      _startTyping();
-    }
-    wordColor.addEventListener('input', () => _applyWordColor(wordColor.value));
-    clearWordColor.addEventListener('click', () => _applyWordColor(null));
-
-    function _coloredMessages() {
-      let index = 0;
-      return messages.map(message => {
-        let html = '';
-        for (const token of message.match(/\^\d+|[\s\S]/g)) {
-          if (/^\^\d+$/.test(token)) { html += token; continue; }
-          const color = wordColors[index++];
-          const escaped = token.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          html += color ? `<span style="color:${color}">${escaped}</span>` : escaped;
-        }
-        index++; // Newline separating phrases in the selection panel.
-        return html;
-      });
-    }
-
-    // A readable transcript avoids announcing every individual keystroke.
-    document.querySelector('#transcript').textContent = messages.slice(1)
-      .map(message => message.replace(/\^\d+/g, '').replace(/\n/g, ' ')).join(' ');
-
-    function _startTyping() {
-      typing?.destroy();
-      typing = null;
-      text.innerHTML = _coloredMessages()[0];
-      if (reducedMotion.matches || typeof Typed === 'undefined') return;
-      text.textContent = '';
-      typing = new Typed(text, {
-        strings: _coloredMessages(),
-        typeSpeed: 65,
-        backSpeed: 28,
-        startDelay: 650,
-        backDelay: 2100,
-        smartBackspace: false,
-        loop: true,
-        showCursor: true,
-        cursorChar: '',
-        autoInsertCss: false,
-        contentType: 'html'
-      });
-    }
-
-    _startTyping();
-    reducedMotion.addEventListener('change', _startTyping);
-  </script>
+  <script src="./text.js"></script>
+  <script type="module" src="./knowledge/knowledge.js"></script>
 </body>
 </html>
