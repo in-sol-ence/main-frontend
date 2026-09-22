@@ -309,3 +309,17 @@ test('the scripted hover, entry and reveal land on the route the engine produced
     child.dispose(); root.dispose();
   } finally { globalThis.document = previous; }
 });
+
+test('the finale anchors where the branch’s line converges, or the farthest part still in view', async () => {
+  const { vanishingPoint, ROUTE_EXIT } = await import('../src/handoff.js');
+  const along = { distance: 40, routeEnd: .2, arcLength: 400 };
+  const tip = along.routeEnd * along.arcLength + ROUTE_EXIT;
+  const seen = [];
+  const point = vanishingPoint(at => { seen.push(at); return { x: .3, y: -.2, z: .9 }; }, along);
+  assert.equal(seen[0], tip, 'the route exit, where layer.js stops drawing the line');
+  assert.deepEqual(point, { x: .65, y: .6 });
+  // Off screen, it falls back to the farthest in-view part of the remaining line.
+  const fallback = vanishingPoint(at => (at <= 70 ? { x: -.5, y: 0, z: .9 } : { x: 3, y: 0, z: .9 }), along);
+  assert.deepEqual(fallback, { x: .25, y: .5 });
+  assert.deepEqual(vanishingPoint(() => ({ x: 0, y: 0, z: 2 }), along), { x: .5, y: .5 }, 'behind the camera: the centre');
+});

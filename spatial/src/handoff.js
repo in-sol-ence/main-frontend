@@ -108,6 +108,23 @@ export const ARRIVAL_STOP = 14;
 export const FINALE_LEAD = 22;
 // Never strand the demonstration: after this long in the branch it ends anyway.
 export const REPEATS_LIMIT = 40;
+// An adaptive branch draws its line only to 25 units past its route end
+// (layer.js `exit`); there it converges into nothing. That tip is where the
+// learner's knowledge is shown, in the same space, at the end of the path.
+export const ROUTE_EXIT = 25;
+// The tip's place on screen, as view fractions; if it is out of view, the
+// farthest point of the remaining line that is still in view.
+export function vanishingPoint(project, { distance, routeEnd, arcLength }) {
+  const inView = p => p && p.z < 1 && Math.abs(p.x) < .9 && Math.abs(p.y) < .9;
+  const tip = routeEnd * arcLength + ROUTE_EXIT;
+  let point = project(tip);
+  if (!inView(point)) {
+    point = null;
+    for (let at = distance + 6; at <= tip; at += 2) { const sample = project(at); if (inView(sample)) point = sample; }
+  }
+  if (!point) return { x: .5, y: .5 };
+  return { x: (point.x + 1) / 2, y: (1 - point.y) / 2 };
+}
 export function finaleReached({ distance, routeEnd, arcLength, forward, passed, passing, elapsed = 0 }) {
   if (elapsed >= REPEATS_LIMIT) return true;
   const rest = routeEnd * arcLength - ARRIVAL_STOP;

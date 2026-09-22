@@ -128,25 +128,29 @@ test('the deployed build actually contains the study the page hands over to', ()
   assert.equal(source, readFileSync(new URL('../spatial/src/main.js', import.meta.url), 'utf8'))
 })
 
-test('the journey’s end hands the page back exactly once, and only from the study itself', async () => {
+test('the journey’s end reports where its path vanishes, exactly once, and only from the study itself', async () => {
   const f = _fixture()
-  let finales = 0
-  f.context.handoff.onFinale(() => { finales++; f.context.handoff.exit() })
+  const points = []
+  f.context.handoff.onFinale(point => points.push(point))
   f.context.handoff.preload()
   f.ready()
-  const finale = { origin: 'https://example.test', source: f.frame.contentWindow, data: { type: `${MESSAGE}:finale` } }
+  const finale = { origin: 'https://example.test', source: f.frame.contentWindow, data: { type: `${MESSAGE}:finale`, point: { x: .61, y: .4 } } }
   f.deliver(finale)
-  assert.equal(finales, 0, 'nothing happens before the study has been entered')
+  assert.equal(points.length, 0, 'nothing happens before the study has been entered')
   await f.context.handoff.enter()
   f.deliver({ ...finale, source: {} })
   f.deliver({ ...finale, origin: 'https://attacker.test' })
-  assert.equal(finales, 0, 'foreign windows cannot end the journey')
+  assert.equal(points.length, 0, 'foreign windows cannot end the journey')
   f.deliver(finale)
   f.deliver(finale)
-  assert.equal(finales, 1)
-  assert.equal(f.stage.classList.contains('is-entering'), false, 'the study cross-fades away')
-  assert.equal(f.stage.hasAttribute('inert'), true)
-  assert.equal(f.pages.inert, false, 'the knowledge page is live again')
+  assert.equal(points.length, 1)
+  assert.deepEqual({ ...points[0] }, { x: .61, y: .4 })
+  assert.equal(f.stage.classList.contains('is-entering'), true, 'the journey stays on screen beneath the volume')
+  // A malformed point falls back to the centre rather than off screen.
+  const g = _fixture(); const seen = []
+  g.context.handoff.onFinale(point => seen.push(point)); g.context.handoff.preload(); g.ready(); await g.context.handoff.enter()
+  g.deliver({ origin: 'https://example.test', source: g.frame.contentWindow, data: { type: `${MESSAGE}:finale`, point: { x: 'a', y: 9 } } })
+  assert.deepEqual({ ...seen[0] }, { x: .5, y: 1 })
   const url = new URL(f.frame.getAttribute('src'), 'https://example.test/')
   assert.equal(url.searchParams.get('repeats'), journey.repeats)
 })

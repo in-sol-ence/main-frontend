@@ -59,8 +59,9 @@ function Scene({ mastery, radius, isolation, surface, autoRotate, background = '
     }
   })
   return <>
-    <color attach="background" args={[background]} />
-    <fog attach="fog" args={[background, 3, 8]} />
+    {/* No background leaves the canvas transparent over whatever hosts it. */}
+    {background && <color attach="background" args={[background]} />}
+    <fog attach="fog" args={[background || '#000000', 3, 8]} />
     <ambientLight intensity={0.35} />
     <directionalLight position={[-3, 4, 4]} intensity={3.4} color="#ffffff" />
     <pointLight position={[-2, 3, 3]} intensity={26} color="#72efff" distance={7} />

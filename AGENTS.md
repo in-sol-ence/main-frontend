@@ -52,8 +52,10 @@ resources pre-empt an existing entry or understanding panel.
 In the handed-in demonstration the RL rationale is followed by the explained
 KC's own resource branches (its video segment opens), then the `repeats` line
 while the rest of that branch passes at the journey's pace. Past the branch's
-last KC the study posts `skatebored:spatial:finale`; the page cross-fades back
-to the same KnowledgeScene and grows John Doe's mastery vector to `finaleStage`
+last KC the study posts `skatebored:spatial:finale` with the path's vanishing
+point; the journey stays on screen, the page's layer rises over it with its black
+removed, and the same KnowledgeScene (transparent) appears at that point and
+grows John Doe's mastery vector to `finaleStage`
 under `copy/demo.js` `finale`. No new renderer; still one mastery vector.
 The handed-in statement types at the earlier slides' pacing and holds 2000ms.
 The demonstration that follows is scripted, never pointer-driven: it reuses the

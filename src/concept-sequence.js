@@ -123,10 +123,11 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     })
   }
 
-  // Back from the journey to the volume it began with, which then grows while
-  // the same span types what it now shows.
-  function _finale() {
-    handoff.exit()
+  // At the end of the path, where its line vanishes, the volume the journey
+  // began with appears in the same space, then grows while the same span types
+  // what it now shows.
+  function _finale(point = { x: .5, y: .5 }) {
+    presentation.anchor?.(point)
     heading.setAttribute('aria-label', demo.finale)
     timer = setTimeout(() => {
       presentation.update(finaleStage.mastery)

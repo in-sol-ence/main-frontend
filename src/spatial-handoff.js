@@ -14,6 +14,12 @@ export const MESSAGE = 'skatebored:spatial'
 // the handoff still happens rather than stranding the viewer on the last slide.
 export const READY_TIMEOUT = 8000
 
+// A finite fraction of the view, or its centre.
+function _point(point) {
+  const _fraction = value => (Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : .5)
+  return { x: _fraction(point?.x), y: _fraction(point?.y) }
+}
+
 export function createSpatialHandoff() {
   const stage = document.querySelector('#spatial-stage')
   const frame = document.querySelector('#spatial-frame')
@@ -35,7 +41,12 @@ export function createSpatialHandoff() {
         const listen = event => {
           if (event.origin !== location.origin || event.source !== frame.contentWindow) return
           // The journey ends in empty space and hands the learner's knowledge back.
-          if (event.data?.type === `${MESSAGE}:finale` && entered) { for (const fn of finales) fn(); finales.length = 0; return }
+          if (event.data?.type === `${MESSAGE}:finale` && entered) {
+            const point = _point(event.data.point)
+            for (const fn of finales) fn(point)
+            finales.length = 0
+            return
+          }
           if (event.data?.type !== `${MESSAGE}:ready`) return
           clearTimeout(timer)
           resolve(true)
@@ -67,13 +78,8 @@ export function createSpatialHandoff() {
       _begin()
       frame.focus({ preventScroll: true })
     },
+    // Called with where the path vanishes, as fractions of the view. The
+    // journey stays on screen; the page's layer rises over it.
     onFinale(fn) { finales.push(fn) },
-    // The same 350ms cross-fade, in reverse, back to the embedding page.
-    exit() {
-      stage.classList.remove('is-entering')
-      stage.setAttribute('inert', '')
-      stage.setAttribute('aria-hidden', 'true')
-      pages.inert = false
-    },
   }
 }

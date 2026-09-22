@@ -20,7 +20,7 @@ import { createResourceBranches } from './resource-branches.js';
 import { resourceLibrary } from './resource-library.js';
 import { openDuration } from './resource-placement.js';
 import { tintFor } from './hierarchy.js';
-import { readHandoff, statementAt, personalNotes, applyPersonalNotes, firstConcept, hoverable, rationaleAt, rationaleRise, narrationAt, emergenceAt, narrationPlacement, MESSAGE, HOVER_DELAY, REVEAL_DELAY, RESOURCE_LEAD, RESOURCE_READ, PASS_HOLD, PASS_DEPTH, finaleReached } from './handoff.js';
+import { readHandoff, statementAt, personalNotes, applyPersonalNotes, firstConcept, hoverable, rationaleAt, rationaleRise, narrationAt, emergenceAt, narrationPlacement, MESSAGE, HOVER_DELAY, REVEAL_DELAY, RESOURCE_LEAD, RESOURCE_READ, PASS_HOLD, PASS_DEPTH, finaleReached, vanishingPoint } from './handoff.js';
 
 const canvas = document.querySelector('#world');
 const failure = document.querySelector('#failure');
@@ -538,7 +538,12 @@ if (renderer) {
       if (state.typed && finaleReached({ distance: active.journey.distance, routeEnd, arcLength: active.arc.length, forward, passed: demo.passed, passing: demo.passing, elapsed: demo.elapsed })) {
         // Past the last concept the space empties; the embedding page takes over.
         releaseTold(); active.focus.emphasis = null;
-        if (parent !== window) parent.postMessage({ type: `${MESSAGE}:finale` }, location.origin);
+        // Where the path's line converges into nothing, as a fraction of the view.
+        const project = at => pointAt(active.arc.stationAtDistance(at), new THREE.Vector3()).project(active.viewCamera);
+        const vanishing = vanishingPoint(project, { distance: active.journey.distance, routeEnd, arcLength: active.arc.length });
+        const point = { x: clamp01(vanishing.x), y: clamp01(vanishing.y) };
+        canvas.dataset.vanishing = `${point.x.toFixed(3)},${point.y.toFixed(3)}`;
+        if (parent !== window) parent.postMessage({ type: `${MESSAGE}:finale`, point }, location.origin);
         canvas.dataset.finale = 'true';
         demonstration = null;
         return null;
@@ -548,6 +553,8 @@ if (renderer) {
     demonstration = null;
     return null;
   }
+
+  const clamp01 = value => Math.max(0, Math.min(1, Number.isFinite(value) ? value : .5));
 
   function beginRepeats() {
     const demo = demonstration;

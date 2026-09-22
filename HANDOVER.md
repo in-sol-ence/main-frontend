@@ -1034,3 +1034,30 @@ for this map. The segment's teaching content was not watched end to end.
 Verification: spatial 141/141, root 20/21 (pre-existing checksum only), with a
 new root test that the finale is accepted once, only from the entered study,
 and restores the page; all spatial checks and the build pass.
+
+### Correction: the finale appears at the end of the path (2026-09-22)
+
+Supersedes step 4 above. The page no longer cross-fades away from the journey.
+With the finale message the study sends `point` (view fractions, exposed as
+`canvas.dataset.vanishing`) from `vanishingPoint()`: the path at the branch's
+route exit, `route.end` + `ROUTE_EXIT` 25, the station where layer.js stops
+drawing the line and world.js fades it out over its last 18 units, i.e. where it
+converges into nothing. If that tip is out of view, the farthest in-view point of
+the remaining line is used, else the centre. The page
+validates it (non-finite values become the centre) and calls
+`presentation.anchor(point)` in `src/demo-entry.jsx`: the one persistent
+volume element is moved to a square of `min(42vw, 62vh)` centred there, kept
+clear of the label's reserved area (shifted/shrunk to its right on wide screens,
+below it on narrow ones; the slot's ResizeObserver stops placing it), its scene drops its background so the
+canvas is transparent (`KnowledgeScene` renders `<color>` only when given a
+background; fog stays black), `body.is-finale` raises `#pages` above
+`#spatial-stage` with page backgrounds transparent and pointer events off, and
+the volume fades in over 900ms. After 1.2s it grows to `finaleStage` while the
+label types, as before. No remount, no second renderer, KnowledgeField
+unchanged. `handoff.exit()` was removed.
+
+Verification: root 21/21 (the knowledge-space checksum test now passes too),
+spatial 141/141, all checks and the build pass; the finale test now asserts the
+point is forwarded once, only from the entered study, that the journey stays
+on screen, and that a malformed point falls back to the centre.
+
