@@ -923,3 +923,6 @@ glow, and its `→` in a 40px near-black circle with a cream arrow; hover lifts
 22% cream hairline, 10px backdrop blur), cream label; hover raises fill/border.
 Reduced motion removes all transitions and movement. Checked in headless
 Chrome at 1440×900 (rest and Demo hover) and 390×844.
+`python scripts/serve.py [port]` (default 4176) serves `dist/` with
+`Cache-Control: no-store`, so a refresh always shows the latest CSS/JS; the
+plain `python -m http.server` let Chrome keep a stale `style.css`.
