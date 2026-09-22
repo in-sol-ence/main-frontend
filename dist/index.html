@@ -84,6 +84,7 @@
     }
     #tuning > summary { cursor: pointer; font-size: 18px; font-weight: 600; }
     #tuning p { margin: 10px 0; }
+    #word-text { white-space: pre-wrap; max-height: 240px; overflow: auto; user-select: text; cursor: text; padding: 8px; border: 1px solid var(--accent-color); }
     #tuning fieldset { border: 0; padding: 12px 0; margin: 0; border-top: 1px solid color-mix(in srgb, var(--accent-color) 20%, transparent); }
     #tuning legend { padding-top: 12px; font-weight: 600; }
     .tune-row { display: grid; grid-template-columns: 1fr 66px; gap: 6px 10px; margin: 9px 0; }
@@ -112,6 +113,13 @@
   <details id="tuning" open>
     <summary>Scene tuning</summary>
     <p>Adjust live. Pause idle spin to set an exact view.</p>
+    <fieldset>
+      <legend>Word colors</legend>
+      <p>Highlight any text below, then choose its color. Typing restarts to preview.</p>
+      <div id="word-text" tabindex="0" aria-label="Select words to color"></div>
+      <label class="tune-row">Selected text color <input id="word-color" type="color" value="#3d2412" disabled></label>
+      <button id="clear-word-color" type="button" disabled>Use default color</button>
+    </fieldset>
     <div id="tuning-fields">Loading skateboard…</div>
     <button id="reset-tuning" type="button">Reset</button>
     <button id="copy-tuning" type="button">Copy settings</button>
@@ -142,6 +150,57 @@
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
     const text = document.querySelector('#typed');
     let typing;
+    const wordText = document.querySelector('#word-text');
+    const wordColor = document.querySelector('#word-color');
+    const clearWordColor = document.querySelector('#clear-word-color');
+    const plainText = messages.map(message => message.replace(/\^\d+/g, '')).join('\n');
+    const wordColors = Array(plainText.length).fill(null);
+    let selectedWords;
+    wordText.textContent = plainText;
+
+    document.addEventListener('selectionchange', () => {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = selection.getRangeAt(0);
+      if (!wordText.contains(range.startContainer) || !wordText.contains(range.endContainer)) return;
+      const prefix = range.cloneRange();
+      prefix.selectNodeContents(wordText);
+      prefix.setEnd(range.startContainer, range.startOffset);
+      selectedWords = [prefix.toString().length, prefix.toString().length + range.toString().length];
+      wordColor.disabled = clearWordColor.disabled = false;
+      wordColor.value = wordColors[selectedWords[0]] || getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim();
+    });
+
+    function _applyWordColor(color) {
+      if (!selectedWords) return;
+      wordColors.fill(color, ...selectedWords);
+      wordText.replaceChildren();
+      for (let index = 0; index < plainText.length; index++) {
+        const span = document.createElement('span');
+        span.textContent = plainText[index];
+        if (wordColors[index]) span.style.color = wordColors[index];
+        wordText.append(span);
+      }
+      wordText.dataset.colors = JSON.stringify(wordColors);
+      _startTyping();
+    }
+    wordColor.addEventListener('input', () => _applyWordColor(wordColor.value));
+    clearWordColor.addEventListener('click', () => _applyWordColor(null));
+
+    function _coloredMessages() {
+      let index = 0;
+      return messages.map(message => {
+        let html = '';
+        for (const token of message.match(/\^\d+|[\s\S]/g)) {
+          if (/^\^\d+$/.test(token)) { html += token; continue; }
+          const color = wordColors[index++];
+          const escaped = token.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          html += color ? `<span style="color:${color}">${escaped}</span>` : escaped;
+        }
+        index++; // Newline separating phrases in the selection panel.
+        return html;
+      });
+    }
 
     // A readable transcript avoids announcing every individual keystroke.
     document.querySelector('#transcript').textContent = messages.slice(1)
@@ -150,11 +209,11 @@
     function _startTyping() {
       typing?.destroy();
       typing = null;
-      text.textContent = 'hello world';
+      text.innerHTML = _coloredMessages()[0];
       if (reducedMotion.matches || typeof Typed === 'undefined') return;
       text.textContent = '';
       typing = new Typed(text, {
-        strings: messages,
+        strings: _coloredMessages(),
         typeSpeed: 65,
         backSpeed: 28,
         startDelay: 650,
@@ -164,7 +223,7 @@
         showCursor: true,
         cursorChar: '',
         autoInsertCss: false,
-        contentType: 'null'
+        contentType: 'html'
       });
     }
 

@@ -227,7 +227,8 @@ async function _createSkateboard() {
   _syncTuning();
   document.querySelector('#reset-tuning').addEventListener('click', () => location.reload());
   document.querySelector('#copy-tuning').addEventListener('click', async event => {
-    const settings = { tuning, position: board.position.toArray(), rotation: board.rotation.toArray(),
+    const settings = { tuning, wordColors: JSON.parse(document.querySelector('#word-text').dataset.colors || '[]'),
+      position: board.position.toArray(), rotation: board.rotation.toArray(),
       camera: camera.position.toArray(), up: camera.up.toArray(), target: controls.target.toArray(),
       idleSpeed: controls.autoRotateSpeed, dragSpeed: controls.rotateSpeed, smoothing: controls.dampingFactor,
       zoom: controls.enableZoom, scrollSpeed: controls.zoomSpeed, depthOfField: bokehPass.enabled,
