@@ -57,4 +57,35 @@ export const tangentSlopeSegments = [
     body: 'Grant Sanderson graphs the distance a car has travelled, then asks how the velocity curve is determined by that distance curve. The answer is a tiny change in distance over the tiny change in time that produced it. As the time step shrinks the ratio stops being a secant slope and becomes the tangent slope, which is the derivative.' },
 ];
 
-export const resourceLibrary = { 'calculus-6-1': motionSegments, 'calculus-3-0-1': tangentSlopeSegments };
+// The knowledge concept the handed-in demonstration opens: calculus -> Limits
+// -> Approaching a Value, id `calculus-2-0`. The video interval is the
+// "Epsilon delta definition" chapter (4:52 to 9:53) listed in the upload's own
+// description; title, channel and 1106 s length were read from YouTube's
+// public metadata on 2026-09-22.
+export const approachingSegments = [
+  { id: 'essence-of-calculus-limits', type: 'video', title: '3B1B: Epsilon-Delta Limits',
+    summary: 'What it precisely means for outputs to approach a value.',
+    url: 'https://www.youtube.com/watch?v=kfF40MiS7zA', start: 292, end: 593, durationSeconds: 301,
+    source: '3Blue1Brown, Essence of Calculus, Chapter 7, "Epsilon delta definition"',
+    license: 'Standard YouTube License, all rights reserved (link or embed only)',
+    body: 'Grant Sanderson turns "the output approaches L as the input approaches a" into a precise game: for any output range epsilon around L, you can find an input range delta around a whose outputs all stay inside it. The limit exists exactly when that always succeeds, even though the function is never evaluated at a itself.' },
+
+  { id: 'approaching-explanation', type: 'explanation', title: 'Approaching Without Arriving',
+    summary: 'A limit describes nearby behaviour, not the value at the point.',
+    durationSeconds: 40, source: 'Written for this map', license: 'Original text',
+    body: 'The limit of f(x) as x approaches a is the value f(x) gets arbitrarily close to when x is close to, but not equal to, a. The function does not need to be defined at a, and if it is, its value there can differ from the limit. That is why (x^2 - 1)/(x - 1) has limit 2 at x = 1 even though it cannot be evaluated there.' },
+
+  { id: 'approaching-check', type: 'question', title: 'Check: A Hole at x = 1',
+    summary: 'Find a limit where the function itself is undefined.',
+    source: 'Written for this map', license: 'Original question',
+    body: 'What is the limit of (x^2 - 1)/(x - 1) as x approaches 1?',
+    choices: [
+      { id: 'a', text: 'It does not exist', correct: false },
+      { id: 'b', text: '0', correct: false },
+      { id: 'c', text: '2', correct: true },
+      { id: 'd', text: '1', correct: false },
+    ],
+    answerExplanation: 'For x ≠ 1 the expression simplifies to x + 1, which approaches 2. Being undefined at x = 1 does not stop the limit from existing.' },
+];
+
+export const resourceLibrary = { 'calculus-2-0': approachingSegments, 'calculus-6-1': motionSegments, 'calculus-3-0-1': tangentSlopeSegments };

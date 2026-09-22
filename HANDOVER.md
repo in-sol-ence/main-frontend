@@ -989,3 +989,42 @@ and `git diff --check` pass. In headless Chrome at 1440×900: goal submitted,
 Applications entered, Motion clicked → five branches and cards, first card
 expanded → embed `youtube-nocookie.com/embed/ryLdyDrBfvI?start=243&end=711`,
 Escape → collapsed. Mobile and reduced motion were not browser-driven.
+
+## Demonstration continues into resources, the rest of the branch, and the finale (2026-09-22)
+
+Builds on the KC resource branches above. "PL model" is now "RL model"
+everywhere (`copy/journey.js`, the study's default `RATIONALE`, tests, AGENTS).
+
+New sequence after the rationale inside Limits:
+1. `resources`: the explained KC (Approaching a Value, `calculus-2-0`, the
+   child route's first KC) grows its resource branches, holding travel at the
+   rationale's weight so nothing lurches. After the fan settles
+   (`openDuration` + `RESOURCE_LEAD` .7s) its video card expands and the embed
+   loads, exactly as clicking would; held `RESOURCE_READ` 5.5s, then collapses.
+2. `repeats`: `copy/journey.js` `repeats` ("The process repeats.") types in the
+   narration layer while travel resumes at the journey's own pace. Each later
+   forward KC of the branch (One-Sided Limits, Continuity) is selected with the
+   existing focus + marker emphasis for `PASS_HOLD` 1.8s once within
+   `PASS_DEPTH` 45; the statement sits beside whichever is selected.
+3. `finale`: once the camera is `FINALE_MARGIN` 10 units past the route's end,
+   the study posts `skatebored:spatial:finale` to its parent (standalone it
+   only sets `canvas.dataset.finale`). The demo no longer returns to the parent
+   calculus layer.
+4. The page (`src/spatial-handoff.js` `onFinale`/`exit`) accepts the message
+   only from its own frame and origin, once, after entering; it reverses the
+   350ms cross-fade and makes the page live. `src/concept-sequence.js`
+   `_finale` sets the heading label, and after 1.2s on John Doe's existing
+   volume updates the one mastery vector to `finaleStage` (his nine plus Q5–Q11,
+   Q13, Q14: 18 of 24, illustrative) while typing `copy/demo.js` `finale`
+   ("John Doe's knowledge state after Skatebored.") at typeSpeed 65 in the same
+   span. The original KnowledgeField damping performs the growth.
+
+Resources for `calculus-2-0` in `spatial/src/resource-library.js`: 3Blue1Brown,
+Essence of Calculus ch. 7 (`kfF40MiS7zA`), 292–593s, the upload's own
+"Epsilon delta definition" chapter (title, channel and 1106s length read from
+YouTube's public metadata); plus an explanation and a check question written
+for this map. The segment's teaching content was not watched end to end.
+
+Verification: spatial 140/140, root 20/21 (pre-existing checksum only), with a
+new root test that the finale is accepted once, only from the entered study,
+and restores the page; all spatial checks and the build pass.

@@ -20,6 +20,7 @@ export function createSpatialHandoff() {
   const pages = document.querySelector('#pages')
   let warmed
   let entered = false
+  const finales = []
 
   const _begin = () => frame.contentWindow?.postMessage({ type: `${MESSAGE}:begin` }, location.origin)
 
@@ -33,6 +34,8 @@ export function createSpatialHandoff() {
         // up waiting is told to begin then, rather than never being started.
         const listen = event => {
           if (event.origin !== location.origin || event.source !== frame.contentWindow) return
+          // The journey ends in empty space and hands the learner's knowledge back.
+          if (event.data?.type === `${MESSAGE}:finale` && entered) { for (const fn of finales) fn(); finales.length = 0; return }
           if (event.data?.type !== `${MESSAGE}:ready`) return
           clearTimeout(timer)
           resolve(true)
@@ -49,6 +52,7 @@ export function createSpatialHandoff() {
         + `&topicLine=${encodeURIComponent(journey.topicLine)}`
         + `&rationale=${encodeURIComponent(journey.rationale)}`
         + `&conceptsLabel=${encodeURIComponent(journey.conceptsLabel)}`
+        + `&repeats=${encodeURIComponent(journey.repeats)}`
       frame.src = `./spatial/index.html?${query}`
       return warmed
     },
@@ -62,6 +66,14 @@ export function createSpatialHandoff() {
       entered = true
       _begin()
       frame.focus({ preventScroll: true })
+    },
+    onFinale(fn) { finales.push(fn) },
+    // The same 350ms cross-fade, in reverse, back to the embedding page.
+    exit() {
+      stage.classList.remove('is-entering')
+      stage.setAttribute('inert', '')
+      stage.setAttribute('aria-hidden', 'true')
+      pages.inert = false
     },
   }
 }

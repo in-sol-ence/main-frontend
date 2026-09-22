@@ -8,9 +8,11 @@ export const journey = {
   // Typed beside the topic the system selects. {topic} becomes its name.
   topicLine: 'John Doe wants to learn {topic}.',
   // Typed beside that topic's knowledge concepts.
-  rationale: 'Our PL model targets knowledge concepts based on John Doe’s knowledge state.',
+  rationale: 'Our RL model targets knowledge concepts based on John Doe’s knowledge state.',
   // Small caps line above the rationale: "Limits → Knowledge concepts".
   conceptsLabel: 'Knowledge concepts',
+  // Typed as the rest of that branch goes by, after its lecture segment.
+  repeats: 'The process repeats.',
 
   // Not shown as written, but they decide the route. The goal must match one of
   // the spatial study's example maps, or it silently falls back to

@@ -56,14 +56,14 @@ export function createResourceBranches({ host }) {
   const api = {
     // One set is alive at a time; opening another concept replaces it, so
     // rapid activation can never leave a duplicate branch, card or timer.
-    open({ layer, key, concept, anchor, depth, resources, tint, width, height, onStatus = () => {} }) {
+    open({ layer, key, concept, anchor, depth, resources, tint, width, height, onStatus = () => {}, hold = 0 }) {
       if (fan) _dispose(fan);
       const group = new THREE.Group();
       group.position.copy(anchor);
       group.scale.setScalar(Math.max(1, depth) / PROTOTYPE_DISTANCE);
       layer.world.scene.add(group);
       const placements = resourcePlacements(concept.id, resources, { side: concept.side === -1 ? -1 : 1, ...fanShapeFor(width, height) });
-      fan = { layer, key, concept, group, tint, onStatus, elapsed: 0, closing: false, expandedId: null, hold: 0, items: [] };
+      fan = { layer, key, concept, group, tint, onStatus, elapsed: 0, closing: false, expandedId: null, hold, items: [] };
       for (const placement of placements) {
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array((SEGMENTS + 1) * 3), 3));

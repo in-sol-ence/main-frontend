@@ -11,7 +11,7 @@ const find = (node, id) => node.id === id ? node : (node.children || []).map(chi
 
 test('every resource set is attached to a real knowledge concept on the calculus map', async () => {
   const { map } = await buildJourney({ userGoal: 'Learn calculus from the beginning' });
-  assert.deepEqual(Object.keys(resourceLibrary).sort(), ['calculus-3-0-1', 'calculus-6-1']);
+  assert.deepEqual(Object.keys(resourceLibrary).sort(), ['calculus-2-0', 'calculus-3-0-1', 'calculus-6-1']);
   for (const [id, list] of Object.entries(resourceLibrary)) {
     const concept = find(map, id);
     assert.ok(concept, `${id} exists`);

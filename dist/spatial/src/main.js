@@ -18,8 +18,9 @@ import { createLearningStory, STORY_DURATION, STORY_RATE } from './route-plan.js
 import { createLanding } from './landing.js';
 import { createResourceBranches } from './resource-branches.js';
 import { resourceLibrary } from './resource-library.js';
+import { openDuration } from './resource-placement.js';
 import { tintFor } from './hierarchy.js';
-import { readHandoff, statementAt, personalNotes, applyPersonalNotes, firstConcept, hoverable, rationaleAt, rationaleRise, narrationAt, emergenceAt, narrationPlacement, MESSAGE, HOVER_DELAY, REVEAL_DELAY } from './handoff.js';
+import { readHandoff, statementAt, personalNotes, applyPersonalNotes, firstConcept, hoverable, rationaleAt, rationaleRise, narrationAt, emergenceAt, narrationPlacement, MESSAGE, HOVER_DELAY, REVEAL_DELAY, RESOURCE_LEAD, RESOURCE_READ, PASS_HOLD, PASS_DEPTH, FINALE_MARGIN } from './handoff.js';
 
 const canvas = document.querySelector('#world');
 const failure = document.querySelector('#failure');
@@ -490,15 +491,68 @@ if (renderer) {
       placeTold(demo.anchor || { x: innerWidth * .5, y: innerHeight * .4 }, dt);
       if (state.done) {
         releaseTold();
-        for (const layer of history.layers) layer.learningWeight = 0;
-        demo.stage = 'returning'; demo.elapsed = 0;
-        requestReturn();
-        if (!history.busy) demonstration = null;
+        // The reason is followed by what the model serves for that concept.
+        const kcId = firstConcept(active.definition);
+        const list = resourceLibrary[kcId];
+        const target = active.landmarks.candidates.find(item => item.concept.id === kcId && item.depth > 6);
+        demo.elapsed = 0; demo.passed = new Set([kcId]); demo.passing = null;
+        if (list?.length && target) {
+          demo.stage = 'resources'; demo.key = target.key; demo.resources = list; demo.opened = false;
+          resources.open({ layer: active, key: target.key, concept: target.concept, anchor: target.anchor, depth: target.depth,
+            resources: list, tint: `#${tintFor(target.concept).getHexString()}`, width: innerWidth, height: innerHeight,
+            onStatus: text => { status.textContent = text; }, hold: active.learningWeight });
+        } else beginRepeats();
       }
       return null;
     }
+    if (demo.stage === 'resources') {
+      const target = active.landmarks.candidates.find(item => item.key === demo.key);
+      const settled = openDuration(demo.resources.length, preference.matches) + RESOURCE_LEAD;
+      if (!demo.opened && demo.elapsed >= settled) {
+        // Its lecture segment opens in place, exactly as a click on the card would.
+        const video = demo.resources.find(item => item.type === 'video') || demo.resources[0];
+        resources.select(video.id);
+        resourceHost.querySelector('.resource-video-load')?.click();
+        demo.opened = true;
+      }
+      if (demo.elapsed >= settled + RESOURCE_READ) { resources.close(); beginRepeats(); }
+      return target || null;
+    }
+    if (demo.stage === 'repeats') {
+      const state = narrationAt(demo.elapsed, handoff.repeats.length, preference.matches);
+      showTold(state.characters);
+      // The rest of the branch goes by at the journey's own pace.
+      active.learningWeight = 0;
+      if (demo.passing) demo.passing.elapsed += dt;
+      if (!demo.passing || demo.passing.elapsed >= PASS_HOLD) {
+        const next = active.landmarks.candidates.find(item => !demo.passed.has(item.concept.id) && item.cycle === 0
+          && (active.definition.route?.forward || []).includes(item.concept.id) && item.depth > 6 && item.depth < PASS_DEPTH && item.labelOpacity >= .3);
+        if (next) { demo.passing = { key: next.key, elapsed: 0 }; demo.passed.add(next.concept.id); active.focus.emphasis = next.key; }
+        else if (demo.passing) { demo.passing = null; active.focus.emphasis = null; }
+      }
+      const passing = demo.passing && active.landmarks.candidates.find(item => item.key === demo.passing.key);
+      if (passing) demo.anchor = passing.label;
+      placeTold(demo.anchor || { x: innerWidth * .5, y: innerHeight * .45 }, dt);
+      const end = ((active.definition.route?.end ?? Math.max(...active.definition.children.map(node => node.at))) * active.arc.length) + FINALE_MARGIN;
+      if (state.typed && active.journey.distance > end) {
+        // Past the last concept the space empties; the embedding page takes over.
+        releaseTold(); active.focus.emphasis = null;
+        if (parent !== window) parent.postMessage({ type: `${MESSAGE}:finale` }, location.origin);
+        canvas.dataset.finale = 'true';
+        demonstration = null;
+        return null;
+      }
+      return passing || null;
+    }
     demonstration = null;
     return null;
+  }
+
+  function beginRepeats() {
+    const demo = demonstration;
+    demo.stage = 'repeats'; demo.elapsed = 0; demo.anchor = null;
+    for (const layer of history.layers) layer.learningWeight = 0;
+    tell(handoff.repeats, `${demo.topic} → ${handoff.conceptsLabel}`, 'beside');
   }
 
   function replaceMap(definition) {

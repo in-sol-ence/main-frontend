@@ -10,9 +10,10 @@ export const TYPE_INTERVAL = .08125;
 // Then it holds for the same 2000ms as every stage of the sequence before it.
 export const STATEMENT_HOLD = 2;
 export const LEARNER = 'John Doe';
-export const RATIONALE = `Our PL model targets knowledge concepts based on ${LEARNER}’s knowledge state.`;
+export const RATIONALE = `Our RL model targets knowledge concepts based on ${LEARNER}’s knowledge state.`;
 export const TOPIC_LINE = `${LEARNER} wants to learn {topic}.`;
 export const CONCEPTS_LABEL = 'Knowledge concepts';
+export const REPEATS = 'The process repeats.';
 
 export function readHandoff(search = '') {
   const parameters = new URLSearchParams(search);
@@ -27,6 +28,7 @@ export function readHandoff(search = '') {
     topicLine: (parameters.get('topicLine') || '').trim().slice(0, 200) || TOPIC_LINE,
     rationale: (parameters.get('rationale') || '').trim().slice(0, 300) || RATIONALE,
     conceptsLabel: (parameters.get('conceptsLabel') || '').trim().slice(0, 80) || CONCEPTS_LABEL,
+    repeats: (parameters.get('repeats') || '').trim().slice(0, 120) || REPEATS,
   };
 }
 
@@ -90,6 +92,17 @@ export const NARRATION_HOLD = 2.8;
 export const NARRATION_STILLNESS = .8;
 // Knowledge concepts rise out of the entered topic along its path over this long.
 export const EMERGENCE_DURATION = 3.2;
+// After the reason, the explained concept's resources grow; its lecture segment
+// opens once the fan has settled and is left up long enough to be seen.
+export const RESOURCE_LEAD = .7;
+export const RESOURCE_READ = 5.5;
+// Then travel resumes at the journey's own pace, and each later concept of the
+// branch is selected for this long as it comes near.
+export const PASS_HOLD = 1.8;
+export const PASS_DEPTH = 45;
+// Path units past the branch's last concept, where the space turns empty and
+// the embedding page takes the learner's knowledge back.
+export const FINALE_MARGIN = 10;
 
 // Characters shown, how far travel is stilled, and when it is finished.
 export function narrationAt(seconds, length, reduced = false) {

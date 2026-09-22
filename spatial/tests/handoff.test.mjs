@@ -17,7 +17,7 @@ test('a goal is only handed in explicitly; the front door is otherwise untouched
   }
   const handed = readHandoff(`?goal=Learn%20calculus%20from%20the%20beginning&background=I%20know%20algebra&statement=${encodeURIComponent(STATEMENT)}`);
   assert.deepEqual(handed, { goal: 'Learn calculus from the beginning', background: 'I know algebra', statement: STATEMENT,
-    learner: LEARNER, topicLine: 'John Doe wants to learn {topic}.', rationale: RATIONALE, conceptsLabel: 'Knowledge concepts' });
+    learner: LEARNER, topicLine: 'John Doe wants to learn {topic}.', rationale: RATIONALE, conceptsLabel: 'Knowledge concepts', repeats: 'The process repeats.' });
   // The embedding page's copy replaces every narration line.
   const worded = readHandoff('?goal=a&learner=Ada&topicLine=Ada%20picks%20%7Btopic%7D.&rationale=Because.&conceptsLabel=Parts');
   assert.deepEqual([worded.learner, worded.topicLine, worded.rationale, worded.conceptsLabel], ['Ada', 'Ada picks {topic}.', 'Because.', 'Parts']);
@@ -116,7 +116,7 @@ test('what the learner already has moves the route, and every note matches it', 
 });
 
 test('a selected concept holds the journey, states its reason, and releases it', () => {
-  assert.equal(RATIONALE, 'Our PL model targets knowledge concepts based on John Doe’s knowledge state.');
+  assert.equal(RATIONALE, 'Our RL model targets knowledge concepts based on John Doe’s knowledge state.');
   assert.equal(rationaleAt(0).presence, 0);
   let peak = 0, previous = -1, rising = true;
   for (let time = 0; time <= 6; time += .02) {

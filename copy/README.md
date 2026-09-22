@@ -6,7 +6,7 @@ quotes, then run `npm run build` to publish it into `dist/`.
 - `landing.js`: the typed phrases on the first page and its two buttons.
 - `demo.js`: the 3D knowledge space: intro, Next, the four stages, closing line.
 - `journey.js`: the spatial path: the opening statement, the topic line, the
-  PL rationale, and the goal/background that decide the route.
+  RL rationale, and the goal/background that decide the route.
 
 Tips:
 - Typographic apostrophes (’) and plain ones (') both work. Inside '...' quotes,

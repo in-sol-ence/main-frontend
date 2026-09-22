@@ -49,12 +49,18 @@ The one exception is resource branches: a knowledge concept listed in
 `spatial/src/resource-library.js` that cannot be entered (no children, no
 explanation) grows its lecture segments in place on click or Enter. Never let
 resources pre-empt an existing entry or understanding panel.
+In the handed-in demonstration the RL rationale is followed by the explained
+KC's own resource branches (its video segment opens), then the `repeats` line
+while the rest of that branch passes at the journey's pace. Past the branch's
+last KC the study posts `skatebored:spatial:finale`; the page cross-fades back
+to the same KnowledgeScene and grows John Doe's mastery vector to `finaleStage`
+under `copy/demo.js` `finale`. No new renderer; still one mastery vector.
 The handed-in statement types at the earlier slides' pacing and holds 2000ms.
 The demonstration that follows is scripted, never pointer-driven: it reuses the
 existing hover, entry, and return paths, derives the hovered topic and its
 knowledge concepts from the compiled route, and shows no understanding panel.
 Keep the exact hover line "John Doe wants to learn [topic]." and the exact
-rationale "Our PL model targets knowledge concepts based on John Doe’s
+rationale "Our RL model targets knowledge concepts based on John Doe’s
 knowledge state." Both type in the one `#narration` storytelling layer: large
 bright type beside the space, away from what it explains, never under a label.
 No cards, panels, boxes or tooltips. The selection's emphasis is the topic's own

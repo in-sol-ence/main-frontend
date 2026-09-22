@@ -127,3 +127,26 @@ test('the deployed build actually contains the study the page hands over to', ()
   // The copy is generated; spatial/ stays the single source of truth.
   assert.equal(source, readFileSync(new URL('../spatial/src/main.js', import.meta.url), 'utf8'))
 })
+
+test('the journey’s end hands the page back exactly once, and only from the study itself', async () => {
+  const f = _fixture()
+  let finales = 0
+  f.context.handoff.onFinale(() => { finales++; f.context.handoff.exit() })
+  f.context.handoff.preload()
+  f.ready()
+  const finale = { origin: 'https://example.test', source: f.frame.contentWindow, data: { type: `${MESSAGE}:finale` } }
+  f.deliver(finale)
+  assert.equal(finales, 0, 'nothing happens before the study has been entered')
+  await f.context.handoff.enter()
+  f.deliver({ ...finale, source: {} })
+  f.deliver({ ...finale, origin: 'https://attacker.test' })
+  assert.equal(finales, 0, 'foreign windows cannot end the journey')
+  f.deliver(finale)
+  f.deliver(finale)
+  assert.equal(finales, 1)
+  assert.equal(f.stage.classList.contains('is-entering'), false, 'the study cross-fades away')
+  assert.equal(f.stage.hasAttribute('inert'), true)
+  assert.equal(f.pages.inert, false, 'the knowledge page is live again')
+  const url = new URL(f.frame.getAttribute('src'), 'https://example.test/')
+  assert.equal(url.searchParams.get('repeats'), journey.repeats)
+})

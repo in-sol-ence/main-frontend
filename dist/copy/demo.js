@@ -20,4 +20,7 @@ export const demo = {
 
   // The last screen before the spatial journey.
   closing: 'Skatebored maps complex syllabi directly into custom trajectories across our n-dimensional space.',
+
+  // After the journey, over John Doe's knowledge volume as it grows.
+  finale: "John Doe's knowledge state after Skatebored.",
 }
