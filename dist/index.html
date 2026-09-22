@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fffdd3">
-  <meta name="description" content="Ten hello worlds. Ten entrances.">
+  <meta name="description" content="A little conversation, one letter at a time.">
   <title>hello world</title>
   <link rel="icon" href="data:,">
   <style>
@@ -16,185 +16,109 @@
     }
     * { box-sizing: border-box; }
     body { margin: 0; }
-    section {
-      min-height: 100svh;
+    main {
       display: grid;
-      place-items: center;
-      padding: 5vw;
-      overflow: clip;
+      align-content: center;
+      min-height: 100svh;
+      padding: 8vw;
     }
-    .phrase {
-      display: flex;
-      justify-content: center;
-      align-items: baseline;
-      gap: .24em;
+    h1 {
       margin: 0;
-      font-size: min(15.5vw, 36vh);
+      min-height: 3.24em;
+      max-width: 1440px;
+      font-size: clamp(3rem, 10.5vw, 10rem);
       font-weight: 600;
-      line-height: 1.1;
+      line-height: 1.08;
       letter-spacing: -.065em;
-      text-align: center;
+      overflow-wrap: break-word;
     }
-    .word { display: block; white-space: nowrap; }
-    .letter { display: inline-block; transform-origin: 50% 85%; }
-    [data-motion="rise"] .word {
-      overflow: clip;
-      padding: .12em .08em;
-      margin: -.12em -.08em;
+    #typed { white-space: pre-wrap; }
+    .typed-cursor {
+      display: inline-block;
+      width: .045em;
+      height: .78em;
+      margin-left: .07em;
+      vertical-align: -.025em;
+      background: currentColor;
+      letter-spacing: 0;
     }
-    .waiting .phrase { visibility: hidden; }
-    @media (max-width: 600px) and (orientation: portrait) {
-      .phrase {
-        flex-direction: column;
-        align-items: center;
-        gap: 0;
-        font-size: min(30vw, 24svh);
-        line-height: 1.04;
-      }
+    .typed-cursor--blink { animation: blink 1.05s step-end infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+    @media (max-width: 600px) {
+      main { padding: 7vw; }
+      h1 { font-size: clamp(2.5rem, 14.5vw, 5.5rem); min-height: 4.32em; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .waiting .phrase { visibility: visible; }
+      .typed-cursor { animation: none; }
     }
   </style>
 </head>
 <body>
   <main>
-    <section data-motion="rise"><h1 class="phrase">hello world</h1></section>
-    <section data-motion="wipe"><h2 class="phrase">hello world</h2></section>
-    <section data-motion="expand"><h2 class="phrase">hello world</h2></section>
-    <section data-motion="flip"><h2 class="phrase">hello world</h2></section>
-    <section data-motion="meet"><h2 class="phrase">hello world</h2></section>
-    <section data-motion="drop"><h2 class="phrase">hello world</h2></section>
-    <section data-motion="focus"><h2 class="phrase">hello world</h2></section>
-    <section data-motion="wave"><h2 class="phrase">hello world</h2></section>
-    <section data-motion="gather"><h2 class="phrase">hello world</h2></section>
-    <section data-motion="type"><h2 class="phrase">hello world</h2></section>
+    <h1 aria-label="hello world"><span aria-hidden="true"><span id="typed">hello world</span></span></h1>
+    <div class="sr-only" id="transcript"></div>
   </main>
+  <script src="./vendor/typed.umd.js"></script>
   <script>
+    const messages = [
+      'hello world',
+      "oh,^650 you're here.",
+      'give me a second^350...',
+      'i had a thought.',
+      'what if we made^500\nsomething?',
+      'not sure what yet.',
+      "maybe that's^400\nthe fun part.",
+      'start with a word.',
+      'then^350 another.',
+      'make a mess.',
+      'change your mind.',
+      'wait.^650\ntry that again.',
+      'there you go.',
+      'look at us,^600\nmaking something.',
+      'anyway,^700\nhello again.'
+    ];
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-    const sections = [...document.querySelectorAll('section')];
-    const ease = 'cubic-bezier(.16, 1, .3, 1)';
-    const activeAnimations = new Map();
+    const text = document.querySelector('#typed');
+    let typing;
 
-    // Keep the original text accessible while animating individual glyphs.
-    for (const section of sections) {
-      const phrase = section.querySelector('.phrase');
-      phrase.setAttribute('aria-label', phrase.textContent);
-      const words = phrase.textContent.split(' ').map(text => {
-        const word = document.createElement('span');
-        word.className = 'word';
-        word.setAttribute('aria-hidden', 'true');
-        for (const character of text) {
-          const letter = document.createElement('span');
-          letter.className = 'letter';
-          letter.textContent = character;
-          word.append(letter);
-        }
-        return word;
-      });
-      phrase.replaceChildren(...words);
-    }
+    // A readable transcript avoids announcing every individual keystroke.
+    document.querySelector('#transcript').textContent = messages.slice(1)
+      .map(message => message.replace(/\^\d+/g, '').replace(/\n/g, ' ')).join(' ');
 
-    function reveal(section) {
-      section.classList.remove('waiting');
-      if (reducedMotion.matches) return;
-      const phrase = section.querySelector('.phrase');
-      const letters = [...section.querySelectorAll('.letter')];
-      const animations = [];
-      const play = (element, frames, options = {}) => {
-        animations.push(element.animate(frames, {
-          duration: 1400, easing: ease, fill: 'both', ...options
-        }));
-      };
-
-      switch (section.dataset.motion) {
-        case 'rise':
-          letters.forEach((letter, i) => play(letter, [
-            { transform: 'translateY(115%) rotate(3deg)' },
-            { transform: 'translateY(0) rotate(0)' }
-          ], { delay: 100 + (9 - i) * 65 }));
-          break;
-        case 'wipe':
-          play(phrase, [
-            { clipPath: 'inset(-20% 0 -20% 100%)' },
-            { clipPath: 'inset(-20% 0 -20% 0%)' }
-          ], { duration: 1900, easing: 'cubic-bezier(.65, 0, .2, 1)' });
-          break;
-        case 'expand':
-          play(phrase, [
-            { transform: 'scale(.5)', opacity: 0 },
-            { transform: 'scale(1)', opacity: 1 }
-          ], { duration: 1900 });
-          break;
-        case 'flip':
-          letters.forEach((letter, i) => play(letter, [
-            { transform: 'perspective(700px) rotateX(-95deg)', opacity: 0 },
-            { transform: 'perspective(700px) rotateX(0)', opacity: 1 }
-          ], { delay: (9 - i) * 75, duration: 1250 }));
-          break;
-        case 'meet':
-          section.querySelectorAll('.word').forEach((word, i) => play(word, [
-            { transform: `translateX(${i ? '' : '-'}35vw)`, opacity: 0 },
-            { transform: 'translateX(0)', opacity: 1 }
-          ], { duration: 1800 }));
-          break;
-        case 'drop':
-          letters.forEach((letter, i) => play(letter, [
-            { transform: `translateY(-1.5em) rotate(${i % 2 ? 8 : -8}deg)`, opacity: 0, offset: 0 },
-            { transform: 'translateY(.055em) rotate(0)', opacity: 1, offset: .72 },
-            { transform: 'translateY(0) rotate(0)', opacity: 1, offset: 1 }
-          ], { delay: (9 - i) * 70, duration: 1200, easing: 'cubic-bezier(.22, .7, .3, 1)' }));
-          break;
-        case 'focus':
-          play(phrase, [
-            { filter: 'blur(20px)', opacity: 0, transform: 'scale(1.035)' },
-            { filter: 'blur(0)', opacity: 1, transform: 'scale(1)' }
-          ], { duration: 2100, easing: 'cubic-bezier(.22, .6, .2, 1)' });
-          break;
-        case 'wave':
-          letters.forEach((letter, i) => play(letter, [
-            { transform: 'translateY(.55em)', opacity: 0, offset: 0 },
-            { transform: 'translateY(-.12em)', opacity: 1, offset: .55 },
-            { transform: 'translateY(0)', opacity: 1, offset: 1 }
-          ], { delay: (9 - i) * 90, duration: 1300, easing: 'cubic-bezier(.37, 0, .25, 1)' }));
-          break;
-        case 'gather':
-          letters.forEach((letter, i) => play(letter, [
-            { transform: `translateX(${(i - 4.5) * .3}em)`, opacity: 0 },
-            { transform: 'translateX(0)', opacity: 1 }
-          ], { duration: 1900, delay: Math.abs(i - 4.5) * 45 }));
-          break;
-        case 'type':
-          letters.forEach((letter, i) => play(letter, [
-            { opacity: 0 }, { opacity: 1 }
-          ], { delay: 180 + (9 - i) * 135, duration: 1, easing: 'steps(1, end)' }));
-          break;
-      }
-      activeAnimations.set(section, animations);
-    }
-
-    if ('IntersectionObserver' in window && 'animate' in Element.prototype) {
-      if (!reducedMotion.matches) sections.forEach(section => section.classList.add('waiting'));
-      const observer = new IntersectionObserver(entries => {
-        for (const entry of entries) {
-          if (entry.intersectionRatio >= .4 && !activeAnimations.has(entry.target)) {
-            reveal(entry.target);
-          } else if (!entry.isIntersecting) {
-            for (const animation of activeAnimations.get(entry.target) || []) animation.cancel();
-            activeAnimations.delete(entry.target);
-            if (!reducedMotion.matches) entry.target.classList.add('waiting');
-          }
-        }
-      }, { threshold: [0, .4] });
-      sections.forEach(section => observer.observe(section));
-      reducedMotion.addEventListener('change', () => {
-        for (const animations of activeAnimations.values()) {
-          for (const animation of animations) animation.cancel();
-        }
-        activeAnimations.clear();
-        sections.forEach(section => section.classList.remove('waiting'));
+    function _startTyping() {
+      typing?.destroy();
+      typing = null;
+      text.textContent = 'hello world';
+      if (reducedMotion.matches || typeof Typed === 'undefined') return;
+      text.textContent = '';
+      typing = new Typed(text, {
+        strings: messages,
+        typeSpeed: 65,
+        backSpeed: 28,
+        startDelay: 650,
+        backDelay: 2100,
+        smartBackspace: false,
+        loop: true,
+        showCursor: true,
+        cursorChar: '',
+        autoInsertCss: false,
+        contentType: 'null'
       });
     }
+
+    _startTyping();
+    reducedMotion.addEventListener('change', _startTyping);
   </script>
 </body>
 </html>
