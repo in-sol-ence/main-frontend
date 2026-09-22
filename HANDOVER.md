@@ -1067,7 +1067,18 @@ The landing phrases now use plain, specific language. The brand and the key
 idea in each phrase use the existing bracket markup for red text. The Demo
 intro, concept sentence, closing line, and finale were tightened without
 changing their timing, reveal phrase, stage count, or learning sequence.
-`dist/style.css` colors the Demo heading red, and `spatial/style.css` gives the
-pre-journey handoff statement the same accent before the line-based journey
-begins. Copy continues to come from `copy/`; `npm run build` syncs it and the
-spatial stylesheet into `dist/`.
+Cream remains the default across the Demo heading and pre-journey statement.
+Only the key terms in the Demo intro, concept labels, closing, and finale take
+the red accent. Copy continues to come from `copy/`; `npm run build` syncs it
+and the spatial stylesheet into `dist/`.
+
+## Text fast-forward (2026-09-22)
+
+Clicking the open page or pressing Space finishes whichever landing phrase,
+Demo sentence, or concept label is currently typing. Each step keeps its
+existing hold, selection, and handoff; another step does not start from the
+same input. The Demo's erase animation can also be completed this way.
+The spatial handoff statement and the journey's typed narration reveal their
+remaining characters immediately, while their existing reading time remains.
+Buttons, links, fields, and other interactive controls retain their own click
+and Space behavior. The landing phrase loop resumes at the next phrase.

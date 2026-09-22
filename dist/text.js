@@ -5,6 +5,8 @@ const messages = landing.phrases.map(phrase => phrase.replace(/[[\]]/g, ''));
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const text = document.querySelector('#typed');
 let typing;
+let firstMessage = 0;
+let resumeTimer;
 // Character indices, including newlines; null inherits cream.
 const wordColors = [];
 for (const phrase of landing.phrases) {
@@ -40,17 +42,20 @@ function _coloredMessages() {
 document.querySelector('#transcript').textContent = messages.slice(1)
   .map(message => message.replace(/\^\d+/g, '').replace(/\n/g, ' ')).join(' ');
 
-function _startTyping() {
+function _startTyping(startAt = 0) {
+  clearTimeout(resumeTimer);
   typing?.destroy();
   typing = null;
-  text.innerHTML = _coloredMessages()[0];
+  firstMessage = startAt;
+  const colored = _coloredMessages();
+  text.innerHTML = colored[startAt];
   if (reducedMotion.matches || typeof Typed === 'undefined') return;
   text.textContent = '';
   typing = new Typed(text, {
-    strings: _coloredMessages(),
+    strings: [...colored.slice(startAt), ...colored.slice(0, startAt)],
     typeSpeed: 65,
     backSpeed: 28,
-    startDelay: 650,
+    startDelay: startAt ? 0 : 650,
     backDelay: 2100,
     smartBackspace: false,
     loop: true,
@@ -62,4 +67,24 @@ function _startTyping() {
 }
 
 _startTyping();
-reducedMotion.addEventListener('change', _startTyping);
+reducedMotion.addEventListener('change', () => _startTyping());
+
+function _skipTyping() {
+  if (!typing || document.querySelector('#home').inert) return false;
+  const current = (firstMessage + typing.arrayPos) % messages.length;
+  if (text.textContent === messages[current]) return false;
+  typing.destroy();
+  typing = null;
+  text.innerHTML = _coloredMessages()[current];
+  resumeTimer = setTimeout(() => _startTyping((current + 1) % messages.length), 2100);
+  return true;
+}
+
+document.querySelector('#home').addEventListener('click', event => {
+  if (!event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) _skipTyping();
+});
+document.addEventListener('keydown', event => {
+  if (event.code !== 'Space' || event.repeat || event.metaKey || event.ctrlKey || event.altKey ||
+      event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return;
+  if (_skipTyping()) event.preventDefault();
+});

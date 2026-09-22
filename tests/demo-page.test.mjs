@@ -71,8 +71,38 @@ function _fixture(reducedMotion = false, sequence = false) {
       return true
     },
     click() { next.dispatchEvent(new window.Event('click')) },
+    skipClick() { page.dispatchEvent(new window.Event('click', { bubbles: true })) },
+    skipSpace() {
+      const event = new window.Event('keydown', { bubbles: true, cancelable: true })
+      event.code = 'Space'
+      document.dispatchEvent(event)
+      return event.defaultPrevented
+    },
   }
 }
+
+test('click and Space finish the current Demo text without skipping the next stage', async () => {
+  const f = _fixture()
+  await f.activate()
+  await f.step()
+  f.skipClick()
+  assert.equal(f.text.textContent, f.sentence)
+  assert.equal(f.text.querySelector('.text-accent')?.textContent, demo.revealAfter)
+  assert.equal(f.next.hidden, false)
+  assert.equal(f.volume.classList.contains('is-visible'), true)
+  f.click()
+  assert.equal(f.next.hidden, true)
+  assert.equal(f.skipSpace(), true)
+  assert.equal(f.text.textContent, '')
+  assert.deepEqual(f.advances, [''])
+
+  const keyboard = _fixture()
+  await keyboard.activate()
+  await keyboard.step()
+  assert.equal(keyboard.skipSpace(), true)
+  assert.equal(keyboard.text.textContent, keyboard.sentence)
+  assert.equal(keyboard.next.hidden, false)
+})
 
 test('actual Typed.js reveals at the phrase, holds, then deletes without touching the canvas', async () => {
   const f = _fixture()
@@ -97,6 +127,7 @@ test('actual Typed.js reveals at the phrase, holds, then deletes without touchin
   }
   assert.ok(reachedPhrase)
   assert.equal(f.text.textContent, f.sentence)
+  assert.equal(f.text.querySelector('.text-accent')?.textContent, demo.revealAfter)
   assert.equal(f.next.hidden, false)
   assert.equal(f.pending.size, 0, 'no automatic erase or looping timer')
   f.click()

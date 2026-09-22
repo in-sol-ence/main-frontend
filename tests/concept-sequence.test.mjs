@@ -58,6 +58,13 @@ function _fixture(reduced = false) {
     async settle() { finish(); await Promise.resolve(); await Promise.resolve() },
     // The shell is intact for every stage; the exit deliberately erases it.
     leave() { leaving = true },
+    skipClick() { page.dispatchEvent(new window.Event('click', { bubbles: true })) },
+    skipSpace() {
+      const event = new window.Event('keydown', { bubbles: true, cancelable: true })
+      event.code = 'Space'
+      document.dispatchEvent(event)
+      return event.defaultPrevented
+    },
     async step() {
       const entry = [...pending.entries()].sort((a, b) => a[1].at - b[1].at)[0]
       if (!entry) return false
@@ -71,6 +78,19 @@ function _fixture(reduced = false) {
     },
   }
 }
+
+test('Space finishes the sentence shell and click finishes only the current concept', async () => {
+  const f = _fixture()
+  await f.activate()
+  assert.equal(f.skipSpace(), true)
+  assert.equal(f.sentence.textContent, 'This is  in the embedding space.')
+  await f.settleEmpty()
+  await f.step()
+  f.skipClick()
+  assert.equal(f.phrase.textContent, conceptStages[0].phrase)
+  assert.equal(f.selections.length, 1)
+  assert.equal(f.handoff.enters, 0)
+})
 
 for (const reduced of [false, true]) test(`sequence follows actual phrase and visual completion (reduced motion: ${reduced})`, async () => {
   const f = _fixture(reduced)

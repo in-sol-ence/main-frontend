@@ -7,6 +7,7 @@ export function initializeDemoPage(onAdvance) {
   const volume = document.querySelector('#knowledge-volume')
   const next = document.querySelector('#demo-next')
   const sentence = demo.intro
+  const coloredSentence = sentence.replace(demo.revealAfter, `<span class="text-accent">${demo.revealAfter}</span>`)
   // Also reserves the full sentence's footprint through the heading's sizing copy.
   heading.setAttribute('aria-label', sentence)
   next.textContent = demo.nextButton
@@ -42,14 +43,14 @@ export function initializeDemoPage(onAdvance) {
     phase = 'typing'
     navigation.disconnect()
     if (motion.matches) {
-      text.textContent = sentence
+      text.innerHTML = coloredSentence
       _complete()
       return
     }
     typing = new window.Typed(text, {
-      strings: [sentence], typeSpeed: 65, backSpeed: 28, startDelay: 0,
+      strings: [coloredSentence], typeSpeed: 65, backSpeed: 28, startDelay: 0,
       smartBackspace: false, loop: false, showCursor: false,
-      autoInsertCss: false, contentType: 'null', onComplete: _complete,
+      autoInsertCss: false, contentType: 'html', onComplete: _complete,
     })
   }
   // Prepare text while the existing wipe reveals it; interaction stays inert.
@@ -94,8 +95,35 @@ export function initializeDemoPage(onAdvance) {
       text.textContent = ''
       _erased()
     } else {
-      text.textContent = sentence
+      text.innerHTML = coloredSentence
       _complete()
     }
+  })
+
+  function _skipTyping() {
+    if (page.inert) return false
+    if (phase === 'typing') {
+      typing?.destroy()
+      text.innerHTML = coloredSentence
+      _complete()
+      return true
+    }
+    if (phase === 'erasing') {
+      typing?.destroy()
+      text.textContent = ''
+      _erased()
+      return true
+    }
+    return false
+  }
+
+  page.addEventListener('click', event => {
+    if (event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return
+    if (_skipTyping()) event.stopImmediatePropagation()
+  })
+  document.addEventListener('keydown', event => {
+    if (event.code !== 'Space' || event.repeat || event.metaKey || event.ctrlKey || event.altKey ||
+        event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return
+    if (_skipTyping()) { event.preventDefault(); event.stopImmediatePropagation() }
   })
 }

@@ -20,7 +20,7 @@ import { createResourceBranches } from './resource-branches.js';
 import { resourceLibrary } from './resource-library.js';
 import { openDuration } from './resource-placement.js';
 import { tintFor } from './hierarchy.js';
-import { readHandoff, statementAt, personalNotes, applyPersonalNotes, firstConcept, hoverable, rationaleAt, rationaleRise, narrationAt, emergenceAt, narrationPlacement, MESSAGE, HOVER_DELAY, REVEAL_DELAY, RESOURCE_LEAD, RESOURCE_READ, PASS_HOLD, PASS_DEPTH, finaleReached, vanishingPoint } from './handoff.js';
+import { readHandoff, statementAt, personalNotes, applyPersonalNotes, firstConcept, hoverable, rationaleAt, rationaleRise, narrationAt, emergenceAt, narrationPlacement, MESSAGE, TYPE_INTERVAL, HOVER_DELAY, REVEAL_DELAY, RESOURCE_LEAD, RESOURCE_READ, PASS_HOLD, PASS_DEPTH, finaleReached, vanishingPoint } from './handoff.js';
 
 const canvas = document.querySelector('#world');
 const failure = document.querySelector('#failure');
@@ -343,6 +343,30 @@ if (renderer) {
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
   }
 
+  function skipTyping() {
+    if (handoffTime !== null && !handoffSubmitted && statement.textContent !== handoff.statement) {
+      handoffTime = Math.max(handoffTime, handoff.statement.length * TYPE_INTERVAL);
+      statement.textContent = handoff.statement;
+      return true;
+    }
+    if (told && !told.fading && told.shown < told.text.length) {
+      told.skip = true;
+      showTold(told.text.length);
+      return true;
+    }
+    return false;
+  }
+
+  window.addEventListener('click', event => {
+    if (event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return;
+    if (skipTyping()) { event.preventDefault(); event.stopImmediatePropagation(); }
+  }, true);
+  window.addEventListener('keydown', event => {
+    if (event.code !== 'Space' || event.repeat || event.metaKey || event.ctrlKey || event.altKey ||
+        event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return;
+    if (skipTyping()) { event.preventDefault(); event.stopImmediatePropagation(); }
+  }, true);
+
   // The storytelling layer. One statement at a time types beside the space it
   // explains; the untyped remainder is laid out invisibly so the lines wrap
   // where they will end and nothing reflows as it types. Assistive technology
@@ -468,7 +492,7 @@ if (renderer) {
       const state = narrationAt(demo.elapsed, told.text.length, preference.matches);
       // Travel settles at the topic while the statement is read.
       active.learningWeight = state.weight;
-      showTold(state.characters);
+      showTold(told.skip ? told.text.length : state.characters);
       placeTold(candidate.label, dt);
       if (state.done) {
         demo.stage = 'entering'; demo.elapsed = 0;
@@ -486,7 +510,7 @@ if (renderer) {
     if (demo.stage === 'reveal') {
       const state = narrationAt(demo.elapsed, handoff.rationale.length, preference.matches);
       active.learningWeight = state.weight;
-      showTold(state.characters);
+      showTold(told.skip ? told.text.length : state.characters);
       demo.anchor = clusterAnchor(active) || demo.anchor;
       placeTold(demo.anchor || { x: innerWidth * .5, y: innerHeight * .4 }, dt);
       if (state.done) {
@@ -520,7 +544,7 @@ if (renderer) {
     }
     if (demo.stage === 'repeats') {
       const state = narrationAt(demo.elapsed, handoff.repeats.length, preference.matches);
-      showTold(state.characters);
+      showTold(told.skip ? told.text.length : state.characters);
       // The rest of the branch goes by at the journey's own pace.
       active.learningWeight = 0;
       if (demo.passing) demo.passing.elapsed += dt;

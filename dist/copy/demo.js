@@ -20,7 +20,9 @@ export const demo = {
 
   // The last screen before the spatial journey.
   closing: 'Skatebored turns a complex syllabus into a learning path through this space.',
+  closingEmphasis: 'learning path',
 
   // After the journey, over John Doe's knowledge volume as it grows.
   finale: "This is John Doe's knowledge state after learning with Skatebored.",
+  finaleEmphasis: 'knowledge state',
 }

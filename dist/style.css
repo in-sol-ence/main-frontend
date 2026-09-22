@@ -126,7 +126,8 @@ h1 {
 /* Reserve the complete text/scene layout before either animation starts. */
 .demo-page { --page-color: #000000; color: var(--text-color); display: grid; grid-template-columns: 1fr 1fr; gap: 4vw; align-items: center; }
 .demo-intro { align-self: center; }
-.demo-heading { width: 100%; min-height: 0; color: #f04c4c; font-size: clamp(2rem, 3.8vw, 4.5rem); }
+.demo-heading { width: 100%; min-height: 0; font-size: clamp(2rem, 3.8vw, 4.5rem); }
+.text-accent, #concept-phrase { color: #f04c4c; }
 .demo-heading::before { content: attr(aria-label); visibility: hidden; grid-area: 1 / 1; }
 .demo-heading { display: grid; }
 #demo-typed { grid-area: 1 / 1; }

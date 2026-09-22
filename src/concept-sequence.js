@@ -29,11 +29,14 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
   const [before, after] = demo.conceptSentence.split('{phrase}')
   const _escape = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   const shell = `${_escape(before)}<span id="concept-phrase"></span>${_escape(after)}`
+  const coloredClosing = closingSentence.replace(demo.closingEmphasis, `<span class="text-accent">${_escape(demo.closingEmphasis)}</span>`)
+  const coloredFinale = demo.finale.replace(demo.finaleEmphasis, `<span class="text-accent">${_escape(demo.finaleEmphasis)}</span>`)
   let phrase
   let shellTyping
   const heading = page.querySelector('[data-page-heading]')
   const motion = matchMedia('(prefers-reduced-motion: reduce)')
   let started = false
+  let phase = 'idle'
   let index = 0
   let typing
   let timer
@@ -43,6 +46,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
   function _highlight() {
     if (!phrase || revealed || phrase.textContent !== conceptStages[index].phrase) return
     revealed = true
+    phase = 'settling'
     const stage = conceptStages[index]
     heading.setAttribute('aria-label', `${before}${stage.phrase}${after}`)
     presentation.update(stage.mastery).then(() => {
@@ -61,6 +65,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
 
   function _type() {
     revealed = false
+    phase = 'stage'
     const previous = phrase.textContent
     typing?.destroy()
     phrase.textContent = previous
@@ -78,6 +83,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
   }
   // The existing full-sentence erase, unchanged from the one Next already runs.
   function _erase(done) {
+    phase = 'erasing'
     if (motion.matches) {
       text.textContent = ''
       done()
@@ -96,20 +102,22 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
   // The same span, the same typing speed, and the same stage hold as every
   // screen before it, so this reads as one continuous sequence rather than a
   // new section. Only then does the page hand over.
+  function _read() { phase = 'holding'; timer = setTimeout(_leave, 2000) }
+
   function _closing() {
     characters.disconnect()
     _erase(() => {
+      phase = 'closing'
       heading.setAttribute('aria-label', closingSentence)
-      const _read = () => { timer = setTimeout(_leave, 2000) }
       if (motion.matches) {
-        text.textContent = closingSentence
+        text.innerHTML = coloredClosing
         _read()
         return
       }
       typing?.destroy()
       typing = new window.Typed(text, {
-        strings: [closingSentence], typeSpeed: 65, startDelay: 0, smartBackspace: false,
-        loop: false, showCursor: false, autoInsertCss: false, contentType: 'null',
+        strings: [coloredClosing], typeSpeed: 65, startDelay: 0, smartBackspace: false,
+        loop: false, showCursor: false, autoInsertCss: false, contentType: 'html',
         onComplete: _read,
       })
     })
@@ -117,6 +125,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
 
   function _leave() {
     _erase(() => {
+      phase = 'handed-off'
       heading.removeAttribute('aria-label')
       handoff.onFinale?.(_finale)
       handoff.enter()
@@ -127,20 +136,24 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
   // began with appears in the same space, then grows while the same span types
   // what it now shows.
   function _finale(point = { x: .5, y: .5 }) {
+    phase = 'finale-wait'
     presentation.anchor?.(point)
     heading.setAttribute('aria-label', demo.finale)
     timer = setTimeout(() => {
+      phase = 'finale'
       presentation.update(finaleStage.mastery)
-      if (motion.matches) { text.textContent = demo.finale; return }
+      if (motion.matches) { text.innerHTML = coloredFinale; phase = 'done'; return }
       typing?.destroy()
       typing = new window.Typed(text, {
-        strings: [demo.finale], typeSpeed: 65, startDelay: 0, smartBackspace: false,
-        loop: false, showCursor: false, autoInsertCss: false, contentType: 'null',
+        strings: [coloredFinale], typeSpeed: 65, startDelay: 0, smartBackspace: false,
+        loop: false, showCursor: false, autoInsertCss: false, contentType: 'html',
+        onComplete: () => { phase = 'done' },
       })
     }, 1200)
   }
   const characters = new MutationObserver(_highlight)
   function _ready() {
+    phase = 'waiting-stage'
     phrase = text.querySelector('#concept-phrase')
     characters.observe(phrase, { childList: true, characterData: true, subtree: true })
     emptySettled.then(() => { timer = setTimeout(_type, 700) })
@@ -158,10 +171,43 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     phrase.textContent = conceptStages[index].phrase
     _highlight()
   })
+
+  function _skipTyping() {
+    if (!started || (page.inert && !document.body.classList.contains('is-finale'))) return false
+    if (phase === 'shell') {
+      shellTyping?.destroy()
+      text.innerHTML = shell
+      _ready()
+    } else if (phase === 'stage') {
+      typing?.destroy()
+      phrase.textContent = conceptStages[index].phrase
+      _highlight()
+    } else if (phase === 'closing') {
+      typing?.destroy()
+      text.innerHTML = coloredClosing
+      _read()
+    } else if (phase === 'finale') {
+      typing?.destroy()
+      text.innerHTML = coloredFinale
+      phase = 'done'
+    } else return false
+    return true
+  }
+
+  page.addEventListener('click', event => {
+    if (event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return
+    if (_skipTyping()) event.stopImmediatePropagation()
+  })
+  document.addEventListener('keydown', event => {
+    if (event.code !== 'Space' || event.repeat || event.metaKey || event.ctrlKey || event.altKey ||
+        event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return
+    if (_skipTyping()) { event.preventDefault(); event.stopImmediatePropagation() }
+  })
   // Called directly after intro deletion; no navigation, page swap, or scene mount.
   return function start() {
     if (started) return
     started = true
+    phase = 'shell'
     handoff.preload()
     emptySettled = presentation.update(Array(24).fill(0))
     heading.setAttribute('aria-label', `${before.trimEnd()} ${after.trimStart()}`)
