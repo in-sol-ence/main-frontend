@@ -1,14 +1,14 @@
 // Demo page copy (the 3D knowledge space). After editing, run `npm run build`.
 
 export const demo = {
-  intro: 'Our platform embeds math in an N-dimensional space. We have restricted this space to three dimensions so you can visualize it.',
+  intro: 'Skatebored places mathematical ideas in an embedding space. This view shows three dimensions so you can see how they connect.',
   // The 3D space fades in the moment this part of the intro has been typed.
   // It must appear word for word in the intro above.
   revealAfter: 'three dimensions',
   nextButton: 'Next',
 
   // Typed after Next. {phrase} is replaced by each stage below, in order.
-  conceptSentence: 'Here is {phrase} represented in the embedding space.',
+  conceptSentence: 'This is {phrase} in the embedding space.',
   // One phrase per stage. Which questions each stage lights up is set in
   // src/concept-sequence.js, in the same order, so keep exactly four.
   stages: [
@@ -19,8 +19,8 @@ export const demo = {
   ],
 
   // The last screen before the spatial journey.
-  closing: 'Skatebored maps complex syllabi directly into custom trajectories across our n-dimensional space.',
+  closing: 'Skatebored turns a complex syllabus into a learning path through this space.',
 
   // After the journey, over John Doe's knowledge volume as it grows.
-  finale: "John Doe's knowledge state after Skatebored.",
+  finale: "This is John Doe's knowledge state after learning with Skatebored.",
 }

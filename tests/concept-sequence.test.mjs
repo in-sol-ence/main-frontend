@@ -64,8 +64,8 @@ function _fixture(reduced = false) {
       pending.delete(entry[0]); now = entry[1].at; entry[1].fn()
       await Promise.resolve(); await Promise.resolve()
       if (selections.length && !leaving) {
-        assert.ok(sentence.textContent.startsWith('Here is '))
-        assert.ok(sentence.textContent.endsWith(' represented in the embedding space.'))
+        assert.ok(sentence.textContent.startsWith('This is '))
+        assert.ok(sentence.textContent.endsWith(' in the embedding space.'))
       }
       return true
     },
@@ -78,7 +78,7 @@ for (const reduced of [false, true]) test(`sequence follows actual phrase and vi
   await f.activate()
   assert.equal(f.clears, 1)
   let shellSteps = 0
-  while (!f.sentence.textContent.endsWith(' represented in the embedding space.')) {
+  while (!f.sentence.textContent.endsWith(' in the embedding space.')) {
     assert.ok(await f.step())
     assert.ok(shellSteps++ < 200)
   }
@@ -116,7 +116,7 @@ for (const reduced of [false, true]) test(`sequence follows actual phrase and vi
   assert.ok(await f.step())
   // One more screen follows, in the same voice: the John Doe sentence is erased
   // and the closing sentence is typed into the very same span.
-  const johnDoe = "Here is John Doe's knowledge represented in the embedding space."
+  const johnDoe = "This is John Doe's knowledge in the embedding space."
   let steps2 = 0
   while (f.sentence.textContent !== closingSentence) {
     assert.ok(await f.step(), 'the screen erases and the next sentence types')
@@ -125,7 +125,7 @@ for (const reduced of [false, true]) test(`sequence follows actual phrase and vi
     assert.equal(f.handoff.enters, 0, 'nothing hands over mid-sentence')
     assert.ok(steps2++ < 1600)
   }
-  assert.match(closingSentence, /^Skatebored maps complex syllabi/)
+  assert.match(closingSentence, /^Skatebored turns a complex syllabus/)
   assert.equal(f.page.querySelector('[data-page-heading]').getAttribute('aria-label'), closingSentence)
   if (!reduced) assert.ok(steps2 > 50, 'erased and typed a character at a time')
   // It is given the same hold as every stage before it, then erased away.

@@ -1061,3 +1061,13 @@ spatial 141/141, all checks and the build pass; the finale test now asserts the
 point is forwarded once, only from the entered study, that the journey stays
 on screen, and that a malformed point falls back to the centre.
 
+## Opening copy and red emphasis (2026-09-22)
+
+The landing phrases now use plain, specific language. The brand and the key
+idea in each phrase use the existing bracket markup for red text. The Demo
+intro, concept sentence, closing line, and finale were tightened without
+changing their timing, reveal phrase, stage count, or learning sequence.
+`dist/style.css` colors the Demo heading red, and `spatial/style.css` gives the
+pre-journey handoff statement the same accent before the line-based journey
+begins. Copy continues to come from `copy/`; `npm run build` syncs it and the
+spatial stylesheet into `dist/`.
