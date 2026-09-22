@@ -22,7 +22,7 @@ async function _createSkateboard() {
   controls.enableDamping = true;
   controls.dampingFactor = .07;
   controls.enablePan = false;
-  controls.enableZoom = true;
+  controls.enableZoom = false;
   controls.zoomToCursor = true;
   controls.minZoom = .78;
   controls.maxZoom = 1.85;
