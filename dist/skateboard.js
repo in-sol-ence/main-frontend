@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OBJLoader } from './vendor/three/OBJLoader.js';
 import { RoomEnvironment } from './vendor/three/RoomEnvironment.js';
+import { OrbitControls } from './vendor/three/OrbitControls.js';
 
 async function _createSkateboard() {
   const container = document.querySelector('#skateboard');
@@ -16,6 +17,20 @@ async function _createSkateboard() {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
   container.append(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = .07;
+  controls.enablePan = false;
+  controls.enableZoom = true;
+  controls.zoomToCursor = true;
+  controls.minZoom = .78;
+  controls.maxZoom = 1.85;
+  controls.rotateSpeed = .9;
+  controls.zoomSpeed = .8;
+  controls.autoRotate = !reducedMotion.matches;
+  controls.autoRotateSpeed = 6;
+  controls.saveState();
 
   // Light the actual object without adding a floor, backdrop, or visible props.
   const environment = new RoomEnvironment();
@@ -80,17 +95,31 @@ async function _createSkateboard() {
   });
   resize.observe(container);
 
-  // A small, slow tilt keeps the deck graphic facing the reader.
-  const started = performance.now();
+  let resumeSpinTimer;
+  controls.addEventListener('start', () => {
+    clearTimeout(resumeSpinTimer);
+    controls.autoRotate = false;
+  });
+  controls.addEventListener('end', () => {
+    clearTimeout(resumeSpinTimer);
+    resumeSpinTimer = setTimeout(() => {
+      controls.autoRotate = !reducedMotion.matches;
+    }, 900);
+  });
+  renderer.domElement.addEventListener('dblclick', () => {
+    controls.reset();
+    controls.autoRotate = !reducedMotion.matches;
+  });
+
+  const clock = new THREE.Clock();
   const render = time => {
-    const seconds = (time - started) / 1000;
-    board.rotation.y = -.32 + (reducedMotion.matches ? 0 : Math.sin(seconds * .38) * .14);
-    board.rotation.z = -.3 + (reducedMotion.matches ? 0 : Math.sin(seconds * .29) * .025);
-    board.position.y = reducedMotion.matches ? 0 : Math.sin(seconds * .65) * .035;
+    controls.update(Math.min(clock.getDelta(), .05));
     renderer.render(scene, camera);
   };
   const updateMotion = () => {
-    renderer.setAnimationLoop(reducedMotion.matches || document.hidden ? null : render);
+    controls.autoRotate = !reducedMotion.matches;
+    renderer.setAnimationLoop(document.hidden ? null : render);
+    clock.getDelta();
     render(performance.now());
   };
   updateMotion();
@@ -99,6 +128,8 @@ async function _createSkateboard() {
   window.addEventListener('pagehide', event => {
     if (event.persisted) return;
     renderer.setAnimationLoop(null);
+    clearTimeout(resumeSpinTimer);
+    controls.dispose();
     resize.disconnect();
     reducedMotion.removeEventListener('change', updateMotion);
     document.removeEventListener('visibilitychange', updateMotion);
