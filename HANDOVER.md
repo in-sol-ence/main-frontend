@@ -1082,3 +1082,20 @@ The spatial handoff statement and the journey's typed narration reveal their
 remaining characters immediately, while their existing reading time remains.
 Buttons, links, fields, and other interactive controls retain their own click
 and Space behavior. The landing phrase loop resumes at the next phrase.
+
+## Center-aligned skateboard reveal (2026-09-22)
+
+This supersedes the trailing-edge reveal descriptions above. During the
+unchanged perspective sweep, `viewer.move()` projects every OBJ vertex and
+returns the midpoint of the leftmost and rightmost screen X coordinates. That
+same-frame center drives both complementary page clips and the persistent
+knowledge canvas clip. The board's movement, pose, scale, easing, duration,
+page positions, and navigation behavior are unchanged. Completion still
+unclips the incoming page only after the board exits the viewport.
+
+The geometry test checks the actual OBJ's projected center and canvas clip at
+25%, 50%, and 75% of the sweep at 1440×900, 390×844, and 2560×1080, as well as
+offscreen endpoints and unchanged pose/camera. All 23 root tests, the three
+required JavaScript syntax checks, and `git diff --check` pass. Browser capture
+was blocked by the unavailable admin-enforced security check, so rendered
+desktop, mobile, and reduced-motion screenshots could not be inspected.

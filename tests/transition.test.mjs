@@ -68,7 +68,7 @@ test('reduced motion skips sweep and can finish an in-progress flight', async ()
   assert.equal(pages[0].inert, false);
 });
 
-test('actual OBJ sweep stays horizontal, exits fully, and clips at projected vertices with a fixed perspective camera', () => {
+test('actual OBJ sweep stays horizontal, exits fully, and clips at its projected center with a fixed perspective camera', () => {
   const model = new OBJLoader().parse(readFileSync(new URL('../dist/models/board.obj', import.meta.url), 'utf8'));
   const bounds = new THREE.Box3().setFromObject(model);
   const size = bounds.getSize(new THREE.Vector3());
@@ -104,11 +104,11 @@ test('actual OBJ sweep stays horizontal, exits fully, and clips at projected ver
     const fixedCamera = camera.matrixWorld.toArray();
     const fixedLens = camera.projectionMatrix.toArray();
     viewer.begin();
-    let previousEdge = -Infinity;
+    let previousCenter = -Infinity;
     let previousRoll = -Infinity;
     for (let frame = 0; frame <= 60; frame++) {
       const progress = frame / 60;
-      const edge = viewer.move(progress);
+      const center = viewer.move(progress);
       let minX = Infinity, maxX = -Infinity;
       model.traverse(mesh => {
         if (!mesh.isMesh) return;
@@ -119,14 +119,16 @@ test('actual OBJ sweep stays horizontal, exits fully, and clips at projected ver
           maxX = Math.max(maxX, (point.x + 1) * width / 2);
         }
       });
-      assert.ok(Math.abs(edge - minX) < 1e-8, 'clip follows the true perspective silhouette');
-      assert.ok(edge > previousEdge, 'trailing edge never reverses');
-      previousEdge = edge;
+      assert.ok(Math.abs(center - (minX + maxX) / 2) < 1e-8, 'clip follows the projected silhouette center');
+      assert.ok(center > previousCenter, 'projected center never reverses');
+      previousCenter = center;
       if (frame === 0) assert.ok(maxX < 0, 'whole board starts off-screen');
       if (frame === 30) assert.ok(minX < 0 && maxX > width, 'the board covers the whole viewport mid-sweep');
-      // The board is what hides the wipe: it must reach past the far edge whenever
-      // the boundary it drives is on screen, or the swap would be visible beside it.
-      if (edge > 0 && edge < width) assert.ok(maxX > width, 'the wipe stays behind the board');
+      if ([15, 30, 45].includes(frame)) {
+        assert.ok(center > minX && center < maxX, `${frame / 60 * 100}% boundary is within the board`);
+        const boundary = THREE.MathUtils.clamp(center, 0, width);
+        assert.equal(volume.style.clipPath, `inset(0 ${Math.max(0, volume.getBoundingClientRect().right - boundary)}px 0 0)`);
+      }
       if (frame === 60) assert.ok(minX > width, 'whole board exits before completion');
       assert.ok(maxX - minX > width, 'the board is wider than the viewport it sweeps');
       const relative = camera.quaternion.clone().invert().multiply(ride.quaternion);

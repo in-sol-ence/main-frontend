@@ -11,7 +11,7 @@ copy there, never as literals in code. `npm run build` publishes it to
 `dist/copy/`, and the journey lines reach the spatial study as boot-hook URL
 parameters. Maintain the phrase list, reduced-motion support, readable transcript,
 and mailto action. Demo opens the knowledge introduction. Keep the canvas mounted
-and derive both page clips from the viewer’s exact trailing-edge position.
+and derive both page clips from the viewer’s projected skateboard center.
 
 All code and built output belong in `/Users/solom/sk/frontend`. Do not modify the
 original checkout or synced project reference files. `dist/` is the static build.

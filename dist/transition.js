@@ -43,7 +43,7 @@ export function createSkateboardTransition({ pages, viewer, duration = 3200 }) {
       const distance = ramp * (edge ** 3 - .5 * edge ** 4) / (1 - ramp);
       const eased = progress < ramp ? distance : progress > 1 - ramp ? 1 - distance
         : (progress - ramp / 2) / (1 - ramp);
-      // The projected trailing edge returned by the viewer is the only boundary.
+      // The viewer returns the skateboard's projected center for this frame.
       const width = document.documentElement.clientWidth;
       const x = Math.max(0, Math.min(width, viewer.move(eased)));
       flight.incoming.style.clipPath = `inset(0 ${Math.max(0, width - x)}px 0 0)`;
