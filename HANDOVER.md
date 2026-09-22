@@ -1071,3 +1071,27 @@ changing their timing, reveal phrase, stage count, or learning sequence.
 pre-journey handoff statement the same accent before the line-based journey
 begins. Copy continues to come from `copy/`; `npm run build` syncs it and the
 spatial stylesheet into `dist/`.
+
+## Phone layout and touch support (2026-09-22)
+
+`dist/style.css` reserves the top of portrait phones for the skateboard so it
+cannot cover the landing copy or actions. Short landscape screens put it beside
+the copy and use two columns for the Demo. The existing transition still gets
+the entire viewport, and the original scene settings are unchanged. Pages use
+the dynamic viewport, safe-area padding, a 48px Next target, and vertical touch
+scrolling outside the interactive canvas. The persistent page host clips canvas
+overflow so rotating a phone cannot expand the mobile viewport.
+
+`src/demo-entry.jsx` keeps the one knowledge canvas aligned with its reserved
+slot when the heading grows, the Demo scrolls, or the viewport changes. Finale
+placement also recalculates on rotation, uses the page's actual layout dimensions
+rather than an overflow-expanded `innerWidth`, and fits below/beside the heading.
+No renderer, mastery data, camera settings, or sequence timing changed.
+
+Verification: production build, all 21 branch tests (23 in the working checkout), the three transition tests,
+JavaScript syntax checks and diff whitespace checks passed. Headless Chromium
+with touch emulation checked 320×568, 390×844, 667×375, 844×390 and 1440×900,
+normal/reduced motion, all landing phrases, Demo/Next taps, canvas dragging, and
+actual touch scrolling with 200% text. The real spatial journey reached its
+finale; follow-up rotation checks exercise the finale message through the
+existing handoff. This is browser emulation, not a physical iPhone/Android test.

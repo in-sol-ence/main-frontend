@@ -171,3 +171,43 @@ body.is-finale #pages { z-index: 6; pointer-events: none; }
 body.is-finale .page { background: transparent; }
 body.is-finale #knowledge-volume { pointer-events: auto; transition: opacity 900ms ease; }
 @media (prefers-reduced-motion: reduce) { body.is-finale #knowledge-volume { transition: none; } }
+
+/* Phone browser chrome, notches, and touch scrolling must not hide controls. */
+#pages { height: 100svh; height: 100dvh; overflow: clip; touch-action: pan-y !important; }
+.page { min-height: 0; }
+.demo-page { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.demo-intro { min-width: 0; }
+.demo-next {
+  min-width: 48px; min-height: 48px;
+  right: max(5vw, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  padding: 12px;
+}
+@media (max-width: 760px) {
+  .page {
+    padding: max(7vw, env(safe-area-inset-top)) max(7vw, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(7vw, env(safe-area-inset-left));
+  }
+  #home h1 { width: 100%; min-height: 4.32em; }
+  #home .intro { width: 100%; margin-top: auto; }
+  .actions { gap: 10px; margin-top: 24px; }
+  .actions a, .actions button { padding-left: 20px; padding-right: 20px; }
+  #skateboard { height: 45svh; }
+  .is-transitioning #skateboard { height: 100%; }
+  .demo-page { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; padding-bottom: 80px; }
+  .knowledge-slot, .knowledge-volume { height: min(40svh, 86vw); min-height: 220px; }
+  .demo-next { right: max(7vw, env(safe-area-inset-right)); }
+}
+/* A phone turned sideways has room for two columns, but little vertical space. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .page { padding: max(20px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); }
+  #home { align-items: center; }
+  #home .intro { width: 53%; margin-top: 0; }
+  #home h1 { width: 100%; font-size: clamp(1.8rem, 4.5vw, 2.5rem); min-height: 3.24em; }
+  .actions { margin-top: 16px; gap: 8px; }
+  .actions a, .actions button { height: 48px; padding-left: 18px; padding-right: 18px; font-size: 16px; }
+  #skateboard { left: 55%; width: 45%; height: 100%; }
+  .is-transitioning #skateboard { left: 0; width: 100%; }
+  .demo-page { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto; align-items: center; gap: 24px; padding-bottom: 68px; }
+  .demo-heading { font-size: clamp(1.25rem, 3.4vw, 2rem); }
+  .knowledge-slot, .knowledge-volume { height: min(65svh, 40vw); min-height: 0; }
+}
