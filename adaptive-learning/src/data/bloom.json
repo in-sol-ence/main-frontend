@@ -1,0 +1,1400 @@
+{
+  "id": "skatebored-bloom-two-sigma",
+  "version": 1,
+  "isFixture": false,
+  "title": "Bloom’s 2 Sigma Problem",
+  "firstStageId": "stage-01",
+  "concepts": {
+    "KC_01": {
+      "index": 0,
+      "name": "Arithmetic Mean",
+      "description": "Understanding the arithmetic mean as the center of a dataset.",
+      "prerequisites": []
+    },
+    "KC_02": {
+      "index": 1,
+      "name": "Standard Deviation",
+      "description": "Understanding standard deviation as a measure of variability around the mean.",
+      "prerequisites": [
+        "KC_01"
+      ]
+    },
+    "KC_03": {
+      "index": 2,
+      "name": "Standardized Distance",
+      "description": "Understanding differences between values or group means in units of standard deviations.",
+      "prerequisites": [
+        "KC_01",
+        "KC_02"
+      ]
+    },
+    "KC_04": {
+      "index": 3,
+      "name": "Normal Distributions and Percentiles",
+      "description": "Understanding the relationship between standard deviations and percentile ranks under a normal-distribution assumption.",
+      "prerequisites": [
+        "KC_02",
+        "KC_03"
+      ]
+    },
+    "KC_05": {
+      "index": 4,
+      "name": "Bloom's Experimental Conditions",
+      "description": "Understanding the conventional instruction, mastery learning, and tutoring conditions compared in Bloom's research.",
+      "prerequisites": []
+    },
+    "KC_06": {
+      "index": 5,
+      "name": "Mastery Learning",
+      "description": "Understanding formative assessment, feedback, corrective instruction, and reassessment.",
+      "prerequisites": [
+        "KC_05"
+      ]
+    },
+    "KC_07": {
+      "index": 6,
+      "name": "Experimental Evidence and Generalization",
+      "description": "Understanding the design, scope, and limits of Bloom's reported experiments.",
+      "prerequisites": [
+        "KC_05"
+      ]
+    },
+    "KC_08": {
+      "index": 7,
+      "name": "Bloom's Reported Results",
+      "description": "Understanding the approximately one-sigma mastery-learning result and two-sigma tutoring result.",
+      "prerequisites": [
+        "KC_03",
+        "KC_04",
+        "KC_05",
+        "KC_06",
+        "KC_07"
+      ]
+    },
+    "KC_09": {
+      "index": 8,
+      "name": "The 2 Sigma Problem",
+      "description": "Understanding Bloom's challenge of reproducing tutoring-level achievement through practical, scalable instruction.",
+      "prerequisites": [
+        "KC_08"
+      ]
+    },
+    "KC_10": {
+      "index": 9,
+      "name": "Application and Interpretation",
+      "description": "Understanding how Bloom's findings motivate adaptive learning without guaranteeing identical results across interventions.",
+      "prerequisites": [
+        "KC_07",
+        "KC_08",
+        "KC_09"
+      ]
+    }
+  },
+  "questions": {
+    "stage-01-core": {
+      "id": "stage-01-core",
+      "stageId": "stage-01",
+      "conceptIds": [
+        "KC_01"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Four students score 60, 70, 80, and 90 on a test.\n\nWhat is the class mean?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "70"
+        },
+        {
+          "id": "B",
+          "text": "75"
+        },
+        {
+          "id": "C",
+          "text": "80"
+        },
+        {
+          "id": "D",
+          "text": "90"
+        }
+      ],
+      "correctAnswer": "B",
+      "answerExplanation": "(60+70+80+90) / 4=75 \n\nThe mean gives a reference point for the center of these scores.",
+      "difficulty": "Introductory",
+      "prerequisiteConceptIds": [],
+      "sourceIds": []
+    },
+    "stage-01-transfer": {
+      "id": "stage-01-transfer",
+      "stageId": "stage-01",
+      "conceptIds": [
+        "KC_01"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "A class has an average test score of 72.\n\nEvery student's score is then increased by exactly 5 points.\n\nWhat is the new mean?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "72"
+        },
+        {
+          "id": "B",
+          "text": "75"
+        },
+        {
+          "id": "C",
+          "text": "77"
+        },
+        {
+          "id": "D",
+          "text": "Cannot tell"
+        }
+      ],
+      "correctAnswer": "C",
+      "answerExplanation": "Adding 5 to every observation increases the mean by 5.",
+      "difficulty": "Introductory",
+      "prerequisiteConceptIds": [],
+      "sourceIds": []
+    },
+    "stage-02-core": {
+      "id": "stage-02-core",
+      "stageId": "stage-02",
+      "conceptIds": [
+        "KC_02"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Two classes both have a mean score of 80.\n\nClass A's scores are mostly between 78 and 82.\n\nClass B's scores are mostly between 60 and 100.\n\nWhich class has the larger standard deviation?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Class A"
+        },
+        {
+          "id": "B",
+          "text": "Class B"
+        },
+        {
+          "id": "C",
+          "text": "They have the same standard deviation because their means are equal"
+        },
+        {
+          "id": "D",
+          "text": "Cannot be determined"
+        }
+      ],
+      "correctAnswer": "B",
+      "answerExplanation": "Standard deviation measures spread around the mean.\n\nClass B's scores are much farther apart despite both classes having the same mean.",
+      "difficulty": "Introductory",
+      "prerequisiteConceptIds": [
+        "KC_01"
+      ],
+      "sourceIds": []
+    },
+    "stage-02-transfer": {
+      "id": "stage-02-transfer",
+      "stageId": "stage-02",
+      "conceptIds": [
+        "KC_02"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Every student in a class receives exactly 85 points.\n\nWhat is the standard deviation?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "0"
+        },
+        {
+          "id": "B",
+          "text": "1"
+        },
+        {
+          "id": "C",
+          "text": "85"
+        },
+        {
+          "id": "D",
+          "text": "It depends on the number of students"
+        }
+      ],
+      "correctAnswer": "A",
+      "answerExplanation": "Every observation equals the mean.\n\nThere is no variability, so the standard deviation is zero.",
+      "difficulty": "Introductory",
+      "prerequisiteConceptIds": [
+        "KC_01"
+      ],
+      "sourceIds": []
+    },
+    "stage-03-core": {
+      "id": "stage-03-core",
+      "stageId": "stage-03",
+      "conceptIds": [
+        "KC_03"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "A conventional class has a mean achievement score of 70 and a standard deviation of 6.\n\nAnother group's mean is 82.\n\nHow far above the conventional mean is the second group's mean?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "1 standard deviation"
+        },
+        {
+          "id": "B",
+          "text": "2 standard deviations"
+        },
+        {
+          "id": "C",
+          "text": "6 standard deviations"
+        },
+        {
+          "id": "D",
+          "text": "12 standard deviations"
+        }
+      ],
+      "correctAnswer": "B",
+      "answerExplanation": "82 − 70 = 12; 12 ÷ 6 = 2.\n\nThe second mean is two conventional-group standard deviations above the conventional mean.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_01",
+        "KC_02"
+      ],
+      "sourceIds": []
+    },
+    "stage-03-transfer": {
+      "id": "stage-03-transfer",
+      "stageId": "stage-03",
+      "conceptIds": [
+        "KC_03"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Imagine a graph where the conventional mean is at z=0.\n\nThe average for another instructional condition appears at z=+2.\n\nWhat does that mean?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Its mean is twice the conventional score"
+        },
+        {
+          "id": "B",
+          "text": "Its mean is two percentage points higher"
+        },
+        {
+          "id": "C",
+          "text": "Its mean is two conventional-group standard deviations higher"
+        },
+        {
+          "id": "D",
+          "text": "Every student improved by two standard deviations"
+        }
+      ],
+      "correctAnswer": "C",
+      "answerExplanation": "A standardized distance of +2 indicates that the second group's mean is two reference-group standard deviations above the reference mean.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_01",
+        "KC_02"
+      ],
+      "sourceIds": []
+    },
+    "stage-04-core": {
+      "id": "stage-04-core",
+      "stageId": "stage-04",
+      "conceptIds": [
+        "KC_04"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "In an approximately normal reference distribution, a score two standard deviations above the mean is closest to which percentile?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "68th"
+        },
+        {
+          "id": "B",
+          "text": "84th"
+        },
+        {
+          "id": "C",
+          "text": "95th"
+        },
+        {
+          "id": "D",
+          "text": "98th"
+        }
+      ],
+      "correctAnswer": "D",
+      "answerExplanation": "For a normal distribution:\n\n z=2 \n\ncorresponds to approximately the 97.7th percentile.\n\nThis means approximately 97.7% of the reference distribution lies below that value.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_02",
+        "KC_03"
+      ],
+      "sourceIds": []
+    },
+    "stage-04-transfer": {
+      "id": "stage-04-transfer",
+      "stageId": "stage-04",
+      "conceptIds": [
+        "KC_04"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "A student is at approximately the 97.7th percentile of a normal reference population.\n\nWhich standardized score is closest?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "z=0"
+        },
+        {
+          "id": "B",
+          "text": "z=1"
+        },
+        {
+          "id": "C",
+          "text": "z=2"
+        },
+        {
+          "id": "D",
+          "text": "z=3"
+        }
+      ],
+      "correctAnswer": "C",
+      "answerExplanation": "Approximately 97.7% of a normal distribution lies below a value two standard deviations above its mean.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_02",
+        "KC_03"
+      ],
+      "sourceIds": []
+    },
+    "stage-05-core": {
+      "id": "stage-05-core",
+      "stageId": "stage-05",
+      "conceptIds": [
+        "KC_05"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which set best matches the three instructional conditions described in Bloom's 1984 paper?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Lecture, homework, final exam"
+        },
+        {
+          "id": "B",
+          "text": "Conventional classroom, mastery-learning classroom, tutoring"
+        },
+        {
+          "id": "C",
+          "text": "Public school, private school, homeschool"
+        },
+        {
+          "id": "D",
+          "text": "Human tutoring, computer tutoring, no instruction"
+        }
+      ],
+      "correctAnswer": "B",
+      "answerExplanation": "Bloom reported three instructional conditions:\n\nConventional classroom instruction.\nMastery-learning classroom instruction.\nTutoring.\n\nThe purpose was to compare student achievement under different instructional approaches.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-05-transfer": {
+      "id": "stage-05-transfer",
+      "stageId": "stage-05",
+      "conceptIds": [
+        "KC_05"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "A researcher creates three groups:\n\nNormal classroom instruction.\nSimilar classroom instruction plus mastery procedures.\nIndividualized tutoring.\n\nWhich historical comparison is this attempting to reproduce?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Bloom's comparison of conventional instruction, mastery learning, and tutoring"
+        },
+        {
+          "id": "B",
+          "text": "A comparison of students from three different schools"
+        },
+        {
+          "id": "C",
+          "text": "A comparison of three examinations"
+        },
+        {
+          "id": "D",
+          "text": "A comparison of three statistical distributions"
+        }
+      ],
+      "correctAnswer": "A",
+      "answerExplanation": "Although the descriptions differ, the three instructional conditions have the same structure as Bloom's comparison.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-06-core": {
+      "id": "stage-06-core",
+      "stageId": "stage-06",
+      "conceptIds": [
+        "KC_06"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "What was the central additional process used in Bloom's mastery-learning condition?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Students simply spent twice as long studying"
+        },
+        {
+          "id": "B",
+          "text": "Formative testing → feedback → corrective instruction → a parallel formative test"
+        },
+        {
+          "id": "C",
+          "text": "Students selected whichever topics interested them"
+        },
+        {
+          "id": "D",
+          "text": "Students were placed in much smaller classes"
+        }
+      ],
+      "correctAnswer": "B",
+      "answerExplanation": "Mastery learning uses formative assessment to identify gaps, feedback and corrective instruction to address them, and reassessment to check whether the learner has achieved mastery.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-06-transfer": {
+      "id": "stage-06-transfer",
+      "stageId": "stage-06",
+      "conceptIds": [
+        "KC_06"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "A student takes a short quiz and discovers that she cannot use conditional probability.\n\nShe receives targeted practice, then takes a different quiz on conditional probability before advancing.\n\nWhich aspect makes this mastery learning rather than ordinary grading?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "The student receives a numerical score."
+        },
+        {
+          "id": "B",
+          "text": "Assessment identifies a gap, triggers corrective instruction, and is followed by reassessment before progression."
+        },
+        {
+          "id": "C",
+          "text": "The student completes all questions without feedback."
+        },
+        {
+          "id": "D",
+          "text": "The teacher gives every student the same additional lecture."
+        }
+      ],
+      "correctAnswer": "B",
+      "answerExplanation": "The assessment controls what happens next in the learning process rather than merely recording the student's performance.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-07-core": {
+      "id": "stage-07-core",
+      "stageId": "stage-07",
+      "conceptIds": [
+        "KC_07"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which statement most accurately describes the studies Bloom summarized?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Millions of students were followed across all school subjects for several years."
+        },
+        {
+          "id": "B",
+          "text": "Students self-selected whether they wanted tutoring."
+        },
+        {
+          "id": "C",
+          "text": "Four samples across grades 4, 5, and 8 studied Probability or Cartography; students were randomly assigned, and each sub-study lasted 11 instructional periods over three weeks."
+        },
+        {
+          "id": "D",
+          "text": "The studies exclusively examined university mathematics students."
+        }
+      ],
+      "correctAnswer": "C",
+      "answerExplanation": "Four samples in grades 4, 5, and 8 studied Probability or Cartography. Students were randomly assigned; each sub-study lasted 11 instructional periods over three weeks. These were specific populations, subjects, and durations, not every educational setting.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-07-transfer": {
+      "id": "stage-07-transfer",
+      "stageId": "stage-07",
+      "conceptIds": [
+        "KC_07"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which conclusion goes furthest beyond what those experiments alone establish?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Large achievement differences appeared in those particular instructional comparisons."
+        },
+        {
+          "id": "B",
+          "text": "Bloom thought tutoring provided an important benchmark."
+        },
+        {
+          "id": "C",
+          "text": "Every subject, age group, tutor, and future tutoring system should produce a 2σ effect."
+        },
+        {
+          "id": "D",
+          "text": "Mastery learning was also compared with conventional instruction."
+        }
+      ],
+      "correctAnswer": "C",
+      "answerExplanation": "Evidence from particular experiments cannot establish that an identical effect will occur under every possible instructional condition.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-08-core": {
+      "id": "stage-08-core",
+      "stageId": "stage-08",
+      "conceptIds": [
+        "KC_08"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which summary matches the result Bloom reported?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Mastery learning ≈ +2σ; tutoring ≈ +1σ"
+        },
+        {
+          "id": "B",
+          "text": "Mastery learning ≈ +1σ; tutoring ≈ +2σ"
+        },
+        {
+          "id": "C",
+          "text": "Both treatments ≈ +2σ"
+        },
+        {
+          "id": "D",
+          "text": "Neither differed substantially from conventional instruction"
+        }
+      ],
+      "correctAnswer": "B",
+      "answerExplanation": "Using the conventional group’s standard deviation (σ) as the reference:\n\nMean(mastery) ≈ Mean(conventional) + 1σ\nMean(tutoring) ≈ Mean(conventional) + 2σ\n\nThese are differences between group means, expressed in conventional-group standard deviation units.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_03",
+        "KC_04",
+        "KC_05",
+        "KC_06",
+        "KC_07"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-08-transfer": {
+      "id": "stage-08-transfer",
+      "stageId": "stage-08",
+      "conceptIds": [
+        "KC_08"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Suppose the conventional achievement distribution is standardized to a mean of 0 and a standard deviation of 1.\n\nWhich approximate pair represents Bloom's reported group means?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Mastery = 0, Tutoring = 1"
+        },
+        {
+          "id": "B",
+          "text": "Mastery = 1, Tutoring = 2"
+        },
+        {
+          "id": "C",
+          "text": "Mastery = 2, Tutoring = 4"
+        },
+        {
+          "id": "D",
+          "text": "Mastery = −1, Tutoring = −2"
+        }
+      ],
+      "correctAnswer": "B",
+      "answerExplanation": "Relative to the conventional mean:\n\nMastery learning: approximately +1σ.\nTutoring: approximately +2σ.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_03",
+        "KC_04",
+        "KC_05",
+        "KC_06",
+        "KC_07"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-09-core": {
+      "id": "stage-09-core",
+      "stageId": "stage-09",
+      "conceptIds": [
+        "KC_09"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "What was Bloom's \"2 Sigma Problem\"?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Determine why standard deviation is represented by sigma."
+        },
+        {
+          "id": "B",
+          "text": "Find a cheaper statistical test for educational experiments."
+        },
+        {
+          "id": "C",
+          "text": "Find practical group-instruction methods capable of approaching the achievement attained under effective tutoring."
+        },
+        {
+          "id": "D",
+          "text": "Prove that every student needs a private tutor."
+        }
+      ],
+      "correctAnswer": "C",
+      "answerExplanation": "Bloom identified the challenge of achieving tutoring-like educational outcomes through practical instructional methods that could be provided to large numbers of learners.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_08"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-09-transfer": {
+      "id": "stage-09-transfer",
+      "stageId": "stage-09",
+      "conceptIds": [
+        "KC_09"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which research project is most directly attempting to address Bloom's problem?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Finding a new symbol for standard deviation."
+        },
+        {
+          "id": "B",
+          "text": "Building an affordable instructional system that adapts feedback and remediation to individual learners, then testing whether it approaches tutoring-level outcomes."
+        },
+        {
+          "id": "C",
+          "text": "Hiring one private human tutor for every learner regardless of cost."
+        },
+        {
+          "id": "D",
+          "text": "Replacing all assessments with lectures."
+        }
+      ],
+      "correctAnswer": "B",
+      "answerExplanation": "The proposed system attempts to provide the benefits of individualized instruction without requiring an individual human tutor for every student.\n\nIts effectiveness would still need to be established experimentally.",
+      "difficulty": "Intermediate",
+      "prerequisiteConceptIds": [
+        "KC_08"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-10-core": {
+      "id": "stage-10-core",
+      "stageId": "stage-10",
+      "conceptIds": [
+        "KC_10"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "A company builds an adaptive AI tutor that gives every learner personalized questions and remediation.\n\nWhich statement is scientifically justified from Bloom's work alone?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Because it is personalized, it will automatically improve achievement by 2σ."
+        },
+        {
+          "id": "B",
+          "text": "Bloom proves that every AI tutor performs as well as a strong human tutor."
+        },
+        {
+          "id": "C",
+          "text": "The system addresses the kind of scalable individualized-instruction problem Bloom highlighted, but its actual learning effect must be measured experimentally."
+        },
+        {
+          "id": "D",
+          "text": "If it uses mastery learning, a +1σ gain is guaranteed."
+        }
+      ],
+      "correctAnswer": "C",
+      "answerExplanation": "Bloom's findings provide a motivating benchmark and research problem.\n\nThey do not establish the performance of a future instructional system.\n\nAn adaptive system needs independent experimental evidence to establish its actual effectiveness.",
+      "difficulty": "Advanced",
+      "prerequisiteConceptIds": [
+        "KC_07",
+        "KC_08",
+        "KC_09"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy",
+        "vanlehn-2011",
+        "vanlehn-copy"
+      ]
+    },
+    "stage-10-transfer": {
+      "id": "stage-10-transfer",
+      "stageId": "stage-10",
+      "conceptIds": [
+        "KC_10"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "A new adaptive platform runs a randomized controlled trial and finds an achievement effect of +0.35 standard deviations compared with ordinary instruction.\n\nWhich interpretation is strongest?",
+      "choices": [
+        {
+          "id": "A",
+          "text": "It failed because Bloom proved successful tutoring must achieve +2 standard deviations."
+        },
+        {
+          "id": "B",
+          "text": "It solved Bloom's problem because every adaptive system automatically counts as a solution."
+        },
+        {
+          "id": "C",
+          "text": "It produced a measured positive effect; comparison with Bloom's 2σ benchmark requires attention to differences in intervention, population, outcome, and experimental design."
+        },
+        {
+          "id": "D",
+          "text": "+0.35 standard deviations means students learned 35% more material."
+        }
+      ],
+      "correctAnswer": "C",
+      "answerExplanation": "Standardized achievement effects can be compared descriptively, but their interpretation depends on the instructional approach, learner population, comparison condition, assessment, and experimental design.",
+      "difficulty": "Advanced",
+      "prerequisiteConceptIds": [
+        "KC_07",
+        "KC_08",
+        "KC_09"
+      ],
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy",
+        "vanlehn-2011",
+        "vanlehn-copy"
+      ]
+    }
+  },
+  "videos": {
+    "stage-01-video": {
+      "id": "stage-01-video",
+      "title": "Mean, median, & mode example",
+      "creator": "Khan Academy",
+      "url": "https://www.youtube.com/watch?v=k3aKKasOmIw",
+      "startTime": 0,
+      "endTime": 75,
+      "segmentDuration": 75,
+      "conceptIds": [
+        "KC_01"
+      ],
+      "description": "Calculating and interpreting the arithmetic mean.",
+      "sourceIds": [
+        "khan-1"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "Source page, metadata and transcript access attempts",
+        "status": "timing-unverified",
+        "notes": "Khan Academy YouTube upload title and publisher confirmed from public player metadata. Caption requests returned empty responses. Proposed clip timing and instructional coverage remain unverified. Original Khan Academy page retained in Sources."
+      }
+    },
+    "stage-02-video": {
+      "id": "stage-02-video",
+      "title": "Measures of spread: range, variance & standard deviation",
+      "creator": "Khan Academy",
+      "url": "https://www.youtube.com/watch?v=E4HAYd0QnRc",
+      "startTime": 0,
+      "endTime": 90,
+      "segmentDuration": 90,
+      "conceptIds": [
+        "KC_02"
+      ],
+      "description": "Standard deviation and variability.",
+      "sourceIds": [
+        "khan-2"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "Source page, metadata and transcript access attempts",
+        "status": "timing-unverified",
+        "notes": "Khan Academy YouTube upload title and publisher confirmed from public player metadata. Caption requests returned empty responses. Proposed clip timing and instructional coverage remain unverified. Original Khan Academy page retained in Sources."
+      }
+    },
+    "stage-03-video": {
+      "id": "stage-03-video",
+      "title": "Z-score introduction",
+      "creator": "Khan Academy",
+      "url": "https://www.youtube.com/watch?v=5S-Zfa-vOXs",
+      "startTime": 0,
+      "endTime": 50,
+      "segmentDuration": 50,
+      "conceptIds": [
+        "KC_03"
+      ],
+      "description": "Expressing the distance between a value and a reference mean using standard deviations.",
+      "sourceIds": [
+        "khan-3"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "Source page, metadata and transcript access attempts",
+        "status": "timing-unverified",
+        "notes": "Khan Academy YouTube upload title and publisher confirmed from public player metadata. Caption requests returned empty responses. Proposed clip timing and instructional coverage remain unverified. Original Khan Academy page retained in Sources."
+      }
+    },
+    "stage-04-video": {
+      "id": "stage-04-video",
+      "title": "Normal distribution problems: Empirical rule",
+      "creator": "Khan Academy",
+      "url": "https://www.youtube.com/watch?v=OhRr26AfFBU",
+      "startTime": 207,
+      "endTime": 248,
+      "segmentDuration": 41,
+      "conceptIds": [
+        "KC_04"
+      ],
+      "description": "The relationship between standard deviations and the proportion of observations in a normal distribution.",
+      "sourceIds": [
+        "khan-4"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "Source page, metadata and transcript access attempts",
+        "status": "timing-unverified",
+        "notes": "Khan Academy YouTube upload title and publisher confirmed from public player metadata. Caption requests returned empty responses. Proposed clip timing and instructional coverage remain unverified. Original Khan Academy page retained in Sources."
+      }
+    },
+    "stage-05-video": {
+      "id": "stage-05-video",
+      "title": "What we're learning from online education",
+      "creator": "Daphne Koller / TED",
+      "url": "https://www.youtube.com/watch?v=U6FvJ6jMGHU",
+      "startTime": 969,
+      "endTime": 1000,
+      "segmentDuration": 31,
+      "conceptIds": [
+        "KC_05"
+      ],
+      "description": "The three instructional conditions in Bloom's comparison.",
+      "sourceIds": [
+        "ted-koller"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "TED official transcript and YouTube player metadata",
+        "status": "transcript-verified",
+        "notes": "TED identifies U6FvJ6jMGHU as the official YouTube edition. This uses the supplied YouTube-edition timestamps. Bloom (1984) remains the factual authority."
+      }
+    },
+    "stage-06-video": {
+      "id": "stage-06-video",
+      "title": "What is mastery learning?",
+      "creator": "Khan Academy",
+      "url": "https://www.youtube.com/watch?v=zRuiDvz8p5o",
+      "startTime": 0,
+      "endTime": 60,
+      "segmentDuration": 60,
+      "conceptIds": [
+        "KC_06"
+      ],
+      "description": "Learning through the identification and correction of knowledge gaps before progression.",
+      "sourceIds": [
+        "khan-6"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "Source page, metadata and transcript access attempts",
+        "status": "timing-unverified",
+        "notes": "YouTube title, publisher and embed metadata resolved. Caption requests returned empty responses. Exact segment content and proposed timing remain unverified; the written concept review is available if playback fails."
+      }
+    },
+    "stage-07-video": {
+      "id": "stage-07-video",
+      "title": "Bloom's 2 Sigma Problem Debunked: One-to-One Tutoring Isn't Going to Save Education",
+      "creator": "Dr. Luke Rowe / Powerful Learning",
+      "url": "https://www.youtube.com/watch?v=IaTk7lHC470",
+      "startTime": 172,
+      "endTime": 230,
+      "segmentDuration": 58,
+      "conceptIds": [
+        "KC_07"
+      ],
+      "description": "The evidence underlying Bloom's reported findings and why the research context matters.",
+      "sourceIds": [
+        "rowe"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "Source page, metadata and transcript access attempts",
+        "status": "timing-unverified",
+        "notes": "YouTube title, publisher and embed metadata resolved. Caption requests returned empty responses. Exact segment content and proposed timing remain unverified; the written concept review is available if playback fails."
+      }
+    },
+    "stage-08-video": {
+      "id": "stage-08-video",
+      "title": "What we're learning from online education",
+      "creator": "Daphne Koller / TED",
+      "url": "https://www.youtube.com/watch?v=U6FvJ6jMGHU",
+      "startTime": 1000,
+      "endTime": 1012,
+      "segmentDuration": 12,
+      "conceptIds": [
+        "KC_08"
+      ],
+      "description": "The approximately one-sigma mastery-learning result and two-sigma tutoring result.",
+      "sourceIds": [
+        "ted-koller"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "TED official transcript and YouTube player metadata",
+        "status": "transcript-verified",
+        "notes": "TED identifies U6FvJ6jMGHU as the official YouTube edition. This uses the supplied YouTube-edition timestamps. Bloom (1984) remains the factual authority."
+      }
+    },
+    "stage-09-video": {
+      "id": "stage-09-video",
+      "title": "What we're learning from online education",
+      "creator": "Daphne Koller / TED",
+      "url": "https://www.youtube.com/watch?v=U6FvJ6jMGHU",
+      "startTime": 1037,
+      "endTime": 1049,
+      "segmentDuration": 12,
+      "conceptIds": [
+        "KC_09"
+      ],
+      "description": "The challenge of reproducing the educational benefits associated with individualized tutoring at scale.",
+      "sourceIds": [
+        "ted-koller"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "TED official transcript and YouTube player metadata",
+        "status": "transcript-verified",
+        "notes": "TED identifies U6FvJ6jMGHU as the official YouTube edition. This uses the supplied YouTube-edition timestamps. Bloom (1984) remains the factual authority."
+      }
+    },
+    "stage-10-video": {
+      "id": "stage-10-video",
+      "title": "Bloom's 2 Sigma Problem Debunked: One-to-One Tutoring Isn't Going to Save Education",
+      "creator": "Dr. Luke Rowe / Powerful Learning",
+      "url": "https://www.youtube.com/watch?v=IaTk7lHC470",
+      "startTime": 745,
+      "endTime": 817,
+      "segmentDuration": 72,
+      "conceptIds": [
+        "KC_10"
+      ],
+      "description": "Later tutoring research has produced meaningful but variable effects, which should not be automatically equated with Bloom's reported 2σ result.",
+      "sourceIds": [
+        "rowe"
+      ],
+      "verification": {
+        "checkedAt": "2026-09-22",
+        "method": "Source page, metadata and transcript access attempts",
+        "status": "timing-unverified",
+        "notes": "YouTube title, publisher and embed metadata resolved. Caption requests returned empty responses. Exact segment content and proposed timing remain unverified; the written concept review is available if playback fails."
+      }
+    }
+  },
+  "explanations": {
+    "stage-01-explanation": {
+      "id": "stage-01-explanation",
+      "title": "Arithmetic Mean — explained",
+      "conceptIds": [
+        "KC_01"
+      ],
+      "content": "The mean is the arithmetic average of a set of numbers.\n\nAdd every value together and divide by the number of values.\n\nIf every observation changes by the same amount, the mean changes by that amount too.\n\nBloom's research compares the average achievement of different groups, so understanding the mean is necessary before interpreting his findings.",
+      "sourceIds": []
+    },
+    "stage-02-explanation": {
+      "id": "stage-02-explanation",
+      "title": "Standard Deviation — explained",
+      "conceptIds": [
+        "KC_02"
+      ],
+      "content": "The mean describes where the center of a dataset is.\n\nStandard deviation describes how spread out the observations are around that center.\n\nTwo groups can have identical means but different standard deviations.\n\nIf every observation has the same value, the standard deviation is zero.",
+      "sourceIds": []
+    },
+    "stage-03-explanation": {
+      "id": "stage-03-explanation",
+      "title": "Standardized Distance — explained",
+      "conceptIds": [
+        "KC_03"
+      ],
+      "content": "Sigma, written σ, represents standard deviation.\n\nA difference of 2σ means a separation equal to twice the reference group's standard deviation.\n\nIt does not mean the score doubled.\n\nFor example, if the conventional mean is 70 and its standard deviation is 6, then a mean two standard deviations higher is:\n\n 70+2(6)=82",
+      "sourceIds": []
+    },
+    "stage-04-explanation": {
+      "id": "stage-04-explanation",
+      "title": "Normal Distributions and Percentiles — explained",
+      "conceptIds": [
+        "KC_04"
+      ],
+      "content": "In a normal distribution, approximately 95.4% of observations lie within two standard deviations of the mean.\n\nThat leaves approximately 2.3% of observations above +2σ.\n\nA value at +2σ is therefore around the 97.7th percentile.\n\nBloom described the average tutored student as performing above approximately 98% of conventional students.\n\nThis does not mean 98% of tutored students were above the conventional mean.",
+      "sourceIds": []
+    },
+    "stage-05-explanation": {
+      "id": "stage-05-explanation",
+      "title": "Bloom's Experimental Conditions — explained",
+      "conceptIds": [
+        "KC_05"
+      ],
+      "content": "Bloom compared three approaches to instruction:\n\nConventional instruction involved ordinary group teaching.\n\nMastery learning added formative testing and corrective procedures to group instruction.\n\nTutoring provided highly individualized instruction, while also using formative assessment and feedback.\n\nUnderstanding these conditions is necessary before comparing their reported outcomes.",
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-06-explanation": {
+      "id": "stage-06-explanation",
+      "title": "Mastery Learning — explained",
+      "conceptIds": [
+        "KC_06"
+      ],
+      "content": "In ordinary grading, a test may simply measure how well a student performed before the class continues.\n\nIn mastery learning, assessments are used to identify missing knowledge.\n\nStudents receive targeted corrective instruction and are reassessed before progressing.\n\nThe central cycle is:\n\n Assessment → Feedback → Correction → Reassessment",
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-07-explanation": {
+      "id": "stage-07-explanation",
+      "title": "Experimental Evidence and Generalization — explained",
+      "conceptIds": [
+        "KC_07"
+      ],
+      "content": "Bloom summarized four samples across grades 4, 5, and 8 studying Probability or Cartography, with random assignment and 11 instructional periods over three weeks per sub-study.\n\nAn experiment can establish findings for the specific population, intervention, and outcome measures that were studied.\n\nIt does not automatically establish that the same results will occur across all other settings.\n\nBloom's studies provide evidence about particular instructional comparisons.\n\nTheir reported effect sizes should not be interpreted as a universal guarantee for all tutoring systems.",
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-08-explanation": {
+      "id": "stage-08-explanation",
+      "title": "Bloom's Reported Results — explained",
+      "conceptIds": [
+        "KC_08"
+      ],
+      "content": "Bloom reported two important comparisons.\n\nThe mastery-learning group had an average achievement level approximately one conventional-group standard deviation above the conventional mean.\n\nThe tutoring group had an average achievement level approximately two conventional-group standard deviations above the conventional mean.\n\nRemember:\n\n Conventional = 0σ\nMastery = +1σ\nTutoring = +2σ \n\nThe values describe standardized differences between group averages.",
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-09-explanation": {
+      "id": "stage-09-explanation",
+      "title": "The 2 Sigma Problem — explained",
+      "conceptIds": [
+        "KC_09"
+      ],
+      "content": "Bloom's finding and Bloom's problem are different things.\n\nFinding: The tutoring group performed approximately two conventional-group standard deviations above the conventional mean.\n\nProblem: How can educators reproduce similarly strong learning outcomes using instructional methods that are affordable and practical for large numbers of students?\n\nThe problem concerns scalable instructional design.",
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy"
+      ]
+    },
+    "stage-10-explanation": {
+      "id": "stage-10-explanation",
+      "title": "Application and Interpretation — explained",
+      "conceptIds": [
+        "KC_10"
+      ],
+      "content": "Bloom's result describes the achievement differences observed in particular instructional experiments.\n\nIt does not guarantee a two-standard-deviation improvement for every future tutoring or adaptive-learning system.\n\nAn adaptive platform may address Bloom's scalability challenge by providing individualized instruction to many learners.\n\nHowever, its actual learning effect must be measured independently.",
+      "sourceIds": [
+        "bloom-1984",
+        "bloom-copy",
+        "vanlehn-2011",
+        "vanlehn-copy"
+      ]
+    }
+  },
+  "stages": {
+    "stage-01": {
+      "stageId": "stage-01",
+      "title": "Arithmetic Mean",
+      "purpose": "Establish the arithmetic mean as the center of a dataset.",
+      "conceptIds": [
+        "KC_01"
+      ],
+      "prerequisiteConceptIds": [],
+      "coreQuestionId": "stage-01-core",
+      "remediationVideoIds": [
+        "stage-01-video"
+      ],
+      "transferQuestionId": "stage-01-transfer",
+      "fallbackExplanationId": "stage-01-explanation",
+      "nextStageId": "stage-02"
+    },
+    "stage-02": {
+      "stageId": "stage-02",
+      "title": "Standard Deviation",
+      "purpose": "Establish the difference between a dataset's center and its spread.",
+      "conceptIds": [
+        "KC_02"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_01"
+      ],
+      "coreQuestionId": "stage-02-core",
+      "remediationVideoIds": [
+        "stage-02-video"
+      ],
+      "transferQuestionId": "stage-02-transfer",
+      "fallbackExplanationId": "stage-02-explanation",
+      "nextStageId": "stage-03"
+    },
+    "stage-03": {
+      "stageId": "stage-03",
+      "title": "Standardized Distance",
+      "purpose": "Teach the learner to interpret differences in units of standard deviations.",
+      "conceptIds": [
+        "KC_03"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_01",
+        "KC_02"
+      ],
+      "coreQuestionId": "stage-03-core",
+      "remediationVideoIds": [
+        "stage-03-video"
+      ],
+      "transferQuestionId": "stage-03-transfer",
+      "fallbackExplanationId": "stage-03-explanation",
+      "nextStageId": "stage-04"
+    },
+    "stage-04": {
+      "stageId": "stage-04",
+      "title": "Normal Distributions and Percentiles",
+      "purpose": "Explain the percentile interpretation associated with a two-standard-deviation difference.",
+      "conceptIds": [
+        "KC_04"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_02",
+        "KC_03"
+      ],
+      "coreQuestionId": "stage-04-core",
+      "remediationVideoIds": [
+        "stage-04-video"
+      ],
+      "transferQuestionId": "stage-04-transfer",
+      "fallbackExplanationId": "stage-04-explanation",
+      "nextStageId": "stage-05"
+    },
+    "stage-05": {
+      "stageId": "stage-05",
+      "title": "Bloom's Experimental Conditions",
+      "purpose": "Introduce the instructional conditions compared in Bloom's research.",
+      "conceptIds": [
+        "KC_05"
+      ],
+      "prerequisiteConceptIds": [],
+      "coreQuestionId": "stage-05-core",
+      "remediationVideoIds": [
+        "stage-05-video"
+      ],
+      "transferQuestionId": "stage-05-transfer",
+      "fallbackExplanationId": "stage-05-explanation",
+      "nextStageId": "stage-06"
+    },
+    "stage-06": {
+      "stageId": "stage-06",
+      "title": "Mastery Learning",
+      "purpose": "Explain the formative-assessment and corrective-instruction process associated with mastery learning.",
+      "conceptIds": [
+        "KC_06"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "coreQuestionId": "stage-06-core",
+      "remediationVideoIds": [
+        "stage-06-video"
+      ],
+      "transferQuestionId": "stage-06-transfer",
+      "fallbackExplanationId": "stage-06-explanation",
+      "nextStageId": "stage-07"
+    },
+    "stage-07": {
+      "stageId": "stage-07",
+      "title": "Experimental Evidence and Generalization",
+      "purpose": "Establish the scope and limitations of the experiments summarized by Bloom.",
+      "conceptIds": [
+        "KC_07"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "coreQuestionId": "stage-07-core",
+      "remediationVideoIds": [
+        "stage-07-video"
+      ],
+      "transferQuestionId": "stage-07-transfer",
+      "fallbackExplanationId": "stage-07-explanation",
+      "nextStageId": "stage-08"
+    },
+    "stage-08": {
+      "stageId": "stage-08",
+      "title": "Bloom's Reported Results",
+      "purpose": "Establish the central findings of Bloom's research.",
+      "conceptIds": [
+        "KC_08"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_03",
+        "KC_04",
+        "KC_05",
+        "KC_06",
+        "KC_07"
+      ],
+      "coreQuestionId": "stage-08-core",
+      "remediationVideoIds": [
+        "stage-08-video"
+      ],
+      "transferQuestionId": "stage-08-transfer",
+      "fallbackExplanationId": "stage-08-explanation",
+      "nextStageId": "stage-09"
+    },
+    "stage-09": {
+      "stageId": "stage-09",
+      "title": "The 2 Sigma Problem",
+      "purpose": "Distinguish Bloom's reported finding from the actual problem he wanted researchers to solve.",
+      "conceptIds": [
+        "KC_09"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_08"
+      ],
+      "coreQuestionId": "stage-09-core",
+      "remediationVideoIds": [
+        "stage-09-video"
+      ],
+      "transferQuestionId": "stage-09-transfer",
+      "fallbackExplanationId": "stage-09-explanation",
+      "nextStageId": "stage-10"
+    },
+    "stage-10": {
+      "stageId": "stage-10",
+      "title": "Application and Interpretation",
+      "purpose": "Evaluate whether the learner can apply Bloom's ideas without exaggerating the original findings.",
+      "conceptIds": [
+        "KC_10"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_07",
+        "KC_08",
+        "KC_09"
+      ],
+      "coreQuestionId": "stage-10-core",
+      "remediationVideoIds": [
+        "stage-10-video"
+      ],
+      "transferQuestionId": "stage-10-transfer",
+      "fallbackExplanationId": "stage-10-explanation",
+      "nextStageId": null
+    }
+  },
+  "sources": [
+    {
+      "id": "bloom-1984",
+      "title": "Bloom (1984) — The 2 Sigma Problem (primary source, pp. 4–5)",
+      "url": "https://web.mit.edu/5.95/readings/bloom-two-sigma.pdf"
+    },
+    {
+      "id": "bloom-copy",
+      "title": "Bloom (1984) — accessible copy",
+      "url": "https://gwern.net/doc/psychology/1984-bloom.pdf"
+    },
+    {
+      "id": "vanlehn-2011",
+      "title": "VanLehn (2011) — The Relative Effectiveness of Human Tutoring, Intelligent Tutoring Systems, and Other Tutoring Systems",
+      "url": "https://doi.org/10.1080/00461520.2011.611369"
+    },
+    {
+      "id": "vanlehn-copy",
+      "title": "VanLehn (2011) — author-hosted paper",
+      "url": "https://www.public.asu.edu/~kvanlehn/Stringent/PDF/EffectivenessOfTutoring_Vanlehn.pdf"
+    },
+    {
+      "id": "khan-1",
+      "title": "Mean, median, & mode example",
+      "url": "https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data/mean-median-basics/v/mean-median-and-mode"
+    },
+    {
+      "id": "khan-2",
+      "title": "Measures of spread: range, variance & standard deviation",
+      "url": "https://www.khanacademy.org/v/range-variance-and-standard-deviation-as-measures-of-dispersion"
+    },
+    {
+      "id": "khan-3",
+      "title": "Z-score introduction",
+      "url": "https://www.khanacademy.org/v/z-score-introduction"
+    },
+    {
+      "id": "khan-4",
+      "title": "Normal distribution problems: Empirical rule",
+      "url": "https://www.khanacademy.org/math/ap-statistics/density-curves-normal-distribution-ap/stats-normal-distributions/v/ck12-org-normal-distribution-problems-empirical-rule"
+    },
+    {
+      "id": "ted-koller",
+      "title": "What we're learning from online education",
+      "url": "https://www.ted.com/talks/daphne_koller_what_we_re_learning_from_online_education"
+    },
+    {
+      "id": "khan-6",
+      "title": "What is mastery learning?",
+      "url": "https://www.youtube.com/watch?v=zRuiDvz8p5o"
+    },
+    {
+      "id": "rowe",
+      "title": "Bloom's 2 Sigma Problem Debunked: One-to-One Tutoring Isn't Going to Save Education",
+      "url": "https://www.youtube.com/watch?v=IaTk7lHC470"
+    }
+  ]
+}

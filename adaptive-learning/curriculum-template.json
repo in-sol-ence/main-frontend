@@ -1,0 +1,984 @@
+{
+  "id": "skatebored-development-fixture",
+  "version": 1,
+  "isFixture": true,
+  "title": "Bloom’s 2 Sigma Problem",
+  "firstStageId": "stage-01",
+  "concepts": {
+    "KC_01": {
+      "index": 0,
+      "name": "Arithmetic Mean",
+      "description": "Understanding the arithmetic mean as the center of a dataset.",
+      "prerequisites": []
+    },
+    "KC_02": {
+      "index": 1,
+      "name": "Standard Deviation",
+      "description": "Understanding standard deviation as a measure of variability around the mean.",
+      "prerequisites": [
+        "KC_01"
+      ]
+    },
+    "KC_03": {
+      "index": 2,
+      "name": "Standardized Distance",
+      "description": "Understanding differences between values or group means in units of standard deviations.",
+      "prerequisites": [
+        "KC_01",
+        "KC_02"
+      ]
+    },
+    "KC_04": {
+      "index": 3,
+      "name": "Normal Distributions and Percentiles",
+      "description": "Understanding the relationship between standard deviations and percentile ranks under a normal-distribution assumption.",
+      "prerequisites": [
+        "KC_02",
+        "KC_03"
+      ]
+    },
+    "KC_05": {
+      "index": 4,
+      "name": "Bloom's Experimental Conditions",
+      "description": "Understanding the conventional instruction, mastery learning, and tutoring conditions compared in Bloom's research.",
+      "prerequisites": []
+    },
+    "KC_06": {
+      "index": 5,
+      "name": "Mastery Learning",
+      "description": "Understanding formative assessment, feedback, corrective instruction, and reassessment.",
+      "prerequisites": [
+        "KC_05"
+      ]
+    },
+    "KC_07": {
+      "index": 6,
+      "name": "Experimental Evidence and Generalization",
+      "description": "Understanding the design, scope, and limits of Bloom's reported experiments.",
+      "prerequisites": [
+        "KC_05"
+      ]
+    },
+    "KC_08": {
+      "index": 7,
+      "name": "Bloom's Reported Results",
+      "description": "Understanding the approximately one-sigma mastery-learning result and two-sigma tutoring result.",
+      "prerequisites": [
+        "KC_03",
+        "KC_04",
+        "KC_05",
+        "KC_06",
+        "KC_07"
+      ]
+    },
+    "KC_09": {
+      "index": 8,
+      "name": "The 2 Sigma Problem",
+      "description": "Understanding Bloom's challenge of reproducing tutoring-level achievement through practical, scalable instruction.",
+      "prerequisites": [
+        "KC_08"
+      ]
+    },
+    "KC_10": {
+      "index": 9,
+      "name": "Application and Interpretation",
+      "description": "Understanding how Bloom's findings motivate adaptive learning without guaranteeing identical results across interventions.",
+      "prerequisites": [
+        "KC_07",
+        "KC_08",
+        "KC_09"
+      ]
+    }
+  },
+  "questions": {
+    "stage-01-core": {
+      "id": "stage-01-core",
+      "stageId": "stage-01",
+      "conceptIds": [
+        "KC_01"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which path would you like to try?",
+      "choices": [
+        {
+          "id": "correct",
+          "text": "Demonstrate understanding"
+        },
+        {
+          "id": "incorrect",
+          "text": "Try the extra support"
+        }
+      ],
+      "correctAnswer": "correct",
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [],
+      "sourceIds": []
+    },
+    "stage-01-transfer": {
+      "id": "stage-01-transfer",
+      "stageId": "stage-01",
+      "conceptIds": [
+        "KC_01"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which path would you like to try?",
+      "choices": [
+        {
+          "id": "correct",
+          "text": "Demonstrate understanding"
+        },
+        {
+          "id": "incorrect",
+          "text": "Try the extra support"
+        }
+      ],
+      "correctAnswer": "correct",
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [],
+      "sourceIds": []
+    },
+    "stage-02-core": {
+      "id": "stage-02-core",
+      "stageId": "stage-02",
+      "conceptIds": [
+        "KC_02"
+      ],
+      "questionType": "numerical",
+      "questionText": "Enter 2 to demonstrate a correct numerical answer.",
+      "choices": [],
+      "correctAnswer": {
+        "value": 2,
+        "tolerance": 0.01
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_01"
+      ],
+      "sourceIds": []
+    },
+    "stage-02-transfer": {
+      "id": "stage-02-transfer",
+      "stageId": "stage-02",
+      "conceptIds": [
+        "KC_02"
+      ],
+      "questionType": "numerical",
+      "questionText": "Enter 2 to demonstrate a correct numerical answer.",
+      "choices": [],
+      "correctAnswer": {
+        "value": 2,
+        "tolerance": 0.01
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_01"
+      ],
+      "sourceIds": []
+    },
+    "stage-03-core": {
+      "id": "stage-03-core",
+      "stageId": "stage-03",
+      "conceptIds": [
+        "KC_03"
+      ],
+      "questionType": "short_answer",
+      "questionText": "Type “ready” to demonstrate a correct short answer.",
+      "choices": [],
+      "correctAnswer": {
+        "acceptedResponses": [
+          "ready",
+          "i am ready"
+        ]
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_01",
+        "KC_02"
+      ],
+      "sourceIds": []
+    },
+    "stage-03-transfer": {
+      "id": "stage-03-transfer",
+      "stageId": "stage-03",
+      "conceptIds": [
+        "KC_03"
+      ],
+      "questionType": "short_answer",
+      "questionText": "Type “ready” to demonstrate a correct short answer.",
+      "choices": [],
+      "correctAnswer": {
+        "acceptedResponses": [
+          "ready",
+          "i am ready"
+        ]
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_01",
+        "KC_02"
+      ],
+      "sourceIds": []
+    },
+    "stage-04-core": {
+      "id": "stage-04-core",
+      "stageId": "stage-04",
+      "conceptIds": [
+        "KC_04"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which path would you like to try?",
+      "choices": [
+        {
+          "id": "correct",
+          "text": "Demonstrate understanding"
+        },
+        {
+          "id": "incorrect",
+          "text": "Try the extra support"
+        }
+      ],
+      "correctAnswer": "correct",
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_02",
+        "KC_03"
+      ],
+      "sourceIds": []
+    },
+    "stage-04-transfer": {
+      "id": "stage-04-transfer",
+      "stageId": "stage-04",
+      "conceptIds": [
+        "KC_04"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which path would you like to try?",
+      "choices": [
+        {
+          "id": "correct",
+          "text": "Demonstrate understanding"
+        },
+        {
+          "id": "incorrect",
+          "text": "Try the extra support"
+        }
+      ],
+      "correctAnswer": "correct",
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_02",
+        "KC_03"
+      ],
+      "sourceIds": []
+    },
+    "stage-05-core": {
+      "id": "stage-05-core",
+      "stageId": "stage-05",
+      "conceptIds": [
+        "KC_05"
+      ],
+      "questionType": "numerical",
+      "questionText": "Enter 2 to demonstrate a correct numerical answer.",
+      "choices": [],
+      "correctAnswer": {
+        "value": 2,
+        "tolerance": 0.01
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [],
+      "sourceIds": []
+    },
+    "stage-05-transfer": {
+      "id": "stage-05-transfer",
+      "stageId": "stage-05",
+      "conceptIds": [
+        "KC_05"
+      ],
+      "questionType": "numerical",
+      "questionText": "Enter 2 to demonstrate a correct numerical answer.",
+      "choices": [],
+      "correctAnswer": {
+        "value": 2,
+        "tolerance": 0.01
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [],
+      "sourceIds": []
+    },
+    "stage-06-core": {
+      "id": "stage-06-core",
+      "stageId": "stage-06",
+      "conceptIds": [
+        "KC_06"
+      ],
+      "questionType": "short_answer",
+      "questionText": "Type “ready” to demonstrate a correct short answer.",
+      "choices": [],
+      "correctAnswer": {
+        "acceptedResponses": [
+          "ready",
+          "i am ready"
+        ]
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "sourceIds": []
+    },
+    "stage-06-transfer": {
+      "id": "stage-06-transfer",
+      "stageId": "stage-06",
+      "conceptIds": [
+        "KC_06"
+      ],
+      "questionType": "short_answer",
+      "questionText": "Type “ready” to demonstrate a correct short answer.",
+      "choices": [],
+      "correctAnswer": {
+        "acceptedResponses": [
+          "ready",
+          "i am ready"
+        ]
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "sourceIds": []
+    },
+    "stage-07-core": {
+      "id": "stage-07-core",
+      "stageId": "stage-07",
+      "conceptIds": [
+        "KC_07"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which path would you like to try?",
+      "choices": [
+        {
+          "id": "correct",
+          "text": "Demonstrate understanding"
+        },
+        {
+          "id": "incorrect",
+          "text": "Try the extra support"
+        }
+      ],
+      "correctAnswer": "correct",
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "sourceIds": []
+    },
+    "stage-07-transfer": {
+      "id": "stage-07-transfer",
+      "stageId": "stage-07",
+      "conceptIds": [
+        "KC_07"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which path would you like to try?",
+      "choices": [
+        {
+          "id": "correct",
+          "text": "Demonstrate understanding"
+        },
+        {
+          "id": "incorrect",
+          "text": "Try the extra support"
+        }
+      ],
+      "correctAnswer": "correct",
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "sourceIds": []
+    },
+    "stage-08-core": {
+      "id": "stage-08-core",
+      "stageId": "stage-08",
+      "conceptIds": [
+        "KC_08"
+      ],
+      "questionType": "numerical",
+      "questionText": "Enter 2 to demonstrate a correct numerical answer.",
+      "choices": [],
+      "correctAnswer": {
+        "value": 2,
+        "tolerance": 0.01
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_03",
+        "KC_04",
+        "KC_05",
+        "KC_06",
+        "KC_07"
+      ],
+      "sourceIds": []
+    },
+    "stage-08-transfer": {
+      "id": "stage-08-transfer",
+      "stageId": "stage-08",
+      "conceptIds": [
+        "KC_08"
+      ],
+      "questionType": "numerical",
+      "questionText": "Enter 2 to demonstrate a correct numerical answer.",
+      "choices": [],
+      "correctAnswer": {
+        "value": 2,
+        "tolerance": 0.01
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_03",
+        "KC_04",
+        "KC_05",
+        "KC_06",
+        "KC_07"
+      ],
+      "sourceIds": []
+    },
+    "stage-09-core": {
+      "id": "stage-09-core",
+      "stageId": "stage-09",
+      "conceptIds": [
+        "KC_09"
+      ],
+      "questionType": "short_answer",
+      "questionText": "Type “ready” to demonstrate a correct short answer.",
+      "choices": [],
+      "correctAnswer": {
+        "acceptedResponses": [
+          "ready",
+          "i am ready"
+        ]
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_08"
+      ],
+      "sourceIds": []
+    },
+    "stage-09-transfer": {
+      "id": "stage-09-transfer",
+      "stageId": "stage-09",
+      "conceptIds": [
+        "KC_09"
+      ],
+      "questionType": "short_answer",
+      "questionText": "Type “ready” to demonstrate a correct short answer.",
+      "choices": [],
+      "correctAnswer": {
+        "acceptedResponses": [
+          "ready",
+          "i am ready"
+        ]
+      },
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_08"
+      ],
+      "sourceIds": []
+    },
+    "stage-10-core": {
+      "id": "stage-10-core",
+      "stageId": "stage-10",
+      "conceptIds": [
+        "KC_10"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which path would you like to try?",
+      "choices": [
+        {
+          "id": "correct",
+          "text": "Demonstrate understanding"
+        },
+        {
+          "id": "incorrect",
+          "text": "Try the extra support"
+        }
+      ],
+      "correctAnswer": "correct",
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_07",
+        "KC_08",
+        "KC_09"
+      ],
+      "sourceIds": []
+    },
+    "stage-10-transfer": {
+      "id": "stage-10-transfer",
+      "stageId": "stage-10",
+      "conceptIds": [
+        "KC_10"
+      ],
+      "questionType": "multiple_choice",
+      "questionText": "Which path would you like to try?",
+      "choices": [
+        {
+          "id": "correct",
+          "text": "Demonstrate understanding"
+        },
+        {
+          "id": "incorrect",
+          "text": "Try the extra support"
+        }
+      ],
+      "correctAnswer": "correct",
+      "answerExplanation": "This is a development fixture. The response tests the learning flow; it does not assess your knowledge of this concept.",
+      "difficulty": "development",
+      "prerequisiteConceptIds": [
+        "KC_07",
+        "KC_08",
+        "KC_09"
+      ],
+      "sourceIds": []
+    }
+  },
+  "videos": {
+    "stage-01-video": {
+      "id": "stage-01-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_01"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    },
+    "stage-02-video": {
+      "id": "stage-02-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_02"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    },
+    "stage-03-video": {
+      "id": "stage-03-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_03"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    },
+    "stage-04-video": {
+      "id": "stage-04-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_04"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    },
+    "stage-05-video": {
+      "id": "stage-05-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_05"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    },
+    "stage-06-video": {
+      "id": "stage-06-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_06"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    },
+    "stage-07-video": {
+      "id": "stage-07-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_07"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    },
+    "stage-08-video": {
+      "id": "stage-08-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_08"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    },
+    "stage-09-video": {
+      "id": "stage-09-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_09"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    },
+    "stage-10-video": {
+      "id": "stage-10-video",
+      "title": "Remediation segment awaiting content",
+      "creator": "Not supplied",
+      "url": null,
+      "startTime": 0,
+      "endTime": 30,
+      "segmentDuration": 30,
+      "conceptIds": [
+        "KC_10"
+      ],
+      "description": "The supplied attachment ends before the video resources. This slot demonstrates targeted remediation.",
+      "sourceIds": []
+    }
+  },
+  "explanations": {
+    "stage-01-explanation": {
+      "id": "stage-01-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_01"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    },
+    "stage-02-explanation": {
+      "id": "stage-02-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_02"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    },
+    "stage-03-explanation": {
+      "id": "stage-03-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_03"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    },
+    "stage-04-explanation": {
+      "id": "stage-04-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_04"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    },
+    "stage-05-explanation": {
+      "id": "stage-05-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_05"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    },
+    "stage-06-explanation": {
+      "id": "stage-06-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_06"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    },
+    "stage-07-explanation": {
+      "id": "stage-07-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_07"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    },
+    "stage-08-explanation": {
+      "id": "stage-08-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_08"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    },
+    "stage-09-explanation": {
+      "id": "stage-09-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_09"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    },
+    "stage-10-explanation": {
+      "id": "stage-10-explanation",
+      "title": "A little more support",
+      "conceptIds": [
+        "KC_10"
+      ],
+      "content": "A written explanation will appear here when the curriculum is supplied. Reading it does not grant mastery. You can continue with this gap recorded in your knowledge state.",
+      "sourceIds": []
+    }
+  },
+  "stages": {
+    "stage-01": {
+      "stageId": "stage-01",
+      "title": "Arithmetic Mean",
+      "purpose": "Check your understanding of arithmetic mean before moving on.",
+      "conceptIds": [
+        "KC_01"
+      ],
+      "prerequisiteConceptIds": [],
+      "coreQuestionId": "stage-01-core",
+      "remediationVideoIds": [
+        "stage-01-video"
+      ],
+      "transferQuestionId": "stage-01-transfer",
+      "fallbackExplanationId": "stage-01-explanation",
+      "nextStageId": "stage-02"
+    },
+    "stage-02": {
+      "stageId": "stage-02",
+      "title": "Standard Deviation",
+      "purpose": "Check your understanding of standard deviation before moving on.",
+      "conceptIds": [
+        "KC_02"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_01"
+      ],
+      "coreQuestionId": "stage-02-core",
+      "remediationVideoIds": [
+        "stage-02-video"
+      ],
+      "transferQuestionId": "stage-02-transfer",
+      "fallbackExplanationId": "stage-02-explanation",
+      "nextStageId": "stage-03"
+    },
+    "stage-03": {
+      "stageId": "stage-03",
+      "title": "Standardized Distance",
+      "purpose": "Check your understanding of standardized distance before moving on.",
+      "conceptIds": [
+        "KC_03"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_01",
+        "KC_02"
+      ],
+      "coreQuestionId": "stage-03-core",
+      "remediationVideoIds": [
+        "stage-03-video"
+      ],
+      "transferQuestionId": "stage-03-transfer",
+      "fallbackExplanationId": "stage-03-explanation",
+      "nextStageId": "stage-04"
+    },
+    "stage-04": {
+      "stageId": "stage-04",
+      "title": "Normal Distributions and Percentiles",
+      "purpose": "Check your understanding of normal distributions and percentiles before moving on.",
+      "conceptIds": [
+        "KC_04"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_02",
+        "KC_03"
+      ],
+      "coreQuestionId": "stage-04-core",
+      "remediationVideoIds": [
+        "stage-04-video"
+      ],
+      "transferQuestionId": "stage-04-transfer",
+      "fallbackExplanationId": "stage-04-explanation",
+      "nextStageId": "stage-05"
+    },
+    "stage-05": {
+      "stageId": "stage-05",
+      "title": "Bloom's Experimental Conditions",
+      "purpose": "Check your understanding of bloom's experimental conditions before moving on.",
+      "conceptIds": [
+        "KC_05"
+      ],
+      "prerequisiteConceptIds": [],
+      "coreQuestionId": "stage-05-core",
+      "remediationVideoIds": [
+        "stage-05-video"
+      ],
+      "transferQuestionId": "stage-05-transfer",
+      "fallbackExplanationId": "stage-05-explanation",
+      "nextStageId": "stage-06"
+    },
+    "stage-06": {
+      "stageId": "stage-06",
+      "title": "Mastery Learning",
+      "purpose": "Check your understanding of mastery learning before moving on.",
+      "conceptIds": [
+        "KC_06"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "coreQuestionId": "stage-06-core",
+      "remediationVideoIds": [
+        "stage-06-video"
+      ],
+      "transferQuestionId": "stage-06-transfer",
+      "fallbackExplanationId": "stage-06-explanation",
+      "nextStageId": "stage-07"
+    },
+    "stage-07": {
+      "stageId": "stage-07",
+      "title": "Experimental Evidence and Generalization",
+      "purpose": "Check your understanding of experimental evidence and generalization before moving on.",
+      "conceptIds": [
+        "KC_07"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_05"
+      ],
+      "coreQuestionId": "stage-07-core",
+      "remediationVideoIds": [
+        "stage-07-video"
+      ],
+      "transferQuestionId": "stage-07-transfer",
+      "fallbackExplanationId": "stage-07-explanation",
+      "nextStageId": "stage-08"
+    },
+    "stage-08": {
+      "stageId": "stage-08",
+      "title": "Bloom's Reported Results",
+      "purpose": "Check your understanding of bloom's reported results before moving on.",
+      "conceptIds": [
+        "KC_08"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_03",
+        "KC_04",
+        "KC_05",
+        "KC_06",
+        "KC_07"
+      ],
+      "coreQuestionId": "stage-08-core",
+      "remediationVideoIds": [
+        "stage-08-video"
+      ],
+      "transferQuestionId": "stage-08-transfer",
+      "fallbackExplanationId": "stage-08-explanation",
+      "nextStageId": "stage-09"
+    },
+    "stage-09": {
+      "stageId": "stage-09",
+      "title": "The 2 Sigma Problem",
+      "purpose": "Check your understanding of the 2 sigma problem before moving on.",
+      "conceptIds": [
+        "KC_09"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_08"
+      ],
+      "coreQuestionId": "stage-09-core",
+      "remediationVideoIds": [
+        "stage-09-video"
+      ],
+      "transferQuestionId": "stage-09-transfer",
+      "fallbackExplanationId": "stage-09-explanation",
+      "nextStageId": "stage-10"
+    },
+    "stage-10": {
+      "stageId": "stage-10",
+      "title": "Application and Interpretation",
+      "purpose": "Check your understanding of application and interpretation before moving on.",
+      "conceptIds": [
+        "KC_10"
+      ],
+      "prerequisiteConceptIds": [
+        "KC_07",
+        "KC_08",
+        "KC_09"
+      ],
+      "coreQuestionId": "stage-10-core",
+      "remediationVideoIds": [
+        "stage-10-video"
+      ],
+      "transferQuestionId": "stage-10-transfer",
+      "fallbackExplanationId": "stage-10-explanation",
+      "nextStageId": null
+    }
+  },
+  "sources": []
+}
