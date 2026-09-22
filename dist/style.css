@@ -35,17 +35,47 @@ h1 {
   pointer-events: none;
 }
 .intro { position: relative; z-index: 2; pointer-events: none; }
-.actions { display: flex; gap: 12px; margin-top: 28px; pointer-events: auto; }
+/* Pill actions that echo the deck's rounded silhouette. Demo is the solid red
+   primary with its arrow in an inset chip; Contact is a dark glass pill with a
+   cream hairline, the spatial study's restraint. */
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 36px; pointer-events: auto; }
 .actions a, .actions button {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-height: 48px; padding: 12px 24px; border: 0; border-radius: 0;
-  background: #f04c4c; color: #000000; font: 600 16px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+  height: 54px; padding: 0 26px; border-radius: 999px; border: 1px solid transparent;
+  font: 600 17px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: -.01em;
+  text-decoration: none; cursor: pointer;
+  transition: background-color 220ms ease, border-color 220ms ease, color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
 }
-.actions a:hover { background: #f76a6a; }
-.actions :focus-visible { outline: 2px solid var(--text-color); outline-offset: 4px; }
-.actions button { cursor: pointer; opacity: 1; }
-.actions button:disabled { cursor: wait; }
+#demo-button {
+  padding: 0 7px 0 26px; background: #f04c4c; color: #160707;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .22), 0 10px 28px -14px rgb(240 76 76 / .7);
+}
+#demo-button::after {
+  content: "\2192"; display: grid; place-items: center; width: 40px; height: 40px;
+  border-radius: 50%; background: #160707; color: #f4dac8; font-size: 17px;
+  transition: transform 220ms ease;
+}
+#demo-button:hover:not(:disabled), #demo-button:focus-visible {
+  background: #f35d5d; transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .25), 0 16px 36px -14px rgb(240 76 76 / .85);
+}
+#demo-button:hover:not(:disabled)::after, #demo-button:focus-visible::after { transform: translateX(3px); }
+.actions a {
+  background: rgb(244 218 200 / .05); color: #f4dac8; border-color: rgb(244 218 200 / .22);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.actions a:hover, .actions a:focus-visible { background: rgb(244 218 200 / .1); border-color: rgb(244 218 200 / .5); transform: translateY(-1px); }
+.actions :focus-visible { outline: 2px solid #f4dac8; outline-offset: 3px; }
+.actions button:disabled { cursor: wait; opacity: .55; box-shadow: none; }
+@media (max-width: 760px) {
+  .actions a, .actions button { height: 50px; font-size: 16px; }
+  #demo-button::after { width: 36px; height: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .actions a, .actions button, #demo-button::after { transition: none; }
+  .actions a:hover, .actions a:focus-visible, #demo-button:hover:not(:disabled), #demo-button:focus-visible,
+  #demo-button:hover:not(:disabled)::after, #demo-button:focus-visible::after { transform: none; }
+}
 #typed { white-space: pre-wrap; }
 .typed-cursor {
   display: inline-block;
@@ -126,3 +156,10 @@ h1 {
 
 /* One persistent visualization, sized by the original page's reserved slot. */
 #knowledge-volume { position: absolute; z-index: 2; min-height: 0; }
+
+/* The spatial journey is handed the same page, not a navigation. It is warmed
+   behind the demo and cross-faded in with the existing 350ms reveal. */
+#spatial-stage { position: fixed; inset: 0; z-index: 5; background: #0b0e10; opacity: 0; pointer-events: none; transition: opacity 350ms ease; }
+#spatial-stage.is-entering { opacity: 1; pointer-events: auto; }
+#spatial-stage iframe { display: block; width: 100%; height: 100%; border: 0; }
+@media (prefers-reduced-motion: reduce) { #spatial-stage { transition: none; } }

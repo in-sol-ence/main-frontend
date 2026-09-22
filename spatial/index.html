@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0e10">
+  <meta name="description" content="Tell Skatebored what you want to learn. Enter a spatial journey through knowledge.">
+  <title>Skatebored — A journey through knowledge</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main aria-label="Skatebored knowledge space" data-phase="landing">
+    <canvas id="world" tabindex="0" role="img" aria-label="A matte skateboard floating in a dark space, with a fine flowing path across its deck. Scroll down to enter Skatebored."></canvas>
+    <section id="landing-space" aria-label="Welcome to Skatebored">
+      <div class="landing-identity"><h1>SKATEBORED</h1><p>Find your path.</p></div>
+      <button id="enter-skatebored" type="button">Explore Skatebored <span aria-hidden="true">↓</span></button>
+    </section>
+    <div id="landmarks" aria-hidden="true"></div>
+    <div id="entry-space" hidden inert>
+      <form id="goal-form" autocomplete="off">
+        <p id="handoff-statement" hidden></p>
+        <span class="entry-signature">SKATEBORED</span>
+        <label for="learning-goal">What do you want to learn?</label>
+        <p id="prompt-support">A learning path built around you.</p>
+        <div class="goal-line">
+          <input id="learning-goal" name="goal" type="text" maxlength="300" required placeholder="Understand reinforcement learning" aria-describedby="demo-note" spellcheck="false">
+          <button id="begin-journey" type="submit" aria-label="Build this learning journey">↗</button>
+        </div>
+        <div class="background-line">
+          <label for="learner-background">I already know</label>
+          <input id="learner-background" name="background" type="text" maxlength="300" placeholder="a little, a lot, or nothing yet" aria-label="Your background, optional">
+          <span>optional</span>
+        </div>
+        <p id="demo-note" class="visually-hidden">Enter a goal to explore a connected knowledge space and an illustrative adaptive journey.</p>
+        <p id="entry-error" role="alert" hidden></p>
+      </form>
+    </div>
+    <span id="journey-seed" aria-hidden="true"></span>
+    <button id="knowledge-action" type="button" hidden>I know this</button>
+    <div id="understanding-labels" aria-hidden="true"></div>
+    <p id="narration" aria-hidden="true" hidden><span class="narration-eyebrow"></span><span class="narration-text"><span class="narration-typed"></span><span class="narration-rest"></span></span></p>
+    <section id="concept-understanding" aria-labelledby="understanding-title" hidden inert>
+      <h2 id="understanding-title"></h2>
+      <p class="learning-reason" hidden></p>
+      <p class="understanding-explanation"></p>
+      <p class="understanding-intuition"></p>
+      <div id="knowledge-check-choices" role="group" aria-label="Answer choices" hidden></div>
+      <p class="understanding-example"></p>
+      <div class="understanding-actions">
+        <button id="understand-concept" type="button">I understand this</button>
+        <button id="continue-exploring" type="button">Continue exploring ↗</button>
+        <button id="explore-freely" type="button" hidden>Explore freely ↗</button>
+      </div>
+    </section>
+    <button id="reopen-understanding" type="button" hidden>Understand this concept</button>
+    <div id="journey-identity" hidden>
+      <span class="journey-eyebrow">LEARNING JOURNEY</span>
+      <span id="journey-goal"></span>
+      <span id="journey-note"></span>
+    </div>
+    <button id="new-journey" type="button" hidden>New journey <span aria-hidden="true">＋</span></button>
+    <button id="restart-check" type="button" hidden>Restart check ↺</button>
+    <button id="resume-flow" type="button" hidden>Resume flow</button>
+    <p id="adaptive-cue" role="status" aria-live="polite" hidden></p>
+    <section id="route-perspective" aria-label="The learning path responding to evidence" hidden>
+      <div id="route-copy">
+        <span id="route-eyebrow">ONE KNOWLEDGE SPACE</span>
+        <h2 id="route-heading">The space is shared. The path is not fixed.</h2>
+        <p id="route-detail"></p>
+      </div>
+      <div id="route-landmarks" aria-hidden="true"></div>
+      <button id="comparison-pause" type="button">Pause</button>
+      <p id="comparison-disclosure">Illustrative learner responses & content selection · not a measured outcome or a linked lecture</p>
+    </section>
+    <p id="journey-status" class="visually-hidden" role="status" aria-live="polite"></p>
+    <div id="spatial-context" hidden>
+      <button id="return-parent" type="button" aria-label="Return to parent journey">←</button>
+      <span id="ancestry" aria-live="polite"></span>
+    </div>
+    <p id="motion-help" class="visually-hidden">Scroll down or up to travel forward or backward along the spatial path. Scrolling takes manual control; Resume flow or Space restores autonomous movement from your current location. R restarts the check with previous answers cleared. Left and right arrows inspect visible concepts; Enter explores the focused concept. Checked concepts immediately present a question. Answers change the route automatically; reinforcement includes an explanation followed by practice. Tab reaches answer choices and Restart check. Escape or Explore freely cancels the automatic next action. Your reduced-motion preference is respected.</p>
+    <ol id="journey-concepts" class="visually-hidden" aria-label="Sample learning journey"></ol>
+    <p id="failure" role="status" hidden>This spatial study needs WebGL. Please try a browser with graphics acceleration enabled.</p>
+    <noscript><p class="unavailable">Enable JavaScript to enter the spatial study.</p></noscript>
+  </main>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

@@ -97,7 +97,7 @@ async function _createSkateboard() {
   model.position.sub(bounds.getCenter(new THREE.Vector3()));
   const board = new THREE.Group();
   board.add(model);
-  board.scale.setScalar(6.35 / size.z * 1.06);
+  board.scale.setScalar(6.35 / size.z * 1.02);
   board.position.set(0, -.45, 0);
   board.rotation.set(-1.8151424220741028, 2.478367537831948, 0.06981317007977318, 'XYZ');
   const ride = new THREE.Group();
@@ -110,10 +110,22 @@ async function _createSkateboard() {
   const homePosition = board.position.clone();
   const homeRotation = board.quaternion.clone();
   const homeScale = board.scale.clone();
-  // The fixed OBJ correction is separate from the riding pivot's yaw/bank.
+  // The fixed OBJ correction is separate from the riding pivot's roll/yaw/tilt.
   const ridingPose = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
   const cameraPose = new THREE.Quaternion();
-  const carve = new THREE.Euler(0, 0, 0, 'YXZ');
+  const carve = new THREE.Euler(0, 0, 0, 'ZYX');
+  const sweepPose = new THREE.Quaternion();
+  const spread = new THREE.Matrix4();
+  // The sweep pose in camera space. The deck's top face is model -Y, so -90 degrees
+  // of roll turns it toward the viewer; that roll keeps travelling through the sweep
+  // but stays far short of edge-on, over a constant nose-up tilt. Yaw still carves:
+  // straight → toward camera → straight → away → straight, with soft endpoints.
+  const _pose = progress => {
+    const turn = Math.sin(2 * Math.PI * progress) * Math.sin(Math.PI * progress);
+    carve.set(THREE.MathUtils.degToRad(-90 + 34 * (2 * progress - 1)),
+      THREE.MathUtils.degToRad(-12 * turn), THREE.MathUtils.degToRad(10));
+    return sweepPose.setFromEuler(carve);
+  };
   const projected = new THREE.Vector3();
   const projection = new THREE.Matrix4();
   const meshes = [];
@@ -136,18 +148,25 @@ async function _createSkateboard() {
         const width = container.clientWidth;
         const depth = 5.9;
         const lens = camera.projectionMatrix.elements;
-        // Fit the same board uniformly; the camera and its perspective stay fixed.
-        const length = Math.min(3, .4 * 2 * depth / lens[0]);
+        // Fill the viewport: the board is longer than the visible width at its depth.
+        const length = 1.25 * 2 * depth / lens[0];
         board.scale.setScalar(length / size.z);
-        const radius = size.length() * board.scale.x / 2;
-        const margin = radius * (lens[0] + Math.abs(lens[8]) + 1) / (depth - radius) + .02;
-        const x = THREE.MathUtils.lerp(-1 - margin, 1 + margin, progress);
+        // Clear each edge by the exact projected reach of the pose actually held there,
+        // not by a loose sphere: the board is wider than the screen now, so a sphere
+        // would overshoot by seconds. Each axis contributes its own worst corner, at
+        // its near depth. Both ends are fixed, so the trailing edge stays monotonic.
+        const clearance = (at, edge) => {
+          spread.makeRotationFromQuaternion(_pose(at).multiply(ridingPose));
+          const reach = spread.elements;
+          return (Math.abs(lens[0] * reach[0] + edge * reach[2]) * size.x
+            + Math.abs(lens[0] * reach[4] + edge * reach[6]) * size.y
+            + Math.abs(lens[0] * reach[8] + edge * reach[10]) * size.z)
+            * board.scale.x / (2 * depth) + .02;
+        };
+        const x = THREE.MathUtils.lerp(-1 - clearance(0, lens[8] - 1), 1 + clearance(1, lens[8] + 1), progress);
         ride.position.set((x + lens[8]) * depth / lens[0], lens[9] * depth / lens[5], -depth)
           .applyMatrix4(camera.matrixWorld);
-        // Straight → toward camera → straight → away → straight, with soft endpoints.
-        const turn = Math.sin(2 * Math.PI * progress) * Math.sin(Math.PI * progress);
-        carve.set(THREE.MathUtils.degToRad(12 + 3 * turn), THREE.MathUtils.degToRad(-18 * turn), 0);
-        ride.quaternion.setFromEuler(carve).premultiply(cameraPose);
+        ride.quaternion.copy(_pose(progress)).premultiply(cameraPose);
         ride.updateMatrixWorld(true);
         let trailing = Infinity;
         for (const mesh of meshes) {

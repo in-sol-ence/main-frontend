@@ -3,6 +3,8 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { createContext, runInContext } from 'node:vm'
 import { parseHTML } from 'linkedom'
+import { demo } from '../copy/demo.js'
+import { journey } from '../copy/journey.js'
 
 function _fixture(reducedMotion = false, sequence = false) {
   const { window, document } = parseHTML(readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8'))
@@ -26,13 +28,19 @@ function _fixture(reducedMotion = false, sequence = false) {
   let id = 0
   let now = 0
   const motion = { matches: reducedMotion, addEventListener(_, handler) { this.handler = handler } }
+  const handoff = { preloads: 0, enters: 0 }
   const context = createContext({
+    demo, journey,
     window, document, CustomEvent: window.CustomEvent, MutationObserver: window.MutationObserver, matchMedia: () => motion,
     setTimeout(fn, delay = 0) { const key = ++id; pending.set(key, { fn, at: now + delay }); return key },
     clearInterval(key) { pending.delete(key) },
     clearTimeout(key) { pending.delete(key) },
     console,
     onAdvance() { advances.push(text.textContent) },
+    handoff: {
+      preload() { handoff.preloads++ },
+      enter() { handoff.enters++ },
+    },
   })
   runInContext(readFileSync(new URL('../dist/vendor/typed.umd.js', import.meta.url), 'utf8'), context)
   window.Typed = context.Typed
@@ -44,12 +52,14 @@ function _fixture(reducedMotion = false, sequence = false) {
         return Promise.resolve()
       },
     }
-    runInContext(readFileSync(new URL('../src/concept-sequence.js', import.meta.url), 'utf8').replaceAll('export ', '') + '\nvar startSequence = initializeConceptSequence(presentation)', context)
+    const sequenceSource = readFileSync(new URL('../src/concept-sequence.js', import.meta.url), 'utf8')
+      .replaceAll('export ', '').split('\n').filter(line => !line.startsWith('import ')).join('\n')
+    runInContext(sequenceSource + '\nvar startSequence = initializeConceptSequence(presentation, handoff)', context)
     context.onAdvance = context.startSequence
   }
-  runInContext(readFileSync(new URL('../src/demo-page.js', import.meta.url), 'utf8').replace('export function', 'function') + '\ninitializeDemoPage(onAdvance)', context)
+  runInContext(readFileSync(new URL('../src/demo-page.js', import.meta.url), 'utf8').replace('export function', 'function').split('\n').filter(line => !line.startsWith('import ')).join('\n') + '\ninitializeDemoPage(onAdvance)', context)
   return {
-    page, text, volume, canvas, next, motion, pending, navigations, advances, selections,
+    page, text, volume, canvas, next, motion, pending, navigations, advances, selections, handoff,
     sentence: heading.getAttribute('aria-label'),
     async enter() { page.dataset.entering = 'true'; await Promise.resolve(); await Promise.resolve() },
     async activate() { page.inert = false; await Promise.resolve(); await Promise.resolve() },
@@ -154,7 +164,10 @@ test('Next runs the whole demonstration in the original page with no navigation 
   }
   assert.deepEqual(f.advances, [''], 'clear only after the complete intro deletion')
   assert.equal(f.selections.length, 4)
-  assert.equal(f.text.textContent, "Here is John Doe's knowledge represented in the embedding space.")
+  // The demonstration ends by erasing itself and handing the same page over.
+  assert.equal(f.text.textContent, '')
+  assert.equal(f.handoff.preloads, 1)
+  assert.equal(f.handoff.enters, 1)
   assert.equal(f.next.hidden, true)
   assert.equal(f.pending.size, 0)
 })

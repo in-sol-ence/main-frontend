@@ -1,6 +1,6 @@
 // Both pages must be mounted and ready before navigate() is called.
 // The viewer calls tick() in its render loop: geometry and clipping share a frame.
-export function createSkateboardTransition({ pages, viewer, duration = 1400 }) {
+export function createSkateboardTransition({ pages, viewer, duration = 3200 }) {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let current = pages.find(page => !page.inert);
   let flight = null;

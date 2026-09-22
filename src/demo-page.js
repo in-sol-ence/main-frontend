@@ -1,11 +1,16 @@
+import { demo } from '../copy/demo.js'
+
 export function initializeDemoPage(onAdvance) {
   const page = document.querySelector('#demo')
   const text = document.querySelector('#demo-typed')
   const heading = page.querySelector('[data-page-heading]')
   const volume = document.querySelector('#knowledge-volume')
   const next = document.querySelector('#demo-next')
-  const sentence = heading.getAttribute('aria-label')
-  const revealAt = sentence.indexOf('three dimensions') + 'three dimensions'.length
+  const sentence = demo.intro
+  // Also reserves the full sentence's footprint through the heading's sizing copy.
+  heading.setAttribute('aria-label', sentence)
+  next.textContent = demo.nextButton
+  const revealAt = sentence.indexOf(demo.revealAfter) + demo.revealAfter.length
   const motion = matchMedia('(prefers-reduced-motion: reduce)')
   let phase = 'waiting'
   let typing

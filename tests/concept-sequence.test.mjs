@@ -3,7 +3,9 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { createContext, runInContext, runInNewContext } from 'node:vm'
 import { parseHTML } from 'linkedom'
-import { conceptStages } from '../src/concept-sequence.js'
+import { conceptStages, closingSentence } from '../src/concept-sequence.js'
+import { demo } from '../copy/demo.js'
+import { journey } from '../copy/journey.js'
 
 function _fixture(reduced = false) {
   const { window, document } = parseHTML(readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8'))
@@ -15,8 +17,14 @@ function _fixture(reduced = false) {
   const sentence = document.querySelector('#demo-typed')
   const pending = new Map()
   const selections = []
-  let id = 0, now = 0, clearCount = 0, finish, emptyFinish
+  let id = 0, now = 0, clearCount = 0, finish, emptyFinish, leaving = false
+  const handoff = { preloads: 0, enters: 0, enteredAt: null }
   const context = createContext({
+    demo, journey,
+    handoff: {
+      preload() { handoff.preloads++ },
+      enter() { handoff.enters++; handoff.enteredAt = now },
+    },
     window, document, MutationObserver: window.MutationObserver,
     matchMedia: () => ({ matches: reduced, addEventListener() {} }),
     setTimeout(fn, delay = 0) { pending.set(++id, { fn, at: now + delay }); return id },
@@ -37,20 +45,25 @@ function _fixture(reduced = false) {
   })
   runInContext(readFileSync(new URL('../dist/vendor/typed.umd.js', import.meta.url), 'utf8'), context)
   window.Typed = context.Typed
-  runInContext(readFileSync(new URL('../src/concept-sequence.js', import.meta.url), 'utf8').replaceAll('export ', '') + '\nvar start = initializeConceptSequence(presentation)', context)
+  // The handoff is injected: this exercises the sequence, not the iframe host.
+  const source = readFileSync(new URL('../src/concept-sequence.js', import.meta.url), 'utf8')
+    .replaceAll('export ', '').split('\n').filter(line => !line.startsWith('import ')).join('\n')
+  runInContext(source + '\nvar start = initializeConceptSequence(presentation, handoff)', context)
   return {
-    page, sentence, pending, selections,
+    page, sentence, pending, selections, handoff,
     get phrase() { return document.querySelector('#concept-phrase') },
     get clears() { return clearCount }, get now() { return now },
     async activate() { page.inert = false; context.start(); await Promise.resolve(); await Promise.resolve() },
     async settleEmpty() { emptyFinish(); await Promise.resolve(); await Promise.resolve() },
     async settle() { finish(); await Promise.resolve(); await Promise.resolve() },
+    // The shell is intact for every stage; the exit deliberately erases it.
+    leave() { leaving = true },
     async step() {
       const entry = [...pending.entries()].sort((a, b) => a[1].at - b[1].at)[0]
       if (!entry) return false
       pending.delete(entry[0]); now = entry[1].at; entry[1].fn()
       await Promise.resolve(); await Promise.resolve()
-      if (selections.length) {
+      if (selections.length && !leaving) {
         assert.ok(sentence.textContent.startsWith('Here is '))
         assert.ok(sentence.textContent.endsWith(' represented in the embedding space.'))
       }
@@ -92,8 +105,46 @@ for (const reduced of [false, true]) test(`sequence follows actual phrase and vi
     }
   }
   assert.equal(f.phrase.textContent, "John Doe's knowledge")
-  assert.equal(f.pending.size, 0, 'final state has no loop or automatic erase')
   assert.equal(f.selections.length, 4)
+  // The John Doe selection holds for the same 2000ms as every other stage.
+  assert.equal(f.pending.size, 1)
+  assert.equal([...f.pending.values()][0].at - f.now, 2000)
+  assert.equal(f.handoff.preloads, 1, 'the study is warmed once, while the sequence runs')
+  assert.equal(f.handoff.enters, 0)
+  const held = f.now
+  f.leave()
+  assert.ok(await f.step())
+  // One more screen follows, in the same voice: the John Doe sentence is erased
+  // and the closing sentence is typed into the very same span.
+  const johnDoe = "Here is John Doe's knowledge represented in the embedding space."
+  let steps2 = 0
+  while (f.sentence.textContent !== closingSentence) {
+    assert.ok(await f.step(), 'the screen erases and the next sentence types')
+    const shown = f.sentence.textContent
+    assert.ok(johnDoe.startsWith(shown) || closingSentence.startsWith(shown), 'only erased or typed, never swapped')
+    assert.equal(f.handoff.enters, 0, 'nothing hands over mid-sentence')
+    assert.ok(steps2++ < 1600)
+  }
+  assert.match(closingSentence, /^Skatebored maps complex syllabi/)
+  assert.equal(f.page.querySelector('[data-page-heading]').getAttribute('aria-label'), closingSentence)
+  if (!reduced) assert.ok(steps2 > 50, 'erased and typed a character at a time')
+  // It is given the same hold as every stage before it, then erased away.
+  const read = f.now
+  let clearedAt = null
+  while (f.handoff.enters === 0) {
+    assert.ok(await f.step(), 'the closing sentence erases and hands over')
+    if (clearedAt === null && f.sentence.textContent !== closingSentence) clearedAt = f.now
+    assert.ok(steps2++ < 1600)
+  }
+  assert.ok(clearedAt - read >= 2000, 'the screen is left up for the same 2000ms before it clears')
+  assert.equal(f.sentence.textContent, '')
+  assert.equal(f.handoff.enters, 1)
+  assert.equal(f.handoff.preloads, 1)
+  assert.ok(f.handoff.enteredAt >= read + 2000)
+  assert.ok(f.handoff.enteredAt > held + 2000)
+  assert.equal(f.selections.length, 4, 'nothing re-selects on the way out')
+  while (await f.step()) assert.ok(steps2++ < 1600)
+  assert.equal(f.handoff.enters, 1, 'the handover happens exactly once')
 })
 
 test('memberships use existing coordinates, retain both concepts, and span distinct regions', () => {

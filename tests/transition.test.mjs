@@ -30,7 +30,7 @@ test('single boundary reveals incoming while retaining complementary outgoing pi
   const navigation = transition.navigate(pages[1]);
   assert.equal(pages[0].inert, true);
   assert.equal(await transition.navigate(pages[1]), false);
-  for (const elapsed of [10, 350, 700, 1050]) {
+  for (const elapsed of [10, 600, 1200, 1800]) {
     transition.tick(start + elapsed);
     const x = positions.at(-1);
     assert.ok(x > 0 && x < 1000);
@@ -39,16 +39,18 @@ test('single boundary reveals incoming while retaining complementary outgoing pi
   }
   // Resize during a flight uses the current viewport in the very same tick.
   document.documentElement.clientWidth = 390;
-  transition.tick(start + 1200);
+  transition.tick(start + 2900);
   assert.equal(pages[1].style.clipPath, `inset(0 ${390 - positions.at(-1)}px 0 0)`);
-  transition.tick(start + 1500);
+  // The sweep is still running one frame before its 3200ms duration elapses.
+  assert.equal(transition.active, true);
+  transition.tick(start + 3300);
   assert.equal(await navigation, true);
   assert.equal(pages[1].inert, false);
   assert.equal(pages[1].focused, true);
   assert.equal(transition.active, false);
   assert.deepEqual(finishes, ['demo']);
   const back = transition.navigate(pages[0]);
-  transition.tick(performance.now() + 1500);
+  transition.tick(performance.now() + 3300);
   assert.equal(await back, true);
   assert.deepEqual(finishes, ['demo', 'home']);
 });
@@ -103,6 +105,7 @@ test('actual OBJ sweep stays horizontal, exits fully, and clips at projected ver
     const fixedLens = camera.projectionMatrix.toArray();
     viewer.begin();
     let previousEdge = -Infinity;
+    let previousRoll = -Infinity;
     for (let frame = 0; frame <= 60; frame++) {
       const progress = frame / 60;
       const edge = viewer.move(progress);
@@ -120,14 +123,26 @@ test('actual OBJ sweep stays horizontal, exits fully, and clips at projected ver
       assert.ok(edge > previousEdge, 'trailing edge never reverses');
       previousEdge = edge;
       if (frame === 0) assert.ok(maxX < 0, 'whole board starts off-screen');
-      if (frame === 30) assert.ok(edge > width * .2 && edge < width * .5, 'incoming is visibly revealed by midpoint');
+      if (frame === 30) assert.ok(minX < 0 && maxX > width, 'the board covers the whole viewport mid-sweep');
+      // The board is what hides the wipe: it must reach past the far edge whenever
+      // the boundary it drives is on screen, or the swap would be visible beside it.
+      if (edge > 0 && edge < width) assert.ok(maxX > width, 'the wipe stays behind the board');
       if (frame === 60) assert.ok(minX > width, 'whole board exits before completion');
+      assert.ok(maxX - minX > width, 'the board is wider than the viewport it sweeps');
       const relative = camera.quaternion.clone().invert().multiply(ride.quaternion);
       const nose = new THREE.Vector3(0, 0, 1).applyQuaternion(board.quaternion).applyQuaternion(relative);
-      assert.ok(nose.x > Math.cos(THREE.MathUtils.degToRad(20)), 'nose remains within 20 degrees of screen-right');
-      const rotation = new THREE.Euler().setFromQuaternion(relative, 'YXZ');
-      assert.ok(Math.abs(rotation.y) <= THREE.MathUtils.degToRad(18) + 1e-9);
-      assert.ok(Math.abs(rotation.x - THREE.MathUtils.degToRad(12)) <= THREE.MathUtils.degToRad(3) + 1e-9);
+      assert.ok(nose.x > Math.cos(THREE.MathUtils.degToRad(18)), 'nose keeps pointing along the sideways travel');
+      assert.ok(Math.abs(nose.y) <= Math.sin(THREE.MathUtils.degToRad(10)) + 1e-9, 'only a slight tilt off horizontal');
+      // The wheels are at model +Y, so -Y is the deck face that must meet the viewer.
+      const deck = new THREE.Vector3(0, -1, 0).applyQuaternion(board.quaternion).applyQuaternion(relative);
+      assert.ok(deck.z > Math.cos(THREE.MathUtils.degToRad(40)), 'deck top faces the viewer, never the wheels');
+      const rotation = new THREE.Euler().setFromQuaternion(relative, 'ZYX');
+      assert.ok(Math.abs(rotation.y) <= THREE.MathUtils.degToRad(12) + 1e-9);
+      assert.ok(Math.abs(rotation.z - THREE.MathUtils.degToRad(10)) < 1e-9);
+      const roll = THREE.MathUtils.degToRad(-90 + 34 * (2 * progress - 1));
+      assert.ok(Math.abs(rotation.x - roll) < 1e-6, 'the board keeps rolling along its length');
+      assert.ok(rotation.x > previousRoll, 'the roll never stalls or reverses');
+      previousRoll = rotation.x;
       assert.deepEqual(camera.matrixWorld.toArray(), fixedCamera);
       assert.deepEqual(camera.projectionMatrix.toArray(), fixedLens);
     }

@@ -1,28 +1,25 @@
-const messages = [
-  'skatebored',
-  'an adaptive learning platform',
-  'skatebored',
-  'revolutionizing edtech?',
-  'skatebored',
-  'mathematically optimal learning',
-  'skatebored',
-  'indexing all of math in an embedding space',
-  'skatebored',
-  'estimating your knowledge',
-  'skatebored',
-  'navigating the mathematics of learning',
-  'skatebored',
-  'rl edtech',
-  'skatebored',
-  'click on the demo bro'
-];
+import { landing } from './copy/landing.js';
+
+// Wording lives in copy/landing.js; [brackets] there mark the red characters.
+const messages = landing.phrases.map(phrase => phrase.replace(/[[\]]/g, ''));
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const text = document.querySelector('#typed');
 let typing;
-const plainText = messages.join('\n');
-// Exported offsets are character indices, including newlines; null inherits cream.
-const wordColors = Array(plainText.length).fill(null);
-wordColors.fill('#f04c4c', 66, 92);
+// Character indices, including newlines; null inherits cream.
+const wordColors = [];
+for (const phrase of landing.phrases) {
+  let red = false;
+  for (const character of phrase.match(/\^\d+|[\s\S]/g) || []) {
+    if (character === '[' || character === ']') { red = character === '['; continue; }
+    if (!/^\^\d+$/.test(character)) wordColors.push(red ? '#f04c4c' : null);
+  }
+  wordColors.push(null); // Newline separating phrases.
+}
+
+document.querySelector('#demo-button').textContent = landing.demoButton;
+const contact = document.querySelector('#contact-link');
+contact.textContent = landing.contactButton;
+contact.href = `mailto:${landing.contactEmail}`;
 
 function _coloredMessages() {
   let index = 0;

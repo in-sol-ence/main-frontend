@@ -405,3 +405,521 @@ browser tool could not verify its admin-enforced security policy. No workaround
 was used and no visual/GPU verification is claimed. Preview for manual review:
 `http://localhost:4176` (Python static server serving this worktree's `dist/`).
 Nothing was deployed.
+
+## Screen-filling sweep, deck toward the viewer (2026-09-22)
+
+This supersedes the sweep pose, scale, clearance and duration in the cinematic
+traversal section above, and replaces an earlier same-day pose note. Nothing
+else about that traversal changed: the camera freeze, constant-velocity ramp,
+vertex-projected clipping, knowledge-canvas clip, restore, and readiness gating
+are untouched.
+
+Correction to the note above and to the older reusable-transition section: model
+**+Y is the wheel side, and -Y is the deck's top face**. Both earlier sections
+claim "+Y (deck-up)", which is wrong and put the wheels toward the viewer. The
+model itself settles it: the four wheel meshes (11904 vertices each, 0.113 x
+0.203 x 0.203, axis along X) are centred at y +0.107, while the full-length deck
+plate (`pCube12`, 0.765 x 0.158 x 2.641) spans y -0.205 to -0.047. Verified again
+by projection: the deck plate sits about one world unit nearer the camera than
+the wheels across the sweep.
+
+- Scale: the board is fitted to 1.25 times the visible width at its depth,
+  replacing the previous 40 percent fit and its 3-unit cap. It measures 172
+  percent of the viewport width and 86 percent of its height at 1440x900, and
+  129 percent wide at 390x844, where a long board in a portrait viewport is a
+  thin ribbon (24 percent of the height). It stays clear of the near plane.
+- Pose, all in camera space via a ZYX euler, built by the `_pose` helper:
+  roll -90 degrees about the board's own length brings the deck's top face to
+  the viewer; that roll keeps travelling, -124 to -56 degrees across the sweep,
+  so the board visibly rotates without ever reaching edge-on or showing its
+  underside. Over it sit a constant 10-degree nose-up tilt and the existing yaw
+  carve, reduced to 12 degrees peak (about 9 effective). The nose therefore
+  stays within 18 degrees of the horizontal travel direction.
+- Clearance: the sphere-based margin is replaced. Each end now uses the exact
+  projected reach of the pose actually held there, summing every axis's worst
+  box corner at its near depth. A sphere around a board wider than the screen
+  overshot by seconds. Evaluating both ends at fixed progress 0 and 1 keeps the
+  trailing edge monotonic; deriving them from the live pose did not.
+- Duration: 1800ms to 3200ms. Because the board is far longer, its travel grew
+  from about 4.0 to 6.6 NDC, so the raw duration understates the pacing: the
+  board crosses at about 2.05 NDC per second, against 2.24 before.
+- Consequence worth knowing: with a board wider than the viewport, the page wipe
+  cannot begin until the trailing edge reaches the near screen edge. At 1440x900
+  the wipe runs from about 2100ms to 3075ms (975ms of the 3200ms flight); before
+  then the board is flying in over the outgoing page. The board is what hides the
+  swap, and it spans the boundary to the far edge for the whole wipe.
+
+Changed files: `dist/skateboard.js`, `dist/transition.js`, and
+`tests/transition.test.mjs`. No `src/` change, so no rebuild was needed.
+
+Verification: the three required JavaScript syntax checks, `git diff --check`,
+and all 3 transition tests pass. The geometry test, which runs the production
+viewer against the original OBJ at 1440x900, 390x844 and 2560x1080, now also
+asserts that model -Y faces the viewer within 40 degrees (never the wheels),
+that the board is wider than the viewport it sweeps, that the roll advances
+monotonically and matches the pose formula, that the tilt holds at 10 degrees,
+and that the board reaches past the far edge whenever the boundary it drives is
+on screen. Its timing fixture was retimed for 3200ms.
+
+Known unrelated failure: `tests/knowledge-space.test.mjs` "the original field
+shrinks to empty and grows each mastery stage" fails its KnowledgeField source
+checksum on a clean checkout of this branch, before and after this change.
+`npm test` therefore reports 12 of 13 passing.
+
+Browser acceptance is still outstanding: Playwright is not installed in this
+checkout and installing it plus a browser download was not undertaken. The
+orientation, coverage and pacing claims above come from projecting the real OBJ
+through the production viewer, not from a rendered frame. Preview for manual
+desktop/mobile/reduced-motion review:
+`python -m http.server 4176 --directory dist`, then `http://localhost:4176`.
+
+## Handover into the spatial calculus journey (2026-09-22)
+
+The demonstration no longer ends on the John Doe selection. That selection holds
+for the same 2000ms as every other stage, the sentence is erased, and the same
+page cross-fades into the existing spatial study, which states the learner's
+goal and then flies into the authored calculus path.
+
+### What was reused rather than built
+
+- The exit is the existing vocabulary only: the same 2000ms stage hold, the same
+  full-sentence Typed.js erase the Next button already performs (backSpeed 28),
+  and the existing 350ms opacity reveal used by `.knowledge-volume`. No new
+  easing, duration, camera move or typography was introduced on this side.
+- The spatial environment, its atmosphere and ambient field, its lighting, depth
+  and type are untouched. Entering at its existing `prompt` phase is what puts
+  the viewer in the floating-line space.
+- The calculus path is the authored `exampleMaps.calculus` tree, reached by the
+  existing goal router. The camera move from that space into the path, and the
+  travel along it, are the existing 11.8s `constructionAt` choreography and
+  `journey` phase. Nothing about the path was added, reordered or restyled.
+
+### The join
+
+`dist/index.html` gains `#spatial-stage`, a fixed full-screen host holding one
+iframe, `inert` and `aria-hidden` until it is entered. It is not a `.page`, so
+the skateboard transition never sees it and is never invoked for this step.
+
+`src/spatial-handoff.js` owns the join. `preload()` is called when the concept
+sequence starts, roughly twenty seconds before it is needed, so the study's
+renderer and first frame already exist when it is shown. It points the iframe at
+`./spatial/index.html` with `goal=Learn calculus from the beginning` and
+`statement=Let’s say John Doe wants to learn calculus.`. `enter()` reveals the stage,
+marks `#pages` inert, and posts a begin message. Messages are matched on exact
+origin and on the frame's own window. If the study never reports ready, an 8s
+fallback hands over anyway; if it reports ready late, it is told to begin then,
+so a slow load cannot leave a motionless space.
+
+Passing the goal matters: `buildJourney`'s router falls back to reinforcement
+learning for anything it does not recognise. The string used here matches the
+existing calculus pattern, and a test asserts the compiled map is the calculus
+one with `fallback` false.
+
+### The spatial boot hook
+
+`spatial/` is otherwise unchanged. The hook is `spatial/src/handoff.js` plus a
+contained path in `main.js`:
+
+- `readHandoff(location.search)` returns null without a `goal`, so the normal
+  front door, its landing skateboard and its prompt are completely unaffected.
+- With a goal, `enterFromHandoff()` skips the landing, disposes it, and arrives
+  at the existing `openingPose()` in the `prompt` phase with `phaseTime` at 2, so
+  the field is already present for the cross-fade rather than fading up into it.
+- `#handoff-statement` is a paragraph inside the existing `#goal-form`, carrying
+  the exact treatment of the prompt label it stands in for. `[data-handoff]`
+  hides the form's other children, so the signature, label, support line, both
+  inputs and the submit control are gone. Living inside the form means the
+  statement inherits the existing prompt recession during construction, and the
+  ambient field opens its pool around it through the existing `promptBounds`.
+- The statement fades in over 1.1s, holds to 2.9s, then sets the goal input and
+  dispatches submit, entering the existing handler unchanged. Reduced motion
+  shows it at once and holds 0.45s; every stage is preserved.
+- Embedded, it waits for the parent's begin message so the reveal starts when it
+  is actually visible. Opened directly, `spatial/index.html?goal=...` begins
+  immediately, which is how to review this half on its own.
+
+### Build and deployment
+
+`dist/` is the deployable and now contains the study it hands over to, so
+`npm run build` runs `scripts/sync-spatial.mjs` after Vite. It regenerates
+`dist/spatial/` from `spatial/{index.html,style.css,src,vendor}`; the dev
+server, tests, README and logs are not deployed. `spatial/` is the single
+source. Editing `dist/spatial/` directly will be overwritten, and a test fails
+if the copy has drifted from the source, which is what catches a forgotten
+build. `spatial/server.mjs` also routes the new module for its own dev server.
+
+### Verification
+
+Root `npm test` is 17 of 18, spatial `npm test` is 127 of 127, the three
+required syntax checks, both spatial check scripts, and `git diff --check` pass.
+The one root failure is the pre-existing `knowledge-space.test.mjs` KnowledgeField
+checksum, which fails identically on a clean checkout of this branch.
+
+New coverage: the sequence test now runs the real Typed.js through all four
+stages and out, asserting the 2000ms hold, that the erase only shrinks the
+sentence, that warming happens once while the sequence runs, and that the
+handover happens exactly once and only after the erase, under both motion
+preferences. The combined controller test still asserts no navigation and no
+canvas replacement across the whole run, now ending erased and handed over.
+`tests/spatial-handoff.test.mjs` runs the real module against the real
+`dist/index.html`: the URL and goal, that warming shows and takes over nothing,
+that foreign-origin and foreign-source messages cannot start it, the reveal and
+retirement of the page beneath, the timeout and late-ready paths, and that the
+built `dist/spatial/` matches its source. `spatial/tests/handoff.test.mjs`
+covers parsing, the calculus routing, and the statement envelope.
+
+Not verified: no browser has run this. Playwright is not installed here, so the
+cross-fade, the statement's appearance in the space, the camera's entry into the
+path, mobile layout and reduced motion are all unexercised visually. The tests
+are DOM, URL and geometry level. Two WebGL contexts are alive during the
+handover, because the React knowledge scene keeps rendering behind the opaque
+iframe; if the journey stutters, retiring that scene after the cross-fade is the
+first thing to try. Serve the build and click through Demo, Next, then wait:
+`python -m http.server 4176 --directory dist`, `http://localhost:4176`.
+
+## Closing screen and the personalized path (2026-09-22)
+
+Builds on the handover above; nothing in the existing visual language, spatial
+environment, path or transitions was redesigned. The full sequence is now:
+John Doe's knowledge state → what Skatebored does with a syllabus → his goal →
+a trajectory shaped by what he already knows → a concept → why that concept.
+
+### One more screen, in the same voice
+
+After the John Doe selection's existing 2000ms hold, the sentence is erased and
+`closingSentence` is typed into the very same `#demo-typed` span, at the same
+typeSpeed 65 and backSpeed 28, and held for the same 2000ms before it is erased
+and the page hands over: "Skatebored maps complex syllabi directly into custom
+trajectories across our n-dimensional space." The knowledge volume stays
+mounted and visible behind it. No new element, duration or type was introduced;
+`_erase` is the existing erase, now shared by both steps.
+
+### The trajectory is actually personalized
+
+The handoff also passes `background=I know algebra`, filled into the study's own
+"I already know" field beside the goal. That is not decoration: the existing
+adaptive engine reads it, marks Algebra Foundations and Functions known, and
+moves them out of the forward route into foundations laid out small and early,
+so the journey itself begins at Limits and runs Derivatives → Integrals →
+Differential Equations → Applications. The route the viewer flies is the one the
+engine produced.
+
+### Why this concept, on hover
+
+`personalNotes(map)` reads that compiled route and writes one short line per
+concept into the concept's existing `annotation.detail`. Nothing new renders:
+`.concept-annotation` is the study's own hover annotation, already positioned
+above its label, already faded in by the existing focus weight, already styled
+as small quiet type rather than a tooltip. The lines are derived, never
+asserted: known concepts say he already knows them, the first forward concept
+says he needs it first, the last says where he is heading, and the rest name the
+concept the route puts before them. A test fails if any note claims knowledge
+the compiled `learnerState` does not hold.
+
+### Why this concept, on click
+
+In the handed-in journey a click states a concept's reason instead of entering
+it. `selectConcept` holds the selection, and its envelope drives the layer's
+existing `learningWeight`, which the journey's own speed law already uses to
+still travel for in-space reading and then resume. So the camera settles on the
+concept, `#concept-rationale` fades in under its label carrying "Our RL model
+targets this knowledge concept based on John Doe's knowledge state", it holds,
+and then both release and travel continues. Moving to another concept carries
+the hold so the journey does not lurch between reasons. The line uses the
+annotation's own typography and is positioned from the existing hit candidate,
+so it is projected type rather than a panel.
+
+Two deliberate consequences, both scoped to the handed-in journey only and both
+easy to revert if you disagree:
+- Clicking no longer enters a concept as a child layer. Entering opens the
+  understanding panel and the adaptive session, which is the deferred work.
+- The hover "I know this" control is hidden. It mutates the learner state and
+  re-plans the route, which is also deferred, and it competed with the reason.
+Opened directly without a `goal`, the study still enters concepts and still
+offers that control: the standalone product is unchanged.
+
+### Verification
+
+Root `npm test` is 17 of 18 and spatial is 129 of 129; the three required syntax
+checks, both spatial check scripts, and `git diff --check` pass. The single root
+failure is the pre-existing `knowledge-space.test.mjs` checksum, unchanged.
+
+The sequence test now drives the real Typed.js out of the last stage, through
+the erase, the closing sentence and its hold, to the handover, asserting the
+text is only ever erased or typed and never swapped, that the closing screen is
+left up for 2000ms, and that nothing hands over mid-sentence, under both motion
+preferences. The spatial test runs the real engine: it asserts the background
+moves algebra into foundations, that the forward route is the expected five
+concepts, that every note matches the compiled learner state, that applying them
+changes only the detail and not the category, and that with no background no
+note claims prior knowledge. The rationale envelope is asserted to rise once,
+reach a full stop, fall once and release.
+
+Still not verified in a browser: Playwright is not installed here. The hover
+annotation copy, the rationale's placement under a label, the camera's settle
+and resume, and the closing screen's fit at mobile widths are all unexercised
+visually. `spatial/index.html?goal=Learn%20calculus%20from%20the%20beginning&background=I%20know%20algebra&statement=John%20Doe%20wants%20to%20learn%20calculus.`
+opens that half directly and begins immediately, which is the fastest way to
+review the path interactions without sitting through the demo.
+
+## Typed statement and the scripted concept demonstration (2026-09-22)
+
+Builds on the two sections above and changes only the handed-in journey. The
+earlier slides, the knowledge space, the closing screen, the cross-fade, the
+spatial environment and the calculus path are untouched. The sequence is now:
+John Doe's knowledge state → what Skatebored does with a syllabus → "Let’s say
+John Doe wants to learn calculus." typed into the space → the calculus path →
+the system hovers the first concept on his route and says what he wants to
+learn → it opens that concept → its knowledge concepts appear → the PL rationale
+→ everything fades and the journey continues.
+
+### The statement types
+
+`SPATIAL_STATEMENT` is now exactly "Let’s say John Doe wants to learn
+calculus." `statementAt(seconds, length, reduced)` in `spatial/src/handoff.js`
+reveals it a character at a time at `TYPE_INTERVAL` (81.25ms, the mean of
+Typed.js's humanized typeSpeed 65 that types every earlier slide; the study has
+no Typed.js and needs none for one deterministic line), holds `STATEMENT_HOLD`
+2s, the same 2000ms as every stage before it, and only then submits the goal.
+It never fades in: `#handoff-statement` lost its `opacity: 0` and gained a
+`min-height` so the form does not reflow as the first character lands. Reduced
+motion shows the full line and holds .45s, as before. `advanceHandoff` in
+`main.js` only writes the text when the shown prefix changes.
+
+### The demonstration is scripted, not built
+
+`demonstrate(dt, active)` in `main.js` runs each journey frame of a handed-in
+journey, between transitions, and returns the concept the system is hovering.
+It is a small state machine over existing behaviour; nothing new is rendered:
+
+- `approach`: `HOVER_DELAY` 1.4s after the constructed journey begins, it
+  looks for the landmark candidate of `firstConcept(map)`, which is
+  `route.forward[0]` off the engine's own compiled route (Limits, given the
+  algebra background; Algebra Foundations without it). `hoverable()` is the
+  pointer's own hit window (depth 6–155) plus a legible label (opacity ≥ .3).
+- `hover`: that candidate is fed to the layer's existing `focus.update` in
+  place of a pointer hit, so the existing spring brightens and scales the label,
+  slows travel, and reveals the existing `.concept-annotation`. Its detail line
+  for the first forward concept is now "John Doe wants to learn Limits.", set by
+  `personalNotes`, so the hover statement names the actual topic. Held
+  `HOVER_HOLD` 2.4s.
+- `entering`: the existing `requestEnter(candidate)` is called, exactly as a
+  click would; the existing hold, `CameraPassage` dive (about 4.8s here) and
+  child layer at the concept follow. Its knowledge concepts are the authored
+  ones: Approaching a Value, One-Sided Limits, Continuity. In a handed-in
+  journey the enter completion no longer calls `openUnderstanding()`, so no
+  panel and no adaptive check open; the breadcrumb `#spatial-context` and the
+  "Understand …" control are hidden for handed-in journeys too.
+- `reveal`: `REVEAL_DELAY` 1.2s after arrival, once the KC labels are up,
+  `#concept-rationale` shows `RATIONALE`, now exactly "Our PL model targets
+  knowledge concepts based on John Doe’s knowledge state.", through the existing
+  `rationaleAt` envelope (rise .6s, hold 3.4s, fall .9s) driving the child
+  layer's `learningWeight`, so the existing speed law stills travel while it is
+  read. It is placed by the shared `placeRationale` under the label of the
+  first KC the child route lists, or the nearest legible one; the click-selected
+  reason uses the same helper.
+- `returning`: the existing `requestReturn()` flies back to the parent at its
+  saved pose and the calculus journey continues from where it was held.
+
+While the demonstration runs, wheel, arrow/Enter/Space keys and canvas clicks
+are ignored, so the viewer cannot break the script or move the camera under it;
+afterwards the existing hover and click-to-reason behaviour is available again.
+New journey clears the demonstration. `canvas.dataset.demonstration` exposes
+the stage. If the target concept is never legible, or an enter/return is
+refused, the demonstration simply ends and travel continues.
+
+### Verification
+
+Root `npm test` is 17 of 18 (the pre-existing `knowledge-space.test.mjs`
+checksum), spatial `npm test` is 130 of 130, the three required syntax checks,
+all seven spatial check scripts, `npm run build`, and `git diff --check` pass.
+`dist/spatial/` was regenerated and matches `spatial/`.
+
+`spatial/tests/handoff.test.mjs` now asserts the statement reveals exactly one
+character per step and never submits mid-sentence; that the first concept and
+its "wants to learn" line come off the compiled route under both backgrounds;
+the exact PL rationale; and, running the real layer, camera passage and child
+layer without WebGL, that at `HOVER_DELAY` the first concept is hoverable and
+mid-frame while the camera is already moving, that the focus is fully up well
+inside `HOVER_HOLD` and slows travel, that it can be entered, that all three
+KCs are legible by `REVEAL_DELAY` with the anchor on screen, and that the
+learning weight brings the child's travel to rest inside the rationale hold.
+
+Browser verification, study half: Playwright is still not installed, but the
+built study was run in headless Chrome 153 (SwiftShader WebGL) driven over its
+debugging protocol at 1440×900, polling the page's own state each frame and
+capturing a frame per stage. Observed in order: the statement typing a
+character at a time in the floating-line space, the complete sentence held,
+construction, the journey, `demonstration=hover` with `focus=0:calculus-2` and
+the annotation "Mathematics · Foundation / John Doe wants to learn Limits."
+above the brightened Limits label mid-frame, entry to `layer=calculus-2` at
+`depth=1`, the three KC labels with the PL rationale under "Approaching a
+Value" rising to opacity 1, holding, and fading once, the return to
+`depth=0`, and travel continuing on the calculus path. `#concept-understanding`,
+`#spatial-context` and `#reopen-understanding` stayed hidden throughout. Under
+SwiftShader the frame clock is clamped, so the run is slower than real time
+but the stage order and holds are the page's own. Not browser-driven: the
+landing → knowledge → cross-fade path in front of it (its only change here is
+the statement string, covered by the root tests), mobile widths, and reduced
+motion. Serve `dist/` and click Demo, then Next, or open the study half
+directly:
+`spatial/index.html?goal=Learn%20calculus%20from%20the%20beginning&background=I%20know%20algebra&statement=Let%E2%80%99s%20say%20John%20Doe%20wants%20to%20learn%20calculus.`
+
+## Cinematic narration for the scripted demonstration (2026-09-22)
+
+Supersedes the placement and typography of the two demonstration sentences in
+the section above. The spatial path, camera system, passages, KC data, route
+and overall aesthetic are unchanged. The small hover annotation and the small
+`#concept-rationale` under a label are gone from the demonstration; both
+sentences now belong to one storytelling layer.
+
+### The storytelling layer
+
+`#narration` (in `spatial/index.html`, `aria-hidden`; the full sentence is sent
+once to the existing `#journey-status` live region) is large, bright type
+beside the space: the handed-in statement's voice (Segoe UI 300, -.035em) at
+`clamp(28px, 2.9vw, 44px)` (41.8px at 1440 wide), `#f4f2e9`, with a soft
+shadow in the space's own black and no panel. A small eyebrow in the journey
+eyebrow's letterspaced caps states the hierarchy: "Calculus from the Beginning
+→ Limits" for the topic, "Limits → Knowledge concepts" for the KCs. The untyped
+remainder is laid out invisibly (`.narration-rest`) so the lines wrap where they
+end and nothing reflows while it types.
+
+`narrationPlacement()` in `spatial/src/handoff.js` puts it on the side away from
+what it explains, chosen once per sentence: level with the selected topic, and
+below the cluster of legible KC labels for the PL sentence. Under 720px wide it
+runs along the bottom under the visualization. `main.js` eases it toward that
+placement so camera drift never drags it, and passes its box as the existing
+`readingSpace` so labels it would cover dim instead of colliding.
+
+### Sequence and timing
+
+`approach` (1.4s into the journey) → `hover`: the existing focus spring on
+Limits plus `focus.emphasis`, which grows the topic's own point marker 2.6×,
+brightens its stem and footprint, and hides its small annotation outright.
+The existing learning weight settles travel to near rest (`NARRATION_STILLNESS`
+.8) so the topic stays in frame. After `NARRATION_LEAD` .8s the sentence types at
+`TYPE_INTERVAL` (the slides' pace) and holds `NARRATION_HOLD` 2.8s. The existing
+simulated click, hold and `CameraPassage` then run while the sentence fades over
+.7s. During the dive the child layer runs its own construction formation
+(`emergenceAt`, 3.2s), opened from where the viewer arrives, so the path draws
+out of the topic and the KCs rise out of it in order. `REVEAL_DELAY` 1.2s after
+arrival and once emergence has let go, the PL sentence types with the same lead,
+pace and hold, fades, and the existing return continues the journey.
+Reduced motion shows each sentence whole, holds 2.2s, and shows KCs at once.
+A post-demonstration click reason uses the same layer, fully shown, with the
+existing `rationaleAt` envelope.
+
+`focus.emphasis` is set only by the demonstration and cleared by `reset()`, so
+pointer hover in the standalone study is unchanged.
+
+### Verification
+
+Spatial `npm test` 134/134 and all seven check scripts pass; root `npm test`
+17/18 (the pre-existing `knowledge-space.test.mjs` checksum); the three syntax
+checks, the transition test, `npm run build` and `git diff --check` pass. New
+tests cover typing/lead/hold/reduced timing, side placement at three desktop
+sizes and on mobile, the emphasis being selection-only, and emergence. The
+real-layer test now runs the full statement duration and asserts the topic stays
+legible and settled throughout, and that KCs are absent before emergence and
+all present before the PL sentence.
+
+Browser: the built study was driven in headless Chrome (SwiftShader) at
+1440×900, 390×844 and 1440×900 with reduced motion, capturing each stage.
+Observed: the statement typing beside Limits with its marker enlarged and no
+small annotation; the dive with the child path and three KCs rising; the PL
+sentence typed below-left of the KCs; fade, return and continued travel. No
+page errors. Known compromise: at 1440×900 the near ribbon of the path crosses
+the lower part of the PL sentence (legible through the shadow), and on mobile
+"Approaching a Value" sits off the right edge in the camera's existing framing.
+Not browser-driven: the landing → knowledge → cross-fade half, which this change
+does not touch.
+
+## All copy in one folder (2026-09-22)
+
+Every line a visitor reads in the demo now lives in `copy/`, so wording can be
+edited without touching code. `copy/README.md` explains each file.
+
+- `copy/landing.js`: the 16 typed phrases, Demo and Contact labels, email.
+  The red characters are marked inline with `[brackets]` instead of the old
+  hardcoded character range 66–92. Rendering is identical (verified character
+  by character; the range's two red newlines were never drawn).
+- `copy/demo.js`: intro sentence, the `revealAfter` trigger ("three
+  dimensions"), Next, the `{phrase}` concept sentence, the four stage phrases,
+  and the closing line. Question memberships stay in `src/concept-sequence.js`,
+  matched to the phrases by order.
+- `copy/journey.js`: learner name, spatial statement, `{topic}` line, PL
+  rationale, the "Knowledge concepts" eyebrow, and the goal/background that
+  select and personalize the route.
+
+How each consumer reads it:
+- `src/` imports it directly; Vite bundles it.
+- `dist/text.js` is now `type="module"` and imports `./copy/landing.js`. The
+  build step `scripts/sync-copy.mjs` publishes `copy/` to `dist/copy/`, so
+  landing edits also need `npm run build`. `dist/index.html` no longer holds the
+  button labels, mailto href, or intro `aria-label`; the scripts set them.
+- The spatial study gets `learner`, `topicLine`, `rationale` and `conceptsLabel`
+  through its existing boot hook (`readHandoff`), with its previous wording as
+  defaults, so the standalone study is unchanged.
+
+Not moved: the standalone study's own interface text in `spatial/`, the page
+`<title>`/meta description, accessibility labels on the canvases, and the
+hidden back-button hook.
+
+Verification: root `npm test` 19/20 (the pre-existing `knowledge-space`
+checksum) including the new `tests/copy.test.mjs`, which fails if `dist/copy/`
+is stale or an edit breaks a placeholder, the red markup, the reveal trigger,
+or the stage count. Spatial `npm test` 134/134, all spatial check scripts,
+syntax checks and `git diff --check` pass. In headless Chrome the landing
+button labels, mailto, typed text and transcript, the Demo intro and
+`aria-label`, and Next all rendered from the copy files.
+
+## Landing actions restyled, board slightly smaller (2026-09-22)
+
+Supersedes "Both buttons are red `#f04c4c`" under Actions and the 1.06 scale
+multiplier under Locked settings.
+
+- The landing actions are no longer filled red blocks. They use the Demo page's
+  Next vocabulary: bare Helvetica 500 text at `clamp(1.05rem, 1.45vw, 1.35rem)`,
+  no fill, border or radius, 44px tap height. Demo is the phrases' red
+  `#f04c4c` with a CSS `→` (`::after`, so the label in `copy/landing.js` stays
+  plain) that nudges 4px on hover/focus; Contact us is 55% cream and brightens
+  to full cream. Disabled Demo is 55% opacity. Focus is a 1px currentColor
+  outline. Reduced motion removes the color transition and the arrow nudge.
+- Board scale multiplier 1.06 → 1.02 in `dist/skateboard.js` (about 4% smaller
+  on the landing). The sweep computes its own fitted scale and restores the home
+  scale, so the transition is unaffected.
+
+Verification: syntax checks, transition tests (3/3) and `git diff --check`
+pass. Checked in headless Chrome at 1440×900 and 390×844, including Demo hover.
+
+### Correction: boxed red actions (2026-09-22)
+
+The bare-text actions above read as links, not buttons, and are superseded.
+Both are square 52px-tall red boxes in Helvetica 600: Demo is solid `#f04c4c`
+with black text and the `→` (brightens to `#f76a6a`, arrow nudges 4px); Contact
+us is a 1.5px `#f04c4c` outline with red text that fills red with black text on
+hover/focus. Focus ring is 2px cream. Reduced motion drops the transitions and
+the nudge. Checked in headless Chrome at 1440×900 and 390×844.
+
+## Running it: must be served, never opened from disk (2026-09-22)
+
+`npm start` (`vite preview --outDir dist --port 4173 --open`) serves `dist/`
+and opens `http://localhost:4173`. Opening `dist/index.html` directly
+(`file://`) cannot work: Chrome blocks ES module scripts there, so
+`skateboard.js`, `text.js` and `knowledge/knowledge.js` never load. The Demo
+button then stays disabled, and since the copy folder moved the labels into
+`text.js`, both buttons also render empty. Verified in headless Chrome: over
+`file://` all three scripts fail with CORS errors; over `npm start` the labels
+render and Demo opens the knowledge page. The Python server above still works.
+
+### Correction: pill actions (2026-09-22)
+
+Supersedes the boxed red actions. Both actions are 54px pills (50px on mobile),
+echoing the deck's rounded silhouette, in Helvetica 600 17px. Demo: solid
+`#f04c4c`, near-black `#160707` label, a 1px inner highlight and soft red drop
+glow, and its `→` in a 40px near-black circle with a cream arrow; hover lifts
+1px, brightens and nudges the arrow 3px. Contact us: dark glass (cream 5% fill,
+22% cream hairline, 10px backdrop blur), cream label; hover raises fill/border.
+Reduced motion removes all transitions and movement. Checked in headless
+Chrome at 1440×900 (rest and Demo hover) and 390×844.

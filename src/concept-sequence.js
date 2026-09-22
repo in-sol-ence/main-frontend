@@ -1,16 +1,29 @@
-// Illustrative memberships over existing question coordinates, not learned embeddings.
-export const conceptStages = [
-  { phrase: 'Integration by parts', ids: ['Q1'] },
-  { phrase: 'U-substitution', ids: ['Q2'] },
-  { phrase: 'Integration methods', ids: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8'] },
-  // Development sample: Python Random(20260922).sample(range(1, 25), 9), sorted; never randomized on render or visit.
-  { phrase: "John Doe's knowledge", ids: ['Q1', 'Q2', 'Q3', 'Q4', 'Q12', 'Q17', 'Q20', 'Q22', 'Q24'] },
-].map(stage => ({ ...stage, mastery: Array.from({ length: 24 }, (_, index) => Number(stage.ids.includes(`Q${index + 1}`))) }))
+import { createSpatialHandoff } from './spatial-handoff.js'
+import { demo } from '../copy/demo.js'
 
-export function initializeConceptSequence(presentation) {
+// Illustrative memberships over existing question coordinates, not learned
+// embeddings. Their phrases are copy/demo.js `stages`, in the same order.
+const _stageIds = [
+  ['Q1'],
+  ['Q2'],
+  ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8'],
+  // Development sample: Python Random(20260922).sample(range(1, 25), 9), sorted; never randomized on render or visit.
+  ['Q1', 'Q2', 'Q3', 'Q4', 'Q12', 'Q17', 'Q20', 'Q22', 'Q24'],
+]
+export const conceptStages = _stageIds.map((ids, index) => ({
+  phrase: demo.stages[index], ids,
+  mastery: Array.from({ length: 24 }, (_, question) => Number(ids.includes(`Q${question + 1}`))),
+}))
+
+// One more screen in the same voice, between the learner's space and his journey.
+export const closingSentence = demo.closing
+
+export function initializeConceptSequence(presentation, handoff = createSpatialHandoff()) {
   const page = document.querySelector('#demo')
   const text = document.querySelector('#demo-typed')
-  const shell = 'Here is <span id="concept-phrase"></span> represented in the embedding space.'
+  const [before, after] = demo.conceptSentence.split('{phrase}')
+  const _escape = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const shell = `${_escape(before)}<span id="concept-phrase"></span>${_escape(after)}`
   let phrase
   let shellTyping
   const heading = page.querySelector('[data-page-heading]')
@@ -26,10 +39,15 @@ export function initializeConceptSequence(presentation) {
     if (!phrase || revealed || phrase.textContent !== conceptStages[index].phrase) return
     revealed = true
     const stage = conceptStages[index]
-    heading.setAttribute('aria-label', `Here is ${stage.phrase} represented in the embedding space.`)
+    heading.setAttribute('aria-label', `${before}${stage.phrase}${after}`)
     presentation.update(stage.mastery).then(() => {
-      if (index === conceptStages.length - 1) return
+      // The last selection holds exactly as long as every other stage, then the
+      // same page hands this learner's space to the existing spatial journey.
       timer = setTimeout(() => {
+        if (index === conceptStages.length - 1) {
+          _closing()
+          return
+        }
         index++
         _type()
       }, 2000)
@@ -51,6 +69,51 @@ export function initializeConceptSequence(presentation) {
       strings: [conceptStages[index].phrase], typeSpeed: 65, backSpeed: 28,
       startDelay: 0, smartBackspace: false, loop: false, showCursor: false,
       autoInsertCss: false, contentType: 'null', onComplete: _highlight,
+    })
+  }
+  // The existing full-sentence erase, unchanged from the one Next already runs.
+  function _erase(done) {
+    if (motion.matches) {
+      text.textContent = ''
+      done()
+      return
+    }
+    const displayed = text.textContent
+    typing?.destroy()
+    text.textContent = displayed
+    typing = new window.Typed(text, {
+      strings: [''], backSpeed: 28, startDelay: 0, smartBackspace: false,
+      loop: false, showCursor: false, autoInsertCss: false, contentType: 'null',
+      onComplete: done,
+    })
+  }
+
+  // The same span, the same typing speed, and the same stage hold as every
+  // screen before it, so this reads as one continuous sequence rather than a
+  // new section. Only then does the page hand over.
+  function _closing() {
+    characters.disconnect()
+    _erase(() => {
+      heading.setAttribute('aria-label', closingSentence)
+      const _read = () => { timer = setTimeout(_leave, 2000) }
+      if (motion.matches) {
+        text.textContent = closingSentence
+        _read()
+        return
+      }
+      typing?.destroy()
+      typing = new window.Typed(text, {
+        strings: [closingSentence], typeSpeed: 65, startDelay: 0, smartBackspace: false,
+        loop: false, showCursor: false, autoInsertCss: false, contentType: 'null',
+        onComplete: _read,
+      })
+    })
+  }
+
+  function _leave() {
+    _erase(() => {
+      heading.removeAttribute('aria-label')
+      handoff.enter()
     })
   }
   const characters = new MutationObserver(_highlight)
@@ -76,8 +139,9 @@ export function initializeConceptSequence(presentation) {
   return function start() {
     if (started) return
     started = true
+    handoff.preload()
     emptySettled = presentation.update(Array(24).fill(0))
-    heading.setAttribute('aria-label', 'Here is represented in the embedding space.')
+    heading.setAttribute('aria-label', `${before.trimEnd()} ${after.trimStart()}`)
     if (motion.matches) {
       text.innerHTML = shell
       _ready()

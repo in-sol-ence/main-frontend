@@ -15,8 +15,8 @@
     <div class="intro">
       <h1 aria-label="skatebored" data-page-heading tabindex="-1"><span aria-hidden="true"><span id="typed">skatebored</span></span></h1>
       <div class="actions">
-        <button id="demo-button" type="button" disabled>Demo</button>
-        <a href="mailto:sol.mahajan@utexas.edu">Contact us</a>
+        <button id="demo-button" type="button" disabled></button>
+        <a id="contact-link"></a>
       </div>
     </div>
 
@@ -24,21 +24,24 @@
     </section>
     <section id="demo" class="page demo-page" inert aria-hidden="true">
       <div class="intro demo-intro">
-        <h1 class="demo-heading" data-page-heading tabindex="-1" aria-label="Our platform embeds math in an N-dimensional space. We have restricted this space to three dimensions so you can visualize it."><span aria-hidden="true" id="demo-typed"></span></h1>
+        <h1 class="demo-heading" data-page-heading tabindex="-1"><span aria-hidden="true" id="demo-typed"></span></h1>
       </div>
       <div id="knowledge-slot" class="knowledge-slot" aria-hidden="true"></div>
-      <button id="demo-next" class="demo-next" type="button" hidden>Next</button>
+      <button id="demo-next" class="demo-next" type="button" hidden></button>
       <button id="back-button" type="button" hidden>Back to skatebored</button>
     </section>
     <div id="knowledge-volume" class="knowledge-volume" aria-label="Interactive knowledge space. Drag to orbit and scroll to zoom." aria-hidden="true" inert></div>
   </main>
   <div id="skateboard" role="img" aria-label="Interactive Globe Down in Flames skateboard. Drag to rotate and double-click to reset."></div>
+  <div id="spatial-stage" inert aria-hidden="true">
+    <iframe id="spatial-frame" title="Skatebored spatial learning journey" src="about:blank"></iframe>
+  </div>
   <script type="importmap">
     { "imports": { "three": "./vendor/three/three.module.js" } }
   </script>
   <script type="module" src="./skateboard.js"></script>
   <script src="./vendor/typed.umd.js"></script>
-  <script src="./text.js"></script>
+  <script type="module" src="./text.js"></script>
   <script type="module" src="./knowledge/knowledge.js"></script>
 </body>
 </html>
