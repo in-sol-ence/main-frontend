@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a1115">
+  <meta name="description" content="Turn an ambition into an explorable landscape of connected ideas. An interactive learning atlas.">
+  <title>Atlas — Follow your curiosity</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./sculpture.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body data-phase="intro">
+  <a class="skip-link" href="#experience">Skip to the learning map</a>
+  <canvas id="atmosphere" aria-hidden="true"></canvas>
+  <div class="ambient-light" aria-hidden="true"></div>
+  <header class="navigation">
+    <a class="wordmark" href="./" aria-label="Atlas home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 1 20.5 11.5 31 16 20.5 20.5 16 31 11.5 20.5 1 16 11.5 11.5Z"/></svg>atlas<span>®</span></a>
+    <span class="nav-caption">A NEW WAY TO FIND YOUR WAY.</span>
+    <div class="nav-actions"><button id="about-button">The idea <span>↗</span></button><button class="replay-button" id="replay-button"><span aria-hidden="true">↻</span> Replay demo</button></div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="scene-shell" id="scene-shell" aria-hidden="true"><canvas id="sculpture"></canvas><div class="sculpture-fallback"><i></i><i></i><i></i><i></i><i></i></div><div class="scene-orbit orbit-back"></div><div class="scene-orbit orbit-front"></div><span class="scene-caption">A WORLD OF IDEAS.<br>WAITING TO OPEN UP.</span><div class="scene-coordinate">FIG. 001 <span>THE ANATOMY OF AN AMBITION</span></div></div>
+      <div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> CURIOSITY HAS NO CEILING.</div>
+      <h1 id="hero-title">Imagine<br><em>what’s next.</em></h1>
+      <p class="hero-subtitle">Every extraordinary idea starts somewhere.<br>Let’s find your somewhere.</p></div>
+      <div class="scene-tags" aria-label="Ideas in the demonstration"><button class="scene-tag tag-math" type="button" data-sculpture-topic="0"><span>⌘</span><div><small>THE FOUNDATIONS</small><b>Linear algebra</b></div><i>↗</i></button><button class="scene-tag tag-ai" type="button" data-sculpture-topic="4"><span>λ</span><div><small>THE AMBITION</small><b>Reinforcement learning</b></div><i>↗</i></button></div>
+      <div class="hero-coordinates" aria-hidden="true"><span>IDEAS / ∞</span><span>EXPLORE THE SPACE BETWEEN</span></div>
+    </section>
+
+    <section id="experience" class="experience" aria-label="Interactive learning atlas">
+      <div class="experience-topline"><span><i class="status-dot"></i> <span id="experience-status">A LITTLE CURIOSITY GOES A LONG WAY</span></span><span class="live-demo-label">INTERACTIVE DEMO <span>01 — 03</span></span></div>
+
+      <div class="intro-landscape" aria-hidden="true">
+        <svg class="orbital" viewBox="0 0 1200 650" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="orbital-stroke" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a5eddb" stop-opacity=".02"/><stop offset=".48" stop-color="#a5eddb" stop-opacity=".36"/><stop offset="1" stop-color="#a5eddb" stop-opacity=".01"/></linearGradient></defs><g fill="none" stroke="url(#orbital-stroke)"><ellipse cx="600" cy="350" rx="555" ry="150" transform="rotate(-17 600 350)"/><ellipse cx="600" cy="350" rx="490" ry="235" transform="rotate(22 600 350)"/><ellipse cx="600" cy="350" rx="350" ry="300" transform="rotate(-38 600 350)"/><ellipse cx="600" cy="350" rx="430" ry="190" transform="rotate(-17 600 350)"/></g><g fill="#c6f2df"><circle cx="179" cy="463" r="3"/><circle cx="1056" cy="210" r="3"/><circle cx="800" cy="573" r="2"/><circle cx="352" cy="129" r="2"/></g></svg>
+        <div class="floating-topic topic-a"><span>⌘</span> Linear algebra <small>FOUNDATION</small></div>
+        <div class="floating-topic topic-b"><span>∂</span> Calculus <small>THE LANGUAGE OF CHANGE</small></div>
+        <div class="floating-topic topic-c"><span>λ</span> Reinforcement learning</div>
+        <div class="floating-topic topic-d"><span>⤴</span> A place to begin</div>
+        <div class="landscape-caption"><span class="crosshair">+</span> EVERY IDEA HAS A WAY IN <span class="crosshair">+</span></div>
+      </div>
+
+      <div class="composer-wrap">
+        <form id="goal-form" class="composer">
+          <div class="composer-heading"><span class="spark-icon">✳</span><span>What are you curious about?</span><span class="input-state" id="input-state">WATCH IT UNFOLD</span></div>
+          <label class="sr-only" for="goal-input">Your learning goal</label>
+          <div class="input-wrap"><textarea id="goal-input" rows="2" maxlength="240" placeholder="I want to understand…" aria-describedby="prompt-help"></textarea><span class="typing-caret" aria-hidden="true"></span></div>
+          <div class="composer-bottom"><span id="prompt-help">Start with a question. We’ll find the connections.</span><button class="generate-button" type="submit" id="generate-button"><span>Make it a map</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div>
+          <div class="building-progress" aria-hidden="true"><i></i></div>
+        </form>
+        <div class="generation-caption" role="status" aria-live="polite" id="generation-caption"></div>
+      </div>
+
+      <div class="map-workspace" id="map-workspace" hidden>
+        <div class="map-arrival"><span class="micro">YOUR AMBITION, UNFOLDED.</span><p>There’s a way <em>into everything.</em></p></div>
+        <div class="map-toolbar"><nav id="breadcrumbs" aria-label="Exploration path"></nav><div class="map-toolbar-right"><span class="map-legend"><i></i> In your path <i class="muted-key"></i> Beyond this goal</span><button id="collapse-button" title="Collapse all expanded topics" aria-label="Collapse all expanded topics">↥</button></div></div>
+        <div class="map-content">
+          <div class="map-center">
+            <div class="goal-beacon" aria-hidden="true"><div class="beacon-ring ring-1"></div><div class="beacon-ring ring-2"></div><div class="beacon-ring ring-3"></div><svg viewBox="0 0 40 40"><path d="M20 5 24 16 35 20 24 24 20 35 16 24 5 20 16 16Z"/></svg></div>
+            <div class="goal-label"><span class="micro">YOUR NORTH STAR</span><h2 id="goal-title">Reinforcement learning</h2><p id="goal-description">How machines learn to make better decisions.</p></div>
+            <div class="goal-metrics"><span><b id="discipline-count">5</b> CONNECTED AREAS</span><span class="metric-separator"></span><span><b id="concept-count">24</b> CONCEPTS TO EXPLORE</span></div>
+          </div>
+          <div class="map-layers" id="map-layers"></div>
+          <div class="exploration-hint" id="exploration-hint"><span class="hint-mouse" aria-hidden="true">↖</span><span>Hover to uncover. Click to hold. <b>Follow your curiosity.</b></span><kbd>esc</kbd><span class="escape-copy">to step back</span></div>
+        </div>
+        <aside class="insight" id="insight" aria-live="polite"></aside>
+        <div class="workspace-bottom"><span><span class="live-dot"></span> <span id="playback-status">YOUR MAP IS READY TO EXPLORE</span></span><div><button id="motion-button" aria-pressed="false">Pause motion</button><span class="separator">/</span><span>CURATED EXAMPLE</span></div></div>
+      </div>
+      <div class="demo-cursor" id="demo-cursor" aria-hidden="true"><svg viewBox="0 0 24 28"><path d="m2 2 3 22 6-7 9-2Z"/></svg><span>Explore</span></div>
+    </section>
+
+    <section class="closing-line"><span class="micro">LESS OVERWHELM. MORE POSSIBILITY.</span><p>The big picture.<br><em>And your very next step.</em></p><button id="explore-button">Find your way in <span>↗</span></button></section>
+  </main>
+  <footer><a class="wordmark" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 1 20.5 11.5 31 16 20.5 20.5 16 31 11.5 20.5 1 16 11.5 11.5Z"/></svg>atlas</a><span>A CONCEPT FOR CONNECTED LEARNING</span><span>BUILT FOR THE CURIOUS. <span class="footer-star">✳</span></span></footer>
+
+  <dialog id="about-dialog"><button class="dialog-close" id="close-dialog" aria-label="Close explanation">×</button><span class="micro">THE IDEA BEHIND ATLAS</span><h2>Every idea is<br><em>made of other ideas.</em></h2><p>A big learning goal can feel impossibly far away. Atlas unfolds it into the ideas underneath, so you can see the whole picture and discover a place to begin.</p><ol><li><span>01</span><div><strong>Start with your ambition.</strong><p>The top band brings together the areas that support your goal.</p></div></li><li><span>02</span><div><strong>Open up the ideas inside.</strong><p>Hover to preview a layer. Click to keep it open and explore further.</p></div></li><li><span>03</span><div><strong>Keep what matters in focus.</strong><p>Green concepts connect to your goal. Gray concepts belong to the subject, but sit outside this introductory path. Make a topic your goal to see its whole map.</p></div></li></ol><div class="dialog-note">An interactive, curated demonstration. Band widths indicate illustrative emphasis, not measured learning time. This preview supports AI / reinforcement learning, linear algebra, and Python goals.</div></dialog>
+  <noscript><p class="noscript">Enable JavaScript to watch the learning map unfold.</p></noscript>
+</body>
+</html>
