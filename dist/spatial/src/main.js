@@ -16,12 +16,16 @@ import { createAdaptiveSession, emphasizeIntervention, navigationStep } from './
 import { createRouteSpace, cameraBlend } from './route-space.js';
 import { createLearningStory, STORY_DURATION, STORY_RATE } from './route-plan.js';
 import { createLanding } from './landing.js';
+import { createResourceBranches } from './resource-branches.js';
+import { resourceLibrary } from './resource-library.js';
+import { tintFor } from './hierarchy.js';
 import { readHandoff, statementAt, personalNotes, applyPersonalNotes, firstConcept, hoverable, rationaleAt, rationaleRise, narrationAt, emergenceAt, narrationPlacement, MESSAGE, HOVER_DELAY, REVEAL_DELAY } from './handoff.js';
 
 const canvas = document.querySelector('#world');
 const failure = document.querySelector('#failure');
 const preference = matchMedia('(prefers-reduced-motion: reduce)');
 const labelHost = document.querySelector('#landmarks');
+const resourceHost = document.querySelector('#resource-branches');
 const accessibleJourney = document.querySelector('#journey-concepts');
 const context = document.querySelector('#spatial-context');
 const ancestry = document.querySelector('#ancestry');
@@ -83,6 +87,19 @@ if (renderer) {
   const handoff = readHandoff(location.search);
   let handoffTime = null, handoffSubmitted = false, selected = null, demonstration = null;
   let told = null, emerging = null, narrationSpace = null;
+  const resources = createResourceBranches({ host: resourceHost });
+
+  // A knowledge concept with authored resources grows them in place. Only
+  // concepts that cannot be entered qualify, so no existing descent changes.
+  function activateResources(hit) {
+    const list = hit && resourceLibrary[hit.concept.id];
+    if (!list?.length || hit.concept.children?.length || hit.concept.explanation) return false;
+    if (resources.key === hit.key) { resources.close(); return true; }
+    resources.open({ layer: history.active, key: hit.key, concept: hit.concept, anchor: hit.anchor, depth: hit.depth,
+      resources: list, tint: `#${tintFor(hit.concept).getHexString()}`, width: innerWidth, height: innerHeight,
+      onStatus: text => { status.textContent = text; } });
+    return true;
+  }
   let pointer = null, transition = null, returnTarget = null;
   let paused = preference.matches, lost = false, previousTime = 0;
   let sceneFocus = 0;
@@ -926,9 +943,14 @@ if (renderer) {
     const hit = staged || pointed;
     active.focus.update(hit, dt);
     if (selected) advanceSelection(dt, active, held);
-    canvas.style.cursor = pointed && (handoff || pointed.concept.children.length || pointed.concept.explanation) ? 'pointer' : '';
+    canvas.style.cursor = pointed && (handoff || pointed.concept.children.length || pointed.concept.explanation || resourceLibrary[pointed.concept.id]) ? 'pointer' : '';
     pose = active.advance(dt, paused);
-    if (!paused || active.journey.scroll.active || hit || wasFocused || selected || learning.visible || history.layers.some(layer => layer.settling)) render(dt);
+    if (!paused || active.journey.scroll.active || hit || wasFocused || selected || learning.visible || resources.layer || history.layers.some(layer => layer.settling)) render(dt);
+    // Resources belong to the layer they grew in; they hold its travel for reading.
+    if (resources.layer && resources.layer !== history.active) resources.dispose();
+    resources.update({ dt, width: innerWidth, height: innerHeight, reduced: preference.matches });
+    // The understanding panel rewrites its layer's weight each frame; defer to the larger of the two.
+    if (resources.layer === active) active.learningWeight = learning.layer === active ? Math.max(active.learningWeight, resources.hold) : resources.hold;
   }
   function setPaused(next) {
     paused = next; previousTime = 0;
@@ -1012,9 +1034,10 @@ if (renderer) {
       keyboardHit = visible.length ? visible[(index + (event.code === 'ArrowRight' ? 1 : visible.length - 1) + visible.length) % visible.length] : null;
       pointer = null;
     }
-    if (event.target === canvas && event.code === 'Enter' && keyboardHit) { event.preventDefault(); requestEnter(keyboardHit); }
+    if (event.target === canvas && event.code === 'Enter' && keyboardHit) { event.preventDefault(); if (!activateResources(keyboardHit)) requestEnter(keyboardHit); }
     if (event.code === 'Space' && !event.target.closest?.('button')) { event.preventDefault(); setPaused(!paused); }
     if (event.code === 'KeyR') restart();
+    if (event.code === 'Escape' && resources.key) { resources.close(); canvas.focus({ preventScroll: true }); return; }
     if (event.code === 'Escape') { pendingAction = null; adaptiveCue.hidden = true; if (learning.open) { learning.close(); canvas.focus({ preventScroll: true }); } else requestReturn(); }
   });
   back.addEventListener('click', () => requestReturn());
@@ -1035,6 +1058,8 @@ if (renderer) {
     const hit = history.active.pick({ x: event.clientX, y: event.clientY }, innerWidth, innerHeight);
     if (event.pointerType === 'touch' && hit?.key !== keyboardHit?.key) { keyboardHit = hit; pointer = null; return; }
     if (handoff) { if (demonstration) return; if (hit) selectConcept(hit); else releaseConcept(); return; }
+    if (activateResources(hit)) return;
+    if (!hit) resources.close();
     requestEnter(hit);
   });
   const leave = event => { if (event?.relatedTarget === knowledgeAction) return; pointer = null; canvas.style.cursor = ''; };

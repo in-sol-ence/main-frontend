@@ -45,6 +45,10 @@ background too: the study's own adaptive engine is what personalizes the route,
 and every on-path note must be read off the route it produced, never asserted.
 The handed-in journey states a concept's reason on click instead of entering it;
 leave the standalone study's own click, entry and knowledge controls alone.
+The one exception is resource branches: a knowledge concept listed in
+`spatial/src/resource-library.js` that cannot be entered (no children, no
+explanation) grows its lecture segments in place on click or Enter. Never let
+resources pre-empt an existing entry or understanding panel.
 The handed-in statement types at the earlier slides' pacing and holds 2000ms.
 The demonstration that follows is scripted, never pointer-driven: it reuses the
 existing hover, entry, and return paths, derives the hovered topic and its

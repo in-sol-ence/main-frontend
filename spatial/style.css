@@ -72,6 +72,30 @@ canvas:focus-visible { outline: 1px solid #b8b5a41f; outline-offset: -4px; }
 /* The storytelling layer: why the space is doing what it shows. Large, bright
    type in the handed-in statement's voice, floating beside the path. No panel;
    a soft shadow of the space's own black keeps it legible over bright lines. */
+/* Resource branches: a knowledge concept's lecture segments, grown in place.
+   Cards take the study's annotation voice; the tint is the concept's own. */
+#resource-branches { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
+.resource-card { position: absolute; top: 0; left: 0; box-sizing: border-box; padding: 6px 8px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #747b76 transparent;
+  color: #e6e7de; font: 400 13px/1.4 "Segoe UI", Arial, sans-serif; text-align: center; border-radius: 4px; opacity: 0; visibility: hidden; will-change: transform, opacity;
+  background: color-mix(in srgb, var(--resource-tint) 12%, rgb(11 14 16 / .55)); border: 1px solid color-mix(in srgb, var(--resource-tint) 50%, transparent); }
+.resource-card[data-expanded="true"] { background: rgb(11 14 16 / .97); border-color: color-mix(in srgb, var(--resource-tint) 75%, transparent); }
+.resource-card button { appearance: none; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.resource-card-toggle { width: 100%; min-height: 44px; padding: 3px; }
+.resource-card-toggle > span { display: block; }
+.resource-card-type { margin-bottom: 3px; color: var(--resource-tint); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+.resource-card button:focus-visible, .resource-card a:focus-visible { outline: 1px solid #c3c8bd; outline-offset: -2px; border-radius: 3px; }
+.resource-content { text-align: left; padding: 0 4px 4px; }
+.resource-content p { margin: 8px 0; }
+.resource-content img { display: block; width: 100%; height: auto; border-radius: 3px; }
+.resource-content a { color: #e6e7de; display: inline-block; padding: 12px 0; }
+.resource-content .resource-close { display: block; margin-left: auto; min-height: 44px; text-decoration: underline; }
+.resource-content fieldset { border: 0; margin: 8px 0; padding: 0; }
+.resource-content fieldset button { display: block; text-align: left; width: 100%; min-height: 44px; border-bottom: 1px solid #67716b; }
+.resource-content button[aria-pressed="true"] { background: #555f59; }
+.resource-content .resource-meta { color: #c3c8bd; font-size: 11px; }
+.resource-video { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; }
+.resource-content .resource-video-load { display: block; width: 100%; min-height: 44px; border: 1px solid #67716b; }
+main[data-route-view="true"] #resource-branches { display: none; }
 #narration { position: absolute; top: 0; left: 0; z-index: 2; margin: 0; color: #f4f2e9; font: 300 clamp(28px, 2.9vw, 44px)/1.18 "Segoe UI", Arial, sans-serif; letter-spacing: -.035em; text-wrap: pretty; text-shadow: 0 0 28px #0b0e10, 0 0 10px #0b0e10b3; opacity: 0; pointer-events: none; will-change: transform, opacity; }
 .narration-eyebrow { display: block; margin-bottom: 18px; color: #b9c2b2; font-size: 11px; font-weight: 400; letter-spacing: .21em; line-height: 1.4; text-transform: uppercase; }
 .narration-eyebrow:empty { display: none; }

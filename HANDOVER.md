@@ -926,3 +926,66 @@ Chrome at 1440×900 (rest and Demo hover) and 390×844.
 `python scripts/serve.py [port]` (default 4176) serves `dist/` with
 `Cache-Control: no-store`, so a refresh always shows the latest CSS/JS; the
 plain `python -m http.server` let Chrome keep a stale `style.css`.
+
+## KC resource branches, transplanted from spatial-expansion (2026-09-22)
+
+Branch `kc-resources`, cut from `transition-fix` at `38dff07`, so it can be
+merged into `transition-fix` later with no conflicts. Nothing was merged or
+cherry-picked from `spatial-expansion`; its old spatial scene, camera, layout,
+typography and demo host were not brought over.
+
+### Source
+
+`spatial-expansion` (`65d7fc9`, based on the older `7eff360`) adds a
+standalone React Three Fiber prototype in `src/resource-branches/`:
+`resourceData.js` (KC id → segments), `placement.js` (seeded fan layout,
+S-curve branches, grow/reveal/collapse timing), `ResourceBranches.jsx` (the
+fan), `ResourceContent.jsx` (the expanded card), plus a demo host with its own
+fake KC, ribbon and camera (not transferred).
+
+### What landed, in `spatial/`
+
+- `src/resource-library.js`: the prototype's data, unchanged. Motion
+  (`calculus-6-1`): MIT 18.01 pumpkin drop 243–711s, Khan 176–378s, Strang 1.1
+  lecture, an explanation and a question. Tangent Slopes (`calculus-3-0-1`):
+  3Blue1Brown 68–434s. Both ids exist on the current calculus map.
+- `src/resource-placement.js`: `placement.js` unchanged except that `clamp`
+  and `smootherstep` now come from the study's own `motion.js`.
+- `src/resource-content.js`: `ResourceContent.jsx` as plain DOM: http(s)-only
+  links, YouTube `t=`, a youtube-nocookie embed cut to `start`/`end` and loaded
+  only on click, the question with its answer feedback, segment times, credits.
+- `src/resource-branches.js`: `ResourceBranches.jsx` adapted to this study's
+  architecture (no React). Branch lines live in the active layer's own
+  `world.scene` at the KC's landmark anchor, scaled by the KC's depth / 6.8
+  (the prototype's camera distance) and turned to face the camera. Cards are
+  projected DOM in `#resource-branches`, as concept labels are. One set alive at
+  a time; the prototype's portrait "ladder" shape; opening stills travel via
+  the layer's existing `learningWeight` (0.9), released on collapse.
+- `src/main.js` (+31 lines): `activateResources(hit)` on canvas click and
+  Enter, standalone study only. Escape collapses; clicking empty space
+  collapses; leaving the layer disposes the set. Cursor shows pointer.
+- `index.html` gains `<div id="resource-branches">`; `style.css` gains the card
+  styles (the prototype's, in the study's Segoe UI annotation voice).
+
+### Deliberate scope limits
+
+- Only KCs that cannot be entered qualify. Motion is such a leaf, so it now
+  grows resources where a click previously did nothing. Tangent Slopes has an
+  `explanation`, so its click still enters it and opens the understanding
+  panel as before; its resource set is present but not yet reachable. Deciding
+  where it belongs inside that panel is the open question for the merge.
+- The handed-in demo journey is untouched (its click still states a reason).
+
+### Verification
+
+Spatial `npm test` 140/140 (ported `resource-placement.test.mjs`, and new
+`resource-branches.test.mjs`: ids are real leaves on the compiled map, embeds
+are private and cut to their segment, and the real fan on the real
+Applications layer opens five distinct on-screen cards, stills travel, expands
+the pumpkin segment in place with the others receding, collapses cleanly,
+releases travel and never duplicates). All seven spatial check scripts, root
+`npm test` 19/20 (the pre-existing checksum), syntax checks, `npm run build`
+and `git diff --check` pass. In headless Chrome at 1440×900: goal submitted,
+Applications entered, Motion clicked → five branches and cards, first card
+expanded → embed `youtube-nocookie.com/embed/ryLdyDrBfvI?start=243&end=711`,
+Escape → collapsed. Mobile and reduced motion were not browser-driven.
