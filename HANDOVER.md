@@ -405,3 +405,41 @@ browser tool could not verify its admin-enforced security policy. No workaround
 was used and no visual/GPU verification is claimed. Preview for manual review:
 `http://localhost:4176` (Python static server serving this worktree's `dist/`).
 Nothing was deployed.
+
+
+## Standalone time comparison overlay (2026-09-22, branch `time-optimization`)
+
+`src/time-comparison/` is a self-contained cinematic overlay, not yet wired into
+`dist/`. It sits above any existing visualization (passed as `children`) which
+stays mounted and is only dimmed; focus mode is never released during the claim.
+
+- `timeline.js`: the single GSAP master timeline and pure helpers. Phases:
+  focus, skatebored, removeMessage, insertCoefficient, counting, tenN,
+  schooling, complete. Count gaps (ms) 380/290/220/160/125/125/155/210/320
+  give the trapezoidal 1→10 rhythm; each integer is an explicit beat, never a
+  tweened decimal. Focus: background opacity .45, black dimmer .3.
+- `TimeComparisonScene.jsx`: `useGSAP` (scoped, `revertOnUpdate` on `runKey`
+  for replay). Measures one tabular digit in em after `document.fonts.ready`.
+  React state holds only the coefficient (null, 1..10) and phase; GSAP owns all
+  visual values. `onPhaseChange(name)` exposes the phase upward.
+- `TimeEquation.jsx` / `TimeCounter.jsx`: `time`, `=`, coefficient slot, `N` as
+  separate pieces. A 1fr/auto/1fr grid anchors `=` so only the RHS grows; the
+  slot width tween (0 → 1 digit → 2 digits at 10) pushes N right. `clip-path`
+  clips the slot without moving the baseline. The italic display row
+  (local system serif, no network fonts) crossfades in place for the final claim.
+- `ComparisonCopy.jsx`: captions positioned off the equation so it never moves.
+- `demo.html` / `demo.jsx`: host with the unchanged KnowledgeScene (Demo page
+  mastery/surface, auto-rotate) behind the overlay, plus a Replay button.
+  Run `npx vite`, open `/src/time-comparison/demo.html`.
+
+Dependencies added: `gsap`, `@gsap/react`. Drei already bundles Troika text, but
+the typography is intentionally DOM for crisp, animatable type.
+Reduced motion keeps the beats but only crossfades: N → 10N, no count/scale/travel.
+The overlay is `aria-hidden`; a polite live region announces both sentences.
+
+Verification: `tests/time-comparison.test.mjs` (7 tests) drives the real timeline
+with plain-object targets: phase order, 1..10 beat times, slot widths, hold before
+the comparison, persistent focus, reduced-motion path. All 20 tests and the build
+pass; `dist/` is unchanged. Headless Chrome (1440×900, 390×844, reduced motion):
+"time =" drift 0px while counting, N moves monotonically right, one canvas whose
+identity survives Replay, no errors besides the existing THREE.Clock deprecation.
