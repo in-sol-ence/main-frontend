@@ -99,10 +99,20 @@ export const RESOURCE_READ = 5.5;
 // Then travel resumes at the journey's own pace, and each later concept of the
 // branch is selected for this long as it comes near.
 export const PASS_HOLD = 1.8;
-export const PASS_DEPTH = 45;
-// Path units past the branch's last concept, where the space turns empty and
-// the embedding page takes the learner's knowledge back.
-export const FINALE_MARGIN = 10;
+export const PASS_DEPTH = 36;
+// An adaptive branch's own arrival law brings travel to rest 14 units short of
+// its last concept (layer.js). Once every concept of the branch has had its
+// turn and the camera is this close to that resting point, the space is empty
+// ahead and the embedding page takes the learner's knowledge back.
+export const ARRIVAL_STOP = 14;
+export const FINALE_LEAD = 22;
+// Never strand the demonstration: after this long in the branch it ends anyway.
+export const REPEATS_LIMIT = 40;
+export function finaleReached({ distance, routeEnd, arcLength, forward, passed, passing, elapsed = 0 }) {
+  if (elapsed >= REPEATS_LIMIT) return true;
+  const rest = routeEnd * arcLength - ARRIVAL_STOP;
+  return !passing && forward.every(id => passed.has(id)) && distance > rest - FINALE_LEAD;
+}
 
 // Characters shown, how far travel is stilled, and when it is finished.
 export function narrationAt(seconds, length, reduced = false) {

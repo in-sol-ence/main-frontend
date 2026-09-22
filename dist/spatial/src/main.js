@@ -20,7 +20,7 @@ import { createResourceBranches } from './resource-branches.js';
 import { resourceLibrary } from './resource-library.js';
 import { openDuration } from './resource-placement.js';
 import { tintFor } from './hierarchy.js';
-import { readHandoff, statementAt, personalNotes, applyPersonalNotes, firstConcept, hoverable, rationaleAt, rationaleRise, narrationAt, emergenceAt, narrationPlacement, MESSAGE, HOVER_DELAY, REVEAL_DELAY, RESOURCE_LEAD, RESOURCE_READ, PASS_HOLD, PASS_DEPTH, FINALE_MARGIN } from './handoff.js';
+import { readHandoff, statementAt, personalNotes, applyPersonalNotes, firstConcept, hoverable, rationaleAt, rationaleRise, narrationAt, emergenceAt, narrationPlacement, MESSAGE, HOVER_DELAY, REVEAL_DELAY, RESOURCE_LEAD, RESOURCE_READ, PASS_HOLD, PASS_DEPTH, finaleReached } from './handoff.js';
 
 const canvas = document.querySelector('#world');
 const failure = document.querySelector('#failure');
@@ -533,8 +533,9 @@ if (renderer) {
       const passing = demo.passing && active.landmarks.candidates.find(item => item.key === demo.passing.key);
       if (passing) demo.anchor = passing.label;
       placeTold(demo.anchor || { x: innerWidth * .5, y: innerHeight * .45 }, dt);
-      const end = ((active.definition.route?.end ?? Math.max(...active.definition.children.map(node => node.at))) * active.arc.length) + FINALE_MARGIN;
-      if (state.typed && active.journey.distance > end) {
+      const forward = active.definition.route?.forward || active.definition.children.map(node => node.id);
+      const routeEnd = active.definition.route?.end ?? Math.max(...active.definition.children.map(node => node.at));
+      if (state.typed && finaleReached({ distance: active.journey.distance, routeEnd, arcLength: active.arc.length, forward, passed: demo.passed, passing: demo.passing, elapsed: demo.elapsed })) {
         // Past the last concept the space empties; the embedding page takes over.
         releaseTold(); active.focus.emphasis = null;
         if (parent !== window) parent.postMessage({ type: `${MESSAGE}:finale` }, location.origin);

@@ -1005,11 +1005,17 @@ New sequence after the rationale inside Limits:
    narration layer while travel resumes at the journey's own pace. Each later
    forward KC of the branch (One-Sided Limits, Continuity) is selected with the
    existing focus + marker emphasis for `PASS_HOLD` 1.8s once within
-   `PASS_DEPTH` 45; the statement sits beside whichever is selected.
-3. `finale`: once the camera is `FINALE_MARGIN` 10 units past the route's end,
-   the study posts `skatebored:spatial:finale` to its parent (standalone it
-   only sets `canvas.dataset.finale`). The demo no longer returns to the parent
-   calculus layer.
+   `PASS_DEPTH` 36; the statement sits beside whichever is selected.
+3. `finale`: `finaleReached()` in `handoff.js`. An adaptive branch never
+   passes its last KC: layer.js's arrival law brings travel to rest
+   `ARRIVAL_STOP` 14 units short of it. So the finale fires once every forward
+   KC has been selected, the last selection has finished, and the camera is
+   within `FINALE_LEAD` 22 of that resting point (about 20s into the branch,
+   measured on the real Limits layer), or after `REPEATS_LIMIT` 40s regardless.
+   The study then posts `skatebored:spatial:finale` to its parent (standalone
+   it only sets `canvas.dataset.finale`). The demo no longer returns to the
+   parent calculus layer. (A first version waited to pass the route end and
+   never fired; a real-layer test now covers this.)
 4. The page (`src/spatial-handoff.js` `onFinale`/`exit`) accepts the message
    only from its own frame and origin, once, after entering; it reverses the
    350ms cross-fade and makes the page live. `src/concept-sequence.js`
@@ -1025,6 +1031,6 @@ Essence of Calculus ch. 7 (`kfF40MiS7zA`), 292–593s, the upload's own
 YouTube's public metadata); plus an explanation and a check question written
 for this map. The segment's teaching content was not watched end to end.
 
-Verification: spatial 140/140, root 20/21 (pre-existing checksum only), with a
+Verification: spatial 141/141, root 20/21 (pre-existing checksum only), with a
 new root test that the finale is accepted once, only from the entered study,
 and restores the page; all spatial checks and the build pass.

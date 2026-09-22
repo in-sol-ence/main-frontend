@@ -129,3 +129,37 @@ test('activating Motion grows its segments on screen, expands one in place, and 
     layer.dispose();
   } finally { globalThis.document = previous; }
 });
+
+test('after the lecture, the rest of the branch goes by and the journey reaches its empty end', async () => {
+  const { PASS_DEPTH, PASS_HOLD, ARRIVAL_STOP, FINALE_LEAD, finaleReached } = await import('../src/handoff.js');
+  const previous = globalThis.document; globalThis.document = { createElement: element };
+  const renderer = { render() {} }, dt = 1 / 30;
+  try {
+    const { map } = await buildJourney({ userGoal: 'Learn calculus from the beginning', userBackground: 'I know algebra' });
+    const limits = find(map, 'calculus-2');
+    const layer = createLayer(limits, element('div'), 1); layer.resize(1440, 900);
+    layer.presence = 1; layer.journey.time = 5; layer.journey.speed = 2.4;
+    const forward = limits.route.forward, passed = new Set([forward[0]]);
+    let passing = null, time = 0, done = false;
+    // The demonstration's own loop, at the journey's own pace.
+    for (; time < 60 && !done; time += dt) {
+      const pose = layer.advance(dt, false); layer.render(pose, dt, 1440, 900, renderer);
+      if (passing) passing.elapsed += dt;
+      if (!passing || passing.elapsed >= PASS_HOLD) {
+        const next = layer.landmarks.candidates.find(item => !passed.has(item.concept.id) && item.cycle === 0 && forward.includes(item.concept.id)
+          && item.depth > 6 && item.depth < PASS_DEPTH && item.labelOpacity >= .3);
+        if (next) { passing = { key: next.key, elapsed: 0 }; passed.add(next.concept.id); } else passing = null;
+      }
+      const held = passing && layer.landmarks.candidates.find(item => item.key === passing.key);
+      layer.focus.update(held || null, dt);
+      done = finaleReached({ distance: layer.journey.distance, routeEnd: limits.route.end, arcLength: layer.arc.length, forward, passed, passing });
+    }
+    assert.deepEqual([...passed], forward, 'every knowledge concept of the branch is selected in turn');
+    assert.ok(done, 'the finale is reached by the journey itself, not by the safety limit');
+    assert.ok(time > 12 && time < 30, `at a readable pace (${time.toFixed(1)}s)`);
+    assert.ok(layer.journey.distance > limits.route.end * layer.arc.length - ARRIVAL_STOP - FINALE_LEAD);
+    // The safety limit ends a demonstration that could never get there.
+    assert.equal(finaleReached({ distance: 0, routeEnd: 1, arcLength: 100, forward: ['x'], passed: new Set(), passing: null, elapsed: 40 }), true);
+    layer.dispose();
+  } finally { globalThis.document = previous; }
+});
