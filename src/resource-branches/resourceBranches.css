@@ -1,0 +1,45 @@
+.resource-card-label {
+  color: #e6e7de;
+  font: 400 13px/1.4 "Segoe UI", Arial, sans-serif;
+  text-align: center;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #747b76 transparent;
+  border-radius: 3px;
+}
+.resource-card-label button, .resource-kc-toggle {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.resource-card-toggle { width: 100%; min-height: 44px; padding: 3px; }
+.resource-card-toggle > span { display: block; }
+.resource-card-type {
+  margin-bottom: 3px;
+  color: var(--resource-tint);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.resource-card-label button:focus-visible, .resource-card-label a:focus-visible,
+.resource-kc-toggle:focus-visible, .resource-card-label[data-focused="true"] .resource-card-toggle {
+  outline: 1px solid #c3c8bd;
+  outline-offset: -2px;
+  border-radius: 3px;
+}
+.resource-content { text-align: left; padding: 0 4px 4px; }
+.resource-content p { margin: 8px 0; }
+.resource-content img { display: block; width: 100%; height: auto; border-radius: 3px; }
+.resource-content a { color: #e6e7de; display: inline-block; padding: 12px 0; }
+.resource-content .resource-close { display: block; margin-left: auto; min-height: 44px; text-decoration: underline; }
+.resource-content fieldset { border: 0; margin: 8px 0; padding: 0; }
+.resource-content fieldset button { display: block; text-align: left; width: 100%; min-height: 44px; border-bottom: 1px solid #67716b; }
+.resource-content button[aria-pressed="true"] { background: #555f59; }
+.resource-content .resource-meta { color: #c3c8bd; font-size: 11px; }
+.resource-kc-toggle { pointer-events: auto; padding: 4px 10px; }
+.resource-card-label[data-expanded="true"] { background: rgba(11, 14, 16, .97); }
+.resource-video { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; } .resource-content .resource-video-load { display: block; width: 100%; min-height: 44px; border: 1px solid #67716b; }
