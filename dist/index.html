@@ -10,8 +10,12 @@
   <style>
     :root {
       color-scheme: light;
-      background: #EDE8D0;
-      color: #3D2412;
+      --page-color: #EDE8D0;
+      --text-color: #3D2412;
+      --cursor-color: #000000;
+      --accent-color: #3D2412;
+      background: var(--page-color);
+      color: var(--text-color);
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
     * { box-sizing: border-box; }
@@ -45,7 +49,7 @@
       height: .78em;
       margin-left: .07em;
       vertical-align: -.025em;
-      background: #000000;
+      background: var(--cursor-color);
       letter-spacing: 0;
     }
     .typed-cursor--blink { animation: blink 1.05s step-end infinite; }
@@ -75,20 +79,21 @@
       position: fixed; top: 16px; right: 16px; z-index: 4;
       width: 290px; max-width: calc(100vw - 32px); max-height: calc(100svh - 32px);
       overflow: auto; overscroll-behavior: contain;
-      padding: 16px; background: #EDE8D0; border: 1px solid #3D2412;
+      padding: 16px; background: var(--page-color); border: 1px solid var(--accent-color);
       font-size: 14px; line-height: 1.4;
     }
     #tuning > summary { cursor: pointer; font-size: 18px; font-weight: 600; }
     #tuning p { margin: 10px 0; }
-    #tuning fieldset { border: 0; padding: 12px 0; margin: 0; border-top: 1px solid #3D241233; }
+    #tuning fieldset { border: 0; padding: 12px 0; margin: 0; border-top: 1px solid color-mix(in srgb, var(--accent-color) 20%, transparent); }
     #tuning legend { padding-top: 12px; font-weight: 600; }
     .tune-row { display: grid; grid-template-columns: 1fr 66px; gap: 6px 10px; margin: 9px 0; }
     .tune-row input[type=range] { grid-column: 1 / -1; width: 100%; margin: 0; }
-    #tuning input { accent-color: #3D2412; min-width: 0; }
-    #tuning input[type=number] { width: 66px; background: transparent; color: inherit; border: 1px solid #3D241255; padding: 3px; }
+    #tuning input { accent-color: var(--accent-color); min-width: 0; }
+    #tuning input[type=number] { width: 66px; background: transparent; color: inherit; border: 1px solid color-mix(in srgb, var(--accent-color) 33%, transparent); padding: 3px; }
+    #tuning input[type=color] { width: 66px; height: 28px; padding: 2px; background: transparent; border: 1px solid var(--accent-color); cursor: pointer; }
     #tuning input[type=checkbox] { justify-self: end; }
-    #tuning button { font: inherit; color: inherit; background: transparent; border: 1px solid #3D2412; padding: 7px 10px; cursor: pointer; }
-    #tuning :focus-visible { outline: 2px solid #3D2412; outline-offset: 3px; }
+    #tuning button { font: inherit; color: inherit; background: transparent; border: 1px solid var(--accent-color); padding: 7px 10px; cursor: pointer; }
+    #tuning :focus-visible { outline: 2px solid var(--accent-color); outline-offset: 3px; }
     @media (max-width: 760px) {
       main { padding: 7vw; align-items: flex-end; }
       h1 { width: 68vw; font-size: clamp(2.5rem, 11.5vw, 5.5rem); min-height: 3.24em; }

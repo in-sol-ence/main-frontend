@@ -96,6 +96,7 @@ async function _createSkateboard() {
   scene.add(board);
 
   const tuning = {
+    pageColor: '#ede8d0', textColor: '#3d2412', cursorColor: '#000000', accentColor: '#3d2412',
     idle: !reducedMotion.matches, resumeDelay: 900, limitTilt: true,
     fov: container.clientWidth / container.clientHeight < .8 ? 72 : 52,
     horizontal: .18, vertical: .26, scale: 1, pitch: 0, yaw: 0, roll: 0
@@ -108,6 +109,7 @@ async function _createSkateboard() {
   function _syncTuning() {
     for (const { object, key, input, range } of bindings) {
       if (input.type === 'checkbox') input.checked = object[key];
+      else if (input.type === 'color') input.value = object[key];
       else if (document.activeElement !== input && document.activeElement !== range) {
         input.value = Number(object[key].toFixed(6));
         range.value = object[key];
@@ -122,11 +124,12 @@ async function _createSkateboard() {
     name.textContent = label;
     const input = document.createElement('input');
     const checkbox = typeof object[key] === 'boolean';
-    input.type = checkbox ? 'checkbox' : 'number';
+    const color = typeof object[key] === 'string';
+    input.type = checkbox ? 'checkbox' : color ? 'color' : 'number';
     input.setAttribute('aria-label', label);
     row.append(name, input);
     let range;
-    if (!checkbox) {
+    if (!checkbox && !color) {
       range = document.createElement('input');
       range.type = 'range';
       range.setAttribute('aria-label', label);
@@ -135,8 +138,8 @@ async function _createSkateboard() {
     }
     for (const element of [input, range].filter(Boolean)) {
       element.addEventListener('input', () => {
-        if (!checkbox && !Number.isFinite(element.valueAsNumber)) return;
-        object[key] = checkbox ? input.checked : THREE.MathUtils.clamp(element.valueAsNumber, min, max);
+        if (!checkbox && !color && !Number.isFinite(element.valueAsNumber)) return;
+        object[key] = checkbox ? input.checked : color ? input.value : THREE.MathUtils.clamp(element.valueAsNumber, min, max);
         if (range) { range.value = object[key]; input.value = object[key]; }
         change?.();
         composer.render();
@@ -146,13 +149,28 @@ async function _createSkateboard() {
     bindings.push({ object, key, input, range });
   }
 
-  for (const title of ['Motion & scrolling', 'Board position', 'Board angle', 'Camera', 'Focus & light']) {
+  for (const title of ['Colors', 'Motion & scrolling', 'Board position', 'Board angle', 'Camera', 'Focus & light']) {
     const section = document.createElement('fieldset');
     const legend = document.createElement('legend');
     legend.textContent = title;
     section.append(legend);
     fields.append(section);
-    if (title === 'Motion & scrolling') {
+    if (title === 'Colors') {
+      for (const [label, key, property] of [
+        ['Page background', 'pageColor', '--page-color'],
+        ['Text', 'textColor', '--text-color'],
+        ['Cursor', 'cursorColor', '--cursor-color'],
+        ['Panel accent', 'accentColor', '--accent-color']
+      ]) {
+        _control(section, label, tuning, key, null, null, null, () => {
+          document.documentElement.style.setProperty(property, tuning[key]);
+          if (key === 'pageColor') {
+            renderer.setClearColor(tuning.pageColor, 1);
+            document.querySelector('meta[name="theme-color"]').content = tuning.pageColor;
+          }
+        });
+      }
+    } else if (title === 'Motion & scrolling') {
       _control(section, 'Idle spin', tuning, 'idle', null, null, null, () => {
         clearTimeout(resumeSpinTimer);
         controls.autoRotate = tuning.idle;
