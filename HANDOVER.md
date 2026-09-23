@@ -1099,3 +1099,20 @@ offscreen endpoints and unchanged pose/camera. All 23 root tests, the three
 required JavaScript syntax checks, and `git diff --check` pass. Browser capture
 was blocked by the unavailable admin-enforced security check, so rendered
 desktop, mobile, and reduced-motion screenshots could not be inspected.
+
+## End-of-sweep completion (2026-09-23)
+
+After the center-aligned reveal reached the far edge, the board could already
+be fully offscreen while the 3200ms clock kept the transition active. The
+viewer now reports when its projected leftmost vertex and the bokeh pass's
+outermost blur have cleared the right edge. On that same frame, after both page
+clips have reached the new page, the coordinator completes the transition.
+The existing motion and easing are
+unchanged; the timer remains a fallback if the board never reports an exit.
+The reduced-motion path still completes immediately.
+
+The actual-OBJ test verifies the exit condition at desktop, phone, and wide
+viewports and confirms it occurs before the timer ends. A coordinator test
+checks that reaching the far edge with the board still visible does not finish
+early, while clearing it removes the invisible end hold. Browser capture was
+again blocked by the unavailable admin-enforced security check.

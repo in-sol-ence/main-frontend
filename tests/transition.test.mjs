@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { createSkateboardTransition } from '../dist/transition.js';
 import * as THREE from '../dist/vendor/three/three.module.js';
 
-function _fixture(reduced = false) {
+function _fixture(reduced = false, exitProgress = Infinity) {
   const motion = { matches: reduced };
   globalThis.matchMedia = () => motion;
   globalThis.document = { documentElement: { clientWidth: 1000 }, body: { classList: { add() {}, remove() {} } } };
@@ -18,7 +18,11 @@ function _fixture(reduced = false) {
   const positions = [];
   const finishes = [];
   const transition = createSkateboardTransition({ pages, viewer: {
-    begin() {}, move(progress) { positions.push(progress * document.documentElement.clientWidth); return positions.at(-1); },
+    begin() {}, move(progress) {
+      this.exited = progress >= exitProgress;
+      positions.push(progress * document.documentElement.clientWidth * (exitProgress === Infinity ? 1 : 1.2));
+      return positions.at(-1);
+    },
     finish(id) { finishes.push(id); }
   } });
   return { transition, pages, positions, finishes, motion };
@@ -68,6 +72,22 @@ test('reduced motion skips sweep and can finish an in-progress flight', async ()
   assert.equal(pages[0].inert, false);
 });
 
+test('finishes when the board clears the viewport, without an invisible end hold', async () => {
+  const { transition, pages, positions, finishes } = _fixture(false, .95);
+  const start = performance.now();
+  const navigation = transition.navigate(pages[1]);
+  transition.tick(start + 2700);
+  assert.ok(positions.at(-1) > 1000, 'the projected center has passed the right edge');
+  assert.equal(pages[1].style.clipPath, 'inset(0 0px 0 0)');
+  assert.equal(transition.active, true, 'the board is still partly visible');
+  transition.tick(start + 2900);
+  assert.equal(await navigation, true);
+  assert.equal(transition.active, false);
+  assert.equal(pages[1].style.clipPath, 'inset(0)');
+  assert.equal(pages[0].style.clipPath, 'inset(0 100% 0 0)');
+  assert.deepEqual(finishes, ['demo']);
+});
+
 test('actual OBJ sweep stays horizontal, exits fully, and clips at its projected center with a fixed perspective camera', () => {
   const model = new OBJLoader().parse(readFileSync(new URL('../dist/models/board.obj', import.meta.url), 'utf8'));
   const bounds = new THREE.Box3().setFromObject(model);
@@ -106,6 +126,7 @@ test('actual OBJ sweep stays horizontal, exits fully, and clips at its projected
     viewer.begin();
     let previousCenter = -Infinity;
     let previousRoll = -Infinity;
+    let firstExit = null;
     for (let frame = 0; frame <= 60; frame++) {
       const progress = frame / 60;
       const center = viewer.move(progress);
@@ -130,6 +151,8 @@ test('actual OBJ sweep stays horizontal, exits fully, and clips at its projected
         assert.equal(volume.style.clipPath, `inset(0 ${Math.max(0, volume.getBoundingClientRect().right - boundary)}px 0 0)`);
       }
       if (frame === 60) assert.ok(minX > width, 'whole board exits before completion');
+      assert.equal(viewer.exited, minX >= width + Math.max(8, width * .005), 'exit clears the projected board and its blur');
+      if (viewer.exited && firstExit === null) firstExit = frame;
       assert.ok(maxX - minX > width, 'the board is wider than the viewport it sweeps');
       const relative = camera.quaternion.clone().invert().multiply(ride.quaternion);
       const nose = new THREE.Vector3(0, 0, 1).applyQuaternion(board.quaternion).applyQuaternion(relative);
@@ -148,6 +171,7 @@ test('actual OBJ sweep stays horizontal, exits fully, and clips at its projected
       assert.deepEqual(camera.matrixWorld.toArray(), fixedCamera);
       assert.deepEqual(camera.projectionMatrix.toArray(), fixedLens);
     }
+    assert.ok(firstExit > 0 && firstExit < 60, 'the board clears the viewport before the timer ends');
     viewer.finish('home');
     assert.ok(board.position.equals(original.position));
     assert.ok(board.quaternion.equals(original.rotation));

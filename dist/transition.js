@@ -48,7 +48,8 @@ export function createSkateboardTransition({ pages, viewer, duration = 3200 }) {
       const x = Math.max(0, Math.min(width, viewer.move(eased)));
       flight.incoming.style.clipPath = `inset(0 ${Math.max(0, width - x)}px 0 0)`;
       flight.outgoing.style.clipPath = `inset(0 0 0 ${x}px)`;
-      if (progress === 1 || motion.matches) _finish();
+      // The board can clear the viewport before the ease's invisible tail ends.
+      if (viewer.exited || progress === 1 || motion.matches) _finish();
       return true;
     },
     get active() { return flight !== null; }

@@ -184,6 +184,8 @@ async function _createSkateboard() {
         const rect = volume.getBoundingClientRect();
         // The projected silhouette may not be centered on the OBJ pivot or canvas.
         const center = (left + right) / 2;
+        // Let the bokeh pass's outermost taps clear the viewport too.
+        this.exited = left >= width + Math.max(8, width * .005);
         const boundary = THREE.MathUtils.clamp(center, 0, width);
         volume.style.clipPath = page === 'home'
           ? `inset(0 ${Math.max(0, rect.right - boundary)}px 0 0)`
