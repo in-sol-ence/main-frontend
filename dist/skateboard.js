@@ -154,7 +154,7 @@ async function _createSkateboard() {
         // Clear each edge by the exact projected reach of the pose actually held there,
         // not by a loose sphere: the board is wider than the screen now, so a sphere
         // would overshoot by seconds. Each axis contributes its own worst corner, at
-        // its near depth. Both ends are fixed, so the trailing edge stays monotonic.
+        // its near depth. Both ends are fixed, so the sweep stays monotonic.
         const clearance = (at, edge) => {
           spread.makeRotationFromQuaternion(_pose(at).multiply(ridingPose));
           const reach = spread.elements;
@@ -168,24 +168,28 @@ async function _createSkateboard() {
           .applyMatrix4(camera.matrixWorld);
         ride.quaternion.copy(_pose(progress)).premultiply(cameraPose);
         ride.updateMatrixWorld(true);
-        let trailing = Infinity;
+        let left = Infinity, right = -Infinity;
         for (const mesh of meshes) {
           projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse).multiply(mesh.matrixWorld);
           const vertices = mesh.geometry.attributes.position;
           for (let index = 0; index < vertices.count; index++) {
             projected.fromBufferAttribute(vertices, index).applyMatrix4(projection);
-            trailing = Math.min(trailing, (projected.x + 1) * width / 2);
+            const screenX = (projected.x + 1) * width / 2;
+            left = Math.min(left, screenX);
+            right = Math.max(right, screenX);
           }
         }
         // The persistent knowledge canvas lives outside the clipped page sections.
         const volume = document.querySelector('#knowledge-volume');
         const rect = volume.getBoundingClientRect();
-        const boundary = THREE.MathUtils.clamp(trailing, 0, width);
+        // The projected silhouette may not be centered on the OBJ pivot or canvas.
+        const center = (left + right) / 2;
+        const boundary = THREE.MathUtils.clamp(center, 0, width);
         volume.style.clipPath = page === 'home'
           ? `inset(0 ${Math.max(0, rect.right - boundary)}px 0 0)`
           : `inset(0 0 0 ${Math.max(0, boundary - rect.left)}px)`;
         composer.render();
-        return trailing;
+        return center;
       },
       finish(id) {
         page = id;
