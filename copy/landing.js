@@ -22,6 +22,7 @@ export const landing = {
     '[See] how it works',
   ],
   demoButton: 'Demo',
+  learnButton: 'Try learning',
   contactButton: 'Contact us',
   contactEmail: 'sol.mahajan@utexas.edu',
 }

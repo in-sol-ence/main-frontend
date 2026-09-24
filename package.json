@@ -6,7 +6,9 @@
   "scripts": {
     "build": "vite build && node scripts/sync-spatial.mjs && node scripts/sync-copy.mjs",
     "test": "node --test tests/*.test.mjs",
-    "start": "vite preview --outDir dist --port 4173 --open"
+    "start": "vite preview --outDir dist --port 4173 --open",
+    "test:browser": "playwright test --project=desktop --project=phone",
+    "test:webkit": "playwright test --project=webkit-phone"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
@@ -16,6 +18,7 @@
     "three": "^0.186.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.62.1",
     "@vitejs/plugin-react": "^5.1.1",
     "linkedom": "^0.18.13",
     "vite": "^7.3.1"

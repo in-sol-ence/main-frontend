@@ -75,3 +75,10 @@ meshes, hide the field, or switch rendering modes. Demonstration stages update
 one React-owned 24-element binary mastery vector on the persistent KnowledgeScene.
 Keep the original field algorithm/dataset unchanged. The source demo does not
 render question markers; do not invent them without explicit clarification.
+
+The integrated Bloom lesson lives in `src/adaptive/`, with curriculum and UI
+wording under `copy/`. Its static entry is `dist/learn/index.html`; the build
+emits both knowledge.js and adaptive.js plus a shared scene chunk. Ship the
+whole dist/ tree. Keep the original standalone sibling demo untouched. Run
+`npm run test:browser` for lesson/navigation/mobile changes; `test:webkit` is
+an additional check on hosts with a working WebKit installation.

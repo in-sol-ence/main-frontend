@@ -172,3 +172,23 @@ body.is-finale #pages { z-index: 6; pointer-events: none; }
 body.is-finale .page { background: transparent; }
 body.is-finale #knowledge-volume { pointer-events: auto; transition: opacity 900ms ease; }
 @media (prefers-reduced-motion: reduce) { body.is-finale #knowledge-volume { transition: none; } }
+
+/* Reserve a separate model area on phones so it never covers reading or actions. */
+html, body { min-width: 0; }
+#pages { height: 100svh; height: 100dvh; }
+.page { min-height: 0; }
+.actions { max-width: 100%; }
+.finale-learn { position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); z-index: 8; min-height: 48px; display: inline-flex; align-items: center; padding: 12px 22px; border-radius: 999px; background: #f04c4c; color: #160707; text-decoration: none; font-weight: 600; }
+[hidden] { display: none !important; }
+@media (max-width: 760px) {
+  #home { align-items: flex-start; padding: max(24px, env(safe-area-inset-top)) 7vw max(24px, env(safe-area-inset-bottom)); }
+  #home .intro { width: 100%; margin-top: 42svh; }
+  #home h1 { width: 100%; min-height: 4.32em; font-size: clamp(2rem, 9vw, 3.8rem); }
+  #home .actions { margin-top: 20px; gap: 10px; padding-bottom: 8px; }
+  .actions a, .actions button { padding-inline: 20px; }
+  #skateboard { height: 42svh; }
+  .is-transitioning #skateboard, body[data-page="demo"] #skateboard { height: 100%; }
+  #pages { touch-action: pan-y !important; }
+  .demo-page { padding-top: max(24px, env(safe-area-inset-top)); padding-bottom: max(80px, calc(env(safe-area-inset-bottom) + 64px)); }
+  .demo-next { bottom: max(16px, env(safe-area-inset-bottom)); min-width: 48px; min-height: 48px; }
+}

@@ -1,6 +1,6 @@
 # Skatebored frontend handover
 
-Updated: 2026-09-22
+Updated: 2026-09-24
 
 ## Location and branch
 
@@ -1116,3 +1116,70 @@ viewports and confirms it occurs before the timer ends. A coordinator test
 checks that reaching the far edge with the board still visible does not finish
 early, while clearing it removes the invisible end hold. Browser capture was
 again blocked by the unavailable admin-enforced security check.
+
+## Mobile polish and integrated adaptive lesson (2026-09-24)
+
+This change is on branch `transition-fix-3`. The existing Demo still opens
+the typed introduction, concept sequence and spatial journey. “Try learning” on the landing page, and the same action after
+the finale finishes, opens `dist/learn/index.html`. Back to skatebored returns
+to the landing page. No deployment or push is part of this change.
+
+The lesson reuses the current Bloom curriculum and deterministic learning
+engine from `/Users/solom/sk/adaptive-learning-demo`. It is self-contained in
+this frontend: `src/adaptive/{App.jsx,learning.js,curriculum.js}`,
+`src/adaptive-entry.jsx`, `copy/adaptive.js` and `copy/adaptive/bloom.json`.
+Visitor-facing copy stays in `copy/`; the sibling demo was not modified.
+It shares the original `src/knowledge/KnowledgeScene.jsx`, including its unchanged
+field generation and coordinates. One canvas persists throughout a lesson.
+The first ten vector entries reflect demonstrated mastery; the remaining
+fourteen stay zero. Existing saved sessions use the same storage key and are
+validated against the complete curriculum before replay. Unavailable storage
+or corrupt sessions never prevent beginning a lesson.
+
+Correct answers advance and update mastery; wrong answers show the assigned
+video, then a transfer question, then an explanation if needed. Videos do not
+award mastery. Consecutive video instances have distinct stage/segment keys,
+readiness has a 12-second timeout (including a constructed but unready player),
+and blocked players offer the timestamped external resource plus Continue.
+Double taps are ignored for 450ms across activity changes. Completion provides
+a restart action, clears progress and retains the mounted scene. A scene error
+has a text fallback so the assessment remains usable.
+
+The lesson uses two columns on desktop and normal scrolling on phones. Short
+landscape desktops scroll the activity column; narrow layouts stack the scene
+below the question. Focus moves to the new activity, phone scroll resets, and
+answer controls have at least 54px touch targets. Reduced motion immediately
+sets the existing field strengths to their target without modifying the original
+KnowledgeField algorithm.
+
+On phones the landing model has a reserved 42svh area with centered, wider
+camera framing. It cannot cover the heading or actions; the original full-screen
+canvas returns for the skateboard transition. Page height follows the dynamic
+viewport, touch scrolling is available, and safe-area padding protects controls.
+The intro's persistent volume follows changes to both its slot and text layout,
+as well as page scrolling. The finale repositions on resize and restores page
+accessibility. Failed model loading no longer leaves the Demo button disabled.
+
+`npm run build` now emits `dist/knowledge/knowledge.js`, `adaptive.js` and their
+shared scene/runtime chunk. All emitted files must be shipped together. `.gitattributes` marks those
+generated bundles and preserves whitespace in upstream shader strings. Static
+landing and learn HTML/CSS remain in `dist/`; spatial and copy output is generated.
+
+Verification:
+- `npm test`: 30 passing tests, including imported curriculum tests for complete
+  all-correct, remediation, misconception and all-fallback sessions.
+- Spatial: 142 passing tests and every existing `check*` script passes.
+- Production build, required static JavaScript syntax checks and whitespace check pass.
+- `npm run test:browser`: 12 browser scenarios across Chromium desktop and emulated iPhone; covers intro/wipe,
+  reduced motion, mobile overlap, full lesson, double taps, refresh, restart,
+  blocked/never-ready video recovery, simulated segment completion, fallback persistence, and 320px, landscape,
+  and tablet layouts. Screenshots are generated into ignored `test-results/`.
+- Optional `npm run test:webkit` is configured, but the installed WebKit process
+  crashes before creating a page on this machine; Safari verification remains open.
+- Browser tests simulate failed/never-ready players. External YouTube playback and
+  educational coverage are not certified by these tests. Original resource notes
+  are preserved in `references/adaptive-resource-verification.md`.
+
+Browser setup after `npm ci`: `npx playwright install chromium`; install WebKit
+as well for the optional Safari-engine run. No external app/service is needed
+for the deterministic test suite.

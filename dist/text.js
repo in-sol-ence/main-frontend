@@ -19,6 +19,8 @@ for (const phrase of landing.phrases) {
 }
 
 document.querySelector('#demo-button').textContent = landing.demoButton;
+document.querySelector('#learn-link').textContent = landing.learnButton;
+document.querySelector('#finale-learn').textContent = landing.learnButton;
 const contact = document.querySelector('#contact-link');
 contact.textContent = landing.contactButton;
 contact.href = `mailto:${landing.contactEmail}`;

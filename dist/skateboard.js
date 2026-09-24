@@ -233,9 +233,9 @@ async function _createSkateboard() {
     const height = container.clientHeight;
     if (!width || !height) return;
     camera.aspect = width / height;
-    camera.fov = 52;
+    camera.fov = width <= 760 && page === 'home' && !transition.active ? 65 : 52;
     camera.clearViewOffset();
-    camera.setViewOffset(width, height, -width * .23, height * .04, width, height);
+    camera.setViewOffset(width, height, width <= 760 && page === 'home' && !transition.active ? 0 : -width * .23, height * .04, width, height);
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
     composer.setSize(width, height);
@@ -296,4 +296,20 @@ async function _createSkateboard() {
 
 _createSkateboard().catch(error => {
   console.error('The skateboard could not be loaded.', error);
+  // A missing model or unavailable GPU must not disable the site’s introduction.
+  const button = document.querySelector('#demo-button');
+  button.disabled = false;
+  button.addEventListener('click', () => {
+    const home = document.querySelector('#home');
+    const demo = document.querySelector('#demo');
+    home.inert = true;
+    home.setAttribute('aria-hidden', 'true');
+    home.style.clipPath = 'inset(0 100% 0 0)';
+    demo.inert = false;
+    demo.removeAttribute('aria-hidden');
+    demo.style.clipPath = 'inset(0)';
+    document.body.dataset.page = 'demo';
+    document.querySelector('#skateboard').hidden = true;
+    demo.querySelector('[data-page-heading]').focus({ preventScroll: true });
+  });
 });

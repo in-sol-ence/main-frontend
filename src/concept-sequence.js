@@ -142,14 +142,19 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     timer = setTimeout(() => {
       phase = 'finale'
       presentation.update(finaleStage.mastery)
-      if (motion.matches) { text.innerHTML = coloredFinale; phase = 'done'; return }
+      if (motion.matches) { text.innerHTML = coloredFinale; _finish(); return }
       typing?.destroy()
       typing = new window.Typed(text, {
         strings: [coloredFinale], typeSpeed: 65, startDelay: 0, smartBackspace: false,
         loop: false, showCursor: false, autoInsertCss: false, contentType: 'html',
-        onComplete: () => { phase = 'done' },
+        onComplete: _finish,
       })
     }, 1200)
+  }
+  function _finish() {
+    phase = 'done'
+    const link = document.querySelector('#finale-learn')
+    if (link) link.hidden = false
   }
   const characters = new MutationObserver(_highlight)
   function _ready() {
@@ -189,7 +194,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     } else if (phase === 'finale') {
       typing?.destroy()
       text.innerHTML = coloredFinale
-      phase = 'done'
+      _finish()
     } else return false
     return true
   }

@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { MarchingCubes, OrbitControls, Html } from '@react-three/drei'
@@ -51,9 +51,17 @@ function KnowledgeField({ mastery, radius, isolation, strengths, surface }) {
 
 function Scene({ mastery, radius, isolation, surface, autoRotate, background = '#07111e', onMasterySettled }) {
   const strengths = useRef(mastery.map(Number))
+  const [reducedMotion, setReducedMotion] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches)
+  useEffect(() => {
+    const preference = matchMedia('(prefers-reduced-motion: reduce)')
+    const _update = () => setReducedMotion(preference.matches)
+    preference.addEventListener('change', _update)
+    return () => preference.removeEventListener('change', _update)
+  }, [])
   const orbitTarget = useMemo(() => [0, -0.1, 0], [])
   // Observe the original damping without changing its volume-generation algorithm.
   useFrame(() => {
+    if (reducedMotion) strengths.current = mastery.map(Number)
     if (strengths.current.every((value, index) => Math.abs(value - mastery[index]) < .004)) {
       onMasterySettled?.(mastery)
     }

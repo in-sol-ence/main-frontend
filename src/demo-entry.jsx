@@ -7,7 +7,7 @@ import { initializeDemoPage } from './demo-page.js'
 const volume = document.querySelector('#knowledge-volume')
 const slot = document.querySelector('#knowledge-slot')
 const pages = document.querySelector('#pages')
-const resize = new ResizeObserver(() => {
+const _placeVolume = () => {
   // Once the volume stands at the end of the spatial path, the slot no longer places it.
   if (volume.dataset.anchored) return
   const bounds = slot.getBoundingClientRect()
@@ -16,8 +16,12 @@ const resize = new ResizeObserver(() => {
     left: `${bounds.left - parent.left}px`, top: `${bounds.top - parent.top}px`,
     width: `${bounds.width}px`, height: `${bounds.height}px`,
   })
-})
+}
+const resize = new ResizeObserver(_placeVolume)
 resize.observe(slot)
+resize.observe(document.querySelector('.demo-intro'))
+resize.observe(pages)
+document.querySelector('#demo').addEventListener('scroll', _placeVolume, { passive: true })
 // React owns the single current mastery vector. Updating it preserves the Canvas.
 function _KnowledgeExperience() {
   const [mastery, setMastery] = useState([1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -31,16 +35,21 @@ function _KnowledgeExperience() {
     volume.classList.remove('is-visible')
     // Centred on the path's vanishing tip, but never over the label that
     // types beside it: beside it on wide screens, below it on narrow ones.
-    const label = document.querySelector('#demo .demo-heading').getBoundingClientRect()
-    let size = Math.min(innerWidth * .42, innerHeight * .62)
-    let left = point.x * innerWidth - size / 2, top = point.y * innerHeight - size / 2
-    if (innerWidth > 760) {
-      const clear = label.right + 24
-      if (left < clear) { left = clear; size = Math.min(size, innerWidth - clear - 16) }
-    } else top = Math.max(top, label.bottom + 16)
-    left = Math.max(0, Math.min(innerWidth - size, left))
-    top = Math.max(0, Math.min(innerHeight - size, top))
-    Object.assign(volume.style, { left: `${left}px`, top: `${top}px`, width: `${size}px`, height: `${size}px` })
+    const _place = () => {
+      const label = document.querySelector('#demo .demo-heading').getBoundingClientRect()
+      let size = Math.min(innerWidth * .42, innerHeight * .62)
+      let left = point.x * innerWidth - size / 2, top = point.y * innerHeight - size / 2
+      if (innerWidth > 760) {
+        const clear = label.right + 24
+        if (left < clear) { left = clear; size = Math.min(size, innerWidth - clear - 16) }
+      } else top = Math.max(top, label.bottom + 16)
+      left = Math.max(0, Math.min(innerWidth - size, left))
+      top = Math.max(0, Math.min(innerHeight - size, top))
+      Object.assign(volume.style, { left: `${left}px`, top: `${top}px`, width: `${size}px`, height: `${size}px` })
+    }
+    _place()
+    window.addEventListener('resize', _place)
+    pages.inert = false
     document.body.classList.add('is-finale')
     requestAnimationFrame(() => requestAnimationFrame(() => volume.classList.add('is-visible')))
   }, [])
