@@ -121,16 +121,10 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     _erase(() => {
       phase = 'handed-off'
       heading.removeAttribute('aria-label')
-      handoff.onFinale?.(_finish)
       handoff.enter()
     })
   }
 
-  function _finish() {
-    phase = 'done'
-    const link = document.querySelector('#finale-learn')
-    if (link) link.hidden = false
-  }
   const characters = new MutationObserver(_highlight)
   function _ready() {
     phase = 'waiting-stage'

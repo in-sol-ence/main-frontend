@@ -1200,3 +1200,13 @@ Verification: production build, all 30 frontend and 142 spatial tests, all
 spatial syntax checks, and desktop/mobile browser checks pass. The browser
 checks confirm that the end event leaves the path visible and the intro text
 empty, with no knowledge-state overlay.
+
+
+## Landing actions simplified (2026-09-24)
+
+The landing Demo button now reads “Learn more” and opens the same introduction.
+Both Try learning links (landing and path ending) and their unused display code
+are removed. The final camera journey remains unobstructed. The existing lesson
+is still available by its direct `/learn/` URL. This supersedes the earlier CTA
+notes. Production build, all 30 frontend tests, required syntax/whitespace
+checks, and four desktop/mobile navigation and lesson browser checks passed.

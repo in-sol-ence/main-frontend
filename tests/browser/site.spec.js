@@ -18,12 +18,13 @@ test('landing actions, mobile framing, introduction and reduced motion', async (
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('/')
-  await expect(page.getByRole('button', { name: /^Demo/ })).toBeEnabled()
+  await expect(page.getByRole('button', { name: /^Learn more/ })).toBeEnabled()
+  await expect(page.getByRole('link', { name: 'Try learning', exact: true })).toHaveCount(0)
   await _noOverflow(page)
   if (info.project.name.includes('phone')) {
     expect(await page.evaluate(() => document.querySelector('#skateboard').getBoundingClientRect().bottom <= document.querySelector('#home h1').getBoundingClientRect().top)).toBe(true)
   }
-  await page.getByRole('button', { name: /^Demo/ }).click()
+  await page.getByRole('button', { name: /^Learn more/ }).click()
   await expect(page.locator('body')).toHaveAttribute('data-page', 'demo')
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeVisible()
@@ -37,20 +38,17 @@ test('landing actions, mobile framing, introduction and reduced motion', async (
   await expect(page.locator('#spatial-stage')).toHaveClass(/is-entering/, { timeout: 35000 })
   const journey = page.frames().find(frame => frame.url().includes('/spatial/index.html'))
   await journey.evaluate(() => parent.postMessage({ type: 'skatebored:spatial:finale', point: { x: .7, y: .6 } }, location.origin))
-  await expect(page.locator('#finale-learn')).toBeVisible()
+  await expect(page.locator('#learn-link, #finale-learn')).toHaveCount(0)
   await expect(page.locator('body')).not.toHaveClass(/is-finale/)
   await expect(page.locator('#demo-typed')).toBeEmpty()
   await expect(page.locator('#spatial-stage')).toHaveClass(/is-entering/)
-  await page.locator('#finale-learn').click()
-  await expect(page.locator('.question')).toBeVisible()
   expect(errors).toEqual([])
 })
 
 test('lesson completes, ignores double taps, saves and restarts', async ({ page }, info) => {
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
-  await page.goto('/')
-  await page.getByRole('link', { name: 'Try learning', exact: true }).click()
+  await page.goto('/learn/')
   const stages = Object.values(bloom.stages)
   const first = bloom.questions[stages[0].coreQuestionId]
   const correct = first.choices.find(choice => choice.id === first.correctAnswer)
@@ -72,7 +70,7 @@ test('lesson completes, ignores double taps, saves and restarts', async ({ page 
   await page.reload()
   await expect(page.getByRole('heading')).toHaveText(first.questionText)
   await page.getByRole('link', { name: 'Back to skatebored' }).click()
-  await expect(page.getByRole('button', { name: /^Demo/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Learn more/ })).toBeVisible()
   expect(errors).toEqual([])
 })
 

@@ -56,7 +56,8 @@ last KC the study posts `skatebored:spatial:finale` with the path's vanishing
 point. The camera continues along the path; do not bring back the knowledge
 volume or type a final knowledge-state statement. The embedding page requests
 `travelSpeed=2` through the boot hook, applied when the final branch pass begins.
-The learning link remains available at the end.
+There is no Try learning action on the landing page or at the end. The landing
+Learn more button opens the existing demo sequence.
 The handed-in statement types at the earlier slides' pacing and holds 2000ms.
 The demonstration that follows is scripted, never pointer-driven: it reuses the
 existing hover, entry, and return paths, derives the hovered topic and its

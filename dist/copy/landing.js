@@ -21,8 +21,7 @@ export const landing = {
     'skatebored',
     '[See] how it works',
   ],
-  demoButton: 'Demo',
-  learnButton: 'Try learning',
+  demoButton: 'Learn more',
   contactButton: 'Contact us',
   contactEmail: 'sol.mahajan@utexas.edu',
 }

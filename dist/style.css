@@ -170,7 +170,6 @@ html, body { min-width: 0; }
 #pages { height: 100svh; height: 100dvh; }
 .page { min-height: 0; }
 .actions { max-width: 100%; }
-.finale-learn { position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); z-index: 8; min-height: 48px; display: inline-flex; align-items: center; padding: 12px 22px; border-radius: 999px; background: #f04c4c; color: #160707; text-decoration: none; font-weight: 600; }
 [hidden] { display: none !important; }
 @media (max-width: 760px) {
   #home { align-items: flex-start; padding: max(24px, env(safe-area-inset-top)) 7vw max(24px, env(safe-area-inset-bottom)); }

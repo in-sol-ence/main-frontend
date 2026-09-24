@@ -1,4 +1,4 @@
-import { c as F, j as D, r as k, K as z } from "./KnowledgeScene-DmcaLnKC.js";
+import { c as j, j as D, r as k, K as z } from "./KnowledgeScene-DmcaLnKC.js";
 const C = {
   // Used in the small per-concept notes, e.g. "John Doe already knows this."
   learner: "John Doe",
@@ -17,12 +17,12 @@ const C = {
   // reinforcement learning. The background decides which topics count as known.
   goal: "Learn calculus from the beginning",
   background: "I know algebra"
-}, J = C.goal, N = C.background, G = C.statement, I = "skatebored:spatial", W = 8e3;
-function V(o) {
+}, F = C.goal, J = C.background, N = C.statement, I = "skatebored:spatial", G = 8e3;
+function W(o) {
   const n = (e) => Number.isFinite(e) ? Math.max(0, Math.min(1, e)) : 0.5;
   return { x: n(o?.x), y: n(o?.y) };
 }
-function Y() {
+function V() {
   const o = document.querySelector("#spatial-stage"), n = document.querySelector("#spatial-frame"), e = document.querySelector("#pages");
   let t, p = !1;
   const i = [], d = () => n.contentWindow?.postMessage({ type: `${I}:begin` }, location.origin);
@@ -35,17 +35,17 @@ function Y() {
         const s = (c) => {
           if (!(c.origin !== location.origin || c.source !== n.contentWindow)) {
             if (c.data?.type === `${I}:finale` && p) {
-              const g = V(c.data.point);
+              const g = W(c.data.point);
               for (const b of i) b(g);
               i.length = 0;
               return;
             }
             c.data?.type === `${I}:ready` && (clearTimeout(a), S(!0), p && d());
           }
-        }, a = setTimeout(() => S(!1), W);
+        }, a = setTimeout(() => S(!1), G);
         addEventListener("message", s);
       });
-      const m = `goal=${encodeURIComponent(J)}&background=${encodeURIComponent(N)}&statement=${encodeURIComponent(G)}&learner=${encodeURIComponent(C.learner)}&topicLine=${encodeURIComponent(C.topicLine)}&rationale=${encodeURIComponent(C.rationale)}&conceptsLabel=${encodeURIComponent(C.conceptsLabel)}&repeats=${encodeURIComponent(C.repeats)}&travelSpeed=2`;
+      const m = `goal=${encodeURIComponent(F)}&background=${encodeURIComponent(J)}&statement=${encodeURIComponent(N)}&learner=${encodeURIComponent(C.learner)}&topicLine=${encodeURIComponent(C.topicLine)}&rationale=${encodeURIComponent(C.rationale)}&conceptsLabel=${encodeURIComponent(C.conceptsLabel)}&repeats=${encodeURIComponent(C.repeats)}&travelSpeed=2`;
       return n.src = `./spatial/index.html?${m}`, t;
     },
     async enter() {
@@ -77,19 +77,19 @@ const y = {
   // The last screen before the spatial journey.
   closing: "Skatebored turns a complex syllabus into a learning path through this space.",
   closingEmphasis: "learning path"
-}, X = [
+}, Y = [
   ["Q1"],
   ["Q2"],
   ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8"],
   // Development sample: Python Random(20260922).sample(range(1, 25), 9), sorted; never randomized on render or visit.
   ["Q1", "Q2", "Q3", "Q4", "Q12", "Q17", "Q20", "Q22", "Q24"]
-], T = X.map((o, n) => ({
+], T = Y.map((o, n) => ({
   phrase: y.stages[n],
   ids: o,
   mastery: Array.from({ length: 24 }, (e, t) => Number(o.includes(`Q${t + 1}`)))
-})), Q = y.closing;
-function Z(o, n = Y()) {
-  const e = document.querySelector("#demo"), t = document.querySelector("#demo-typed"), [p, i] = y.conceptSentence.split("{phrase}"), d = (r) => r.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"), m = `${d(p)}<span id="concept-phrase"></span>${d(i)}`, S = Q.replace(y.closingEmphasis, `<span class="text-accent">${d(y.closingEmphasis)}</span>`);
+})), q = y.closing;
+function X(o, n = V()) {
+  const e = document.querySelector("#demo"), t = document.querySelector("#demo-typed"), [p, i] = y.conceptSentence.split("{phrase}"), d = (r) => r.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"), m = `${d(p)}<span id="concept-phrase"></span>${d(i)}`, S = q.replace(y.closingEmphasis, `<span class="text-accent">${d(y.closingEmphasis)}</span>`);
   let s, a;
   const c = e.querySelector("[data-page-heading]"), g = matchMedia("(prefers-reduced-motion: reduce)");
   let b = !1, l = "idle", h = 0, f, w, x = !1, u;
@@ -103,11 +103,11 @@ function Z(o, n = Y()) {
           O();
           return;
         }
-        h++, $();
+        h++, _();
       }, 2e3);
     });
   }
-  function $() {
+  function _() {
     x = !1, l = "stage";
     const r = s.textContent;
     if (f?.destroy(), s.textContent = r, g.matches) {
@@ -132,8 +132,8 @@ function Z(o, n = Y()) {
       t.textContent = "", r();
       return;
     }
-    const j = t.textContent;
-    f?.destroy(), t.textContent = j, f = new window.Typed(t, {
+    const H = t.textContent;
+    f?.destroy(), t.textContent = H, f = new window.Typed(t, {
       strings: [""],
       backSpeed: 28,
       startDelay: 0,
@@ -150,7 +150,7 @@ function Z(o, n = Y()) {
   }
   function O() {
     M.disconnect(), E(() => {
-      if (l = "closing", c.setAttribute("aria-label", Q), g.matches) {
+      if (l = "closing", c.setAttribute("aria-label", q), g.matches) {
         t.innerHTML = S, v();
         return;
       }
@@ -169,18 +169,13 @@ function Z(o, n = Y()) {
   }
   function P() {
     E(() => {
-      l = "handed-off", c.removeAttribute("aria-label"), n.onFinale?.(H), n.enter();
+      l = "handed-off", c.removeAttribute("aria-label"), n.enter();
     });
-  }
-  function H() {
-    l = "done";
-    const r = document.querySelector("#finale-learn");
-    r && (r.hidden = !1);
   }
   const M = new MutationObserver(L);
   function A() {
     l = "waiting-stage", s = t.querySelector("#concept-phrase"), M.observe(s, { childList: !0, characterData: !0, subtree: !0 }), u.then(() => {
-      w = setTimeout($, 700);
+      w = setTimeout(_, 700);
     });
   }
   g.addEventListener("change", () => {
@@ -192,7 +187,7 @@ function Z(o, n = Y()) {
       f?.destroy(), s.textContent = T[h].phrase, L();
     }
   });
-  function q() {
+  function Q() {
     if (!b || e.inert) return !1;
     if (l === "shell")
       a?.destroy(), t.innerHTML = m, A();
@@ -204,9 +199,9 @@ function Z(o, n = Y()) {
     return !0;
   }
   return e.addEventListener("click", (r) => {
-    r.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || q() && r.stopImmediatePropagation();
+    r.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || Q() && r.stopImmediatePropagation();
   }), document.addEventListener("keydown", (r) => {
-    r.code !== "Space" || r.repeat || r.metaKey || r.ctrlKey || r.altKey || r.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || q() && (r.preventDefault(), r.stopImmediatePropagation());
+    r.code !== "Space" || r.repeat || r.metaKey || r.ctrlKey || r.altKey || r.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || Q() && (r.preventDefault(), r.stopImmediatePropagation());
   }), function() {
     if (!b) {
       if (b = !0, l = "shell", n.preload(), u = o.update(Array(24).fill(0)), c.setAttribute("aria-label", `${p.trimEnd()} ${i.trimStart()}`), g.matches) {
@@ -226,7 +221,7 @@ function Z(o, n = Y()) {
     }
   };
 }
-function ee(o) {
+function Z(o) {
   const n = document.querySelector("#demo"), e = document.querySelector("#demo-typed"), t = n.querySelector("[data-page-heading]"), p = document.querySelector("#knowledge-volume"), i = document.querySelector("#demo-next"), d = y.intro, m = d.replace(y.revealAfter, `<span class="text-accent">${y.revealAfter}</span>`);
   t.setAttribute("aria-label", d), i.textContent = y.nextButton;
   const S = d.indexOf(y.revealAfter) + y.revealAfter.length, s = matchMedia("(prefers-reduced-motion: reduce)");
@@ -304,12 +299,12 @@ const R = document.querySelector("#knowledge-volume"), K = document.querySelecto
     width: `${o.width}px`,
     height: `${o.height}px`
   });
-}, _ = new ResizeObserver(B);
-_.observe(K);
-_.observe(document.querySelector(".demo-intro"));
-_.observe(U);
+}, $ = new ResizeObserver(B);
+$.observe(K);
+$.observe(document.querySelector(".demo-intro"));
+$.observe(U);
 document.querySelector("#demo").addEventListener("scroll", B, { passive: !0 });
-function te() {
+function ee() {
   const [o, n] = k.useState([1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), e = k.useRef(null), t = k.useCallback((i) => new Promise((d) => {
     e.current = { vector: i, resolve: d }, n(i);
   }), []), p = k.useCallback((i) => {
@@ -318,7 +313,7 @@ function te() {
     e.current = null, d();
   }, []);
   return k.useEffect(() => {
-    ee(Z({ update: t }));
+    Z(X({ update: t }));
   }, [t]), /* @__PURE__ */ D.jsx(
     z,
     {
@@ -332,4 +327,4 @@ function te() {
     }
   );
 }
-F.createRoot(R).render(/* @__PURE__ */ D.jsx(te, {}));
+j.createRoot(R).render(/* @__PURE__ */ D.jsx(ee, {}));
