@@ -21,6 +21,7 @@ export function readHandoff(search = '') {
   if (!goal) return null;
   return {
     goal,
+    travelSpeed: Math.max(1, Math.min(3, Number(parameters.get('travelSpeed')) || 1)),
     background: (parameters.get('background') || '').trim().slice(0, 300),
     statement: (parameters.get('statement') || '').trim().slice(0, 200),
     // The embedding page owns the narration copy; these defaults are its current wording.

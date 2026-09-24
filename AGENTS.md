@@ -53,10 +53,10 @@ In the handed-in demonstration the RL rationale is followed by the explained
 KC's own resource branches (its video segment opens), then the `repeats` line
 while the rest of that branch passes at the journey's pace. Past the branch's
 last KC the study posts `skatebored:spatial:finale` with the path's vanishing
-point; the journey stays on screen, the page's layer rises over it with its black
-removed, and the same KnowledgeScene (transparent) appears at that point and
-grows John Doe's mastery vector to `finaleStage`
-under `copy/demo.js` `finale`. No new renderer; still one mastery vector.
+point. The camera continues along the path; do not bring back the knowledge
+volume or type a final knowledge-state statement. The embedding page requests
+`travelSpeed=2` through the boot hook, applied when the final branch pass begins.
+The learning link remains available at the end.
 The handed-in statement types at the earlier slides' pacing and holds 2000ms.
 The demonstration that follows is scripted, never pointer-driven: it reuses the
 existing hover, entry, and return paths, derives the hovered topic and its

@@ -64,6 +64,7 @@ export function createSpatialHandoff() {
         + `&rationale=${encodeURIComponent(journey.rationale)}`
         + `&conceptsLabel=${encodeURIComponent(journey.conceptsLabel)}`
         + `&repeats=${encodeURIComponent(journey.repeats)}`
+        + '&travelSpeed=2'
       frame.src = `./spatial/index.html?${query}`
       return warmed
     },

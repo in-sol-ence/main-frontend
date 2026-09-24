@@ -165,14 +165,6 @@ h1 {
 #spatial-stage iframe { display: block; width: 100%; height: 100%; border: 0; }
 @media (prefers-reduced-motion: reduce) { #spatial-stage { transition: none; } }
 
-/* The finale: the page's layer rises over the still-running spatial journey
-   with its black removed, so the learner's knowledge appears where the path's
-   line vanishes rather than on a separate page. */
-body.is-finale #pages { z-index: 6; pointer-events: none; }
-body.is-finale .page { background: transparent; }
-body.is-finale #knowledge-volume { pointer-events: auto; transition: opacity 900ms ease; }
-@media (prefers-reduced-motion: reduce) { body.is-finale #knowledge-volume { transition: none; } }
-
 /* Reserve a separate model area on phones so it never covers reading or actions. */
 html, body { min-width: 0; }
 #pages { height: 100svh; height: 100dvh; }

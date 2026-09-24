@@ -18,11 +18,6 @@ export const conceptStages = _stageIds.map((ids, index) => ({
 // One more screen in the same voice, between the learner's space and his journey.
 export const closingSentence = demo.closing
 
-// Where the journey leaves John Doe: his starting knowledge plus the nearby
-// clusters the demonstration covered. Illustrative, like every stage above.
-export const finaleStage = (ids => ({ ids, mastery: Array.from({ length: 24 }, (_, question) => Number(ids.includes(`Q${question + 1}`))) }))(
-  ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q17', 'Q20', 'Q22', 'Q24'])
-
 export function initializeConceptSequence(presentation, handoff = createSpatialHandoff()) {
   const page = document.querySelector('#demo')
   const text = document.querySelector('#demo-typed')
@@ -30,7 +25,6 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
   const _escape = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   const shell = `${_escape(before)}<span id="concept-phrase"></span>${_escape(after)}`
   const coloredClosing = closingSentence.replace(demo.closingEmphasis, `<span class="text-accent">${_escape(demo.closingEmphasis)}</span>`)
-  const coloredFinale = demo.finale.replace(demo.finaleEmphasis, `<span class="text-accent">${_escape(demo.finaleEmphasis)}</span>`)
   let phrase
   let shellTyping
   const heading = page.querySelector('[data-page-heading]')
@@ -127,30 +121,11 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     _erase(() => {
       phase = 'handed-off'
       heading.removeAttribute('aria-label')
-      handoff.onFinale?.(_finale)
+      handoff.onFinale?.(_finish)
       handoff.enter()
     })
   }
 
-  // At the end of the path, where its line vanishes, the volume the journey
-  // began with appears in the same space, then grows while the same span types
-  // what it now shows.
-  function _finale(point = { x: .5, y: .5 }) {
-    phase = 'finale-wait'
-    presentation.anchor?.(point)
-    heading.setAttribute('aria-label', demo.finale)
-    timer = setTimeout(() => {
-      phase = 'finale'
-      presentation.update(finaleStage.mastery)
-      if (motion.matches) { text.innerHTML = coloredFinale; _finish(); return }
-      typing?.destroy()
-      typing = new window.Typed(text, {
-        strings: [coloredFinale], typeSpeed: 65, startDelay: 0, smartBackspace: false,
-        loop: false, showCursor: false, autoInsertCss: false, contentType: 'html',
-        onComplete: _finish,
-      })
-    }, 1200)
-  }
   function _finish() {
     phase = 'done'
     const link = document.querySelector('#finale-learn')
@@ -178,7 +153,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
   })
 
   function _skipTyping() {
-    if (!started || (page.inert && !document.body.classList.contains('is-finale'))) return false
+    if (!started || page.inert) return false
     if (phase === 'shell') {
       shellTyping?.destroy()
       text.innerHTML = shell
@@ -191,10 +166,6 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
       typing?.destroy()
       text.innerHTML = coloredClosing
       _read()
-    } else if (phase === 'finale') {
-      typing?.destroy()
-      text.innerHTML = coloredFinale
-      _finish()
     } else return false
     return true
   }

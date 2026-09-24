@@ -1183,3 +1183,20 @@ Verification:
 Browser setup after `npm ci`: `npx playwright install chromium`; install WebKit
 as well for the optional Safari-engine run. No external app/service is needed
 for the deterministic test suite.
+
+
+## Continuous, faster path ending (2026-09-24)
+
+The final John Doe knowledge-state overlay has been removed, including its
+copy, mastery update and canvas repositioning. After the path finishes, the
+spatial journey stays visible and the existing Try learning action appears.
+The camera continues forward. The embedded demo requests `travelSpeed=2`
+through the existing boot hook; the final branch pass uses twice the normal
+cruise speed with the existing acceleration smoothing. Earlier narration and
+the standalone study retain their pacing. This supersedes the finale-overlay
+behavior described above.
+
+Verification: production build, all 30 frontend and 142 spatial tests, all
+spatial syntax checks, and desktop/mobile browser checks pass. The browser
+checks confirm that the end event leaves the path visible and the intro text
+empty, with no knowledge-state overlay.

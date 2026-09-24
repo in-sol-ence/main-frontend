@@ -583,6 +583,8 @@ if (renderer) {
   function beginRepeats() {
     const demo = demonstration;
     demo.stage = 'repeats'; demo.elapsed = 0; demo.anchor = null;
+    // The embedded demo accelerates the final path through the existing smooth motion law.
+    history.active.journey.cruiseSpeed *= handoff.travelSpeed;
     for (const layer of history.layers) layer.learningWeight = 0;
     tell(handoff.repeats, `${demo.topic} → ${handoff.conceptsLabel}`, 'beside');
   }

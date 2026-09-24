@@ -16,13 +16,17 @@ test('a goal is only handed in explicitly; the front door is otherwise untouched
     assert.equal(readHandoff(search), null, search);
   }
   const handed = readHandoff(`?goal=Learn%20calculus%20from%20the%20beginning&background=I%20know%20algebra&statement=${encodeURIComponent(STATEMENT)}`);
-  assert.deepEqual(handed, { goal: 'Learn calculus from the beginning', background: 'I know algebra', statement: STATEMENT,
+  assert.deepEqual(handed, { goal: 'Learn calculus from the beginning', travelSpeed: 1, background: 'I know algebra', statement: STATEMENT,
     learner: LEARNER, topicLine: 'John Doe wants to learn {topic}.', rationale: RATIONALE, conceptsLabel: 'Knowledge concepts', repeats: 'The process repeats.' });
   // The embedding page's copy replaces every narration line.
   const worded = readHandoff('?goal=a&learner=Ada&topicLine=Ada%20picks%20%7Btopic%7D.&rationale=Because.&conceptsLabel=Parts');
   assert.deepEqual([worded.learner, worded.topicLine, worded.rationale, worded.conceptsLabel], ['Ada', 'Ada picks {topic}.', 'Because.', 'Parts']);
   assert.equal(personalNotes({ route: { forward: ['x'] }, children: [{ id: 'x', title: 'Limits' }] }, 'Ada', worded.topicLine).get('x'), 'Ada picks Limits.');
   assert.equal(readHandoff('?goal=a').background, '');
+  assert.equal(readHandoff('?goal=a&travelSpeed=2').travelSpeed, 2);
+  for (const [value, expected] of [['bad', 1], ['-1', 1], ['20', 3]]) {
+    assert.equal(readHandoff(`?goal=a&travelSpeed=${value}`).travelSpeed, expected);
+  }
   assert.equal(readHandoff(`?goal=${'x'.repeat(400)}`).goal.length, 300);
   assert.equal(readHandoff(`?goal=a&statement=${'y'.repeat(400)}`).statement.length, 200);
 });

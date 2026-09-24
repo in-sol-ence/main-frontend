@@ -51,6 +51,7 @@ test('warming points the existing study at the calculus goal, and only starts it
   const source = f.frame.src || f.frame.getAttribute('src')
   const url = new URL(source, 'https://example.test/index.html')
   assert.equal(url.pathname, '/spatial/index.html')
+  assert.equal(url.searchParams.get('travelSpeed'), '2')
   // The router falls back to reinforcement learning unless the goal says calculus.
   assert.equal(url.searchParams.get('goal'), SPATIAL_GOAL)
   assert.match(url.searchParams.get('goal'), /calculus/i)
