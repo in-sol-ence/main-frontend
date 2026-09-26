@@ -58,6 +58,8 @@ const narration = document.querySelector('#narration');
 const narrationEyebrow = narration.querySelector('.narration-eyebrow');
 const narrationTyped = narration.querySelector('.narration-typed');
 const narrationRest = narration.querySelector('.narration-rest');
+const handoff = readHandoff(location.search);
+if (handoff) document.documentElement.dataset.theme = 'red';
 let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
@@ -68,15 +70,16 @@ try {
 
 if (renderer) {
   renderer.autoClear = false;
+  if (handoff) renderer.setClearColor(0x000000, 1);
   renderer.setPixelRatio(Math.min(Math.max(devicePixelRatio, 1.5), 2));
   const atmosphere = createAtmosphere();
-  const knowledgeField = createKnowledgeField();
+  const knowledgeField = createKnowledgeField(Boolean(handoff));
   const landing = createLanding();
   let landingState=landing.update(0,innerWidth,innerHeight,preference.matches);
   const routeSpace = createRouteSpace(document.querySelector('#route-landmarks'));
   let comparison = null, pendingStory = null;
   const emptyDefinition = { id: 'empty-space', title: 'What do you want to learn?', startDistance: 39, children: [], pathways: [] };
-  let history = new ExplorationHistory(createLayer(emptyDefinition, labelHost));
+  let history = new ExplorationHistory(createLayer(emptyDefinition, labelHost, 0, Boolean(handoff)));
   let phase = 'landing', phaseTime = 0, generation = 0, exampleTime = 0, exampleIndex = 0;
   let constructionCenter = 0, exitPresences = [];
   let currentRequest = null, adapting = false, actionHit = null, actionHeld = false, keyboardHit = null;
@@ -85,7 +88,6 @@ if (renderer) {
   const seedPosition = new THREE.Vector3();
   let pose = landingState.pose;
   let discoveryStart = null, entryState = null;
-  const handoff = readHandoff(location.search);
   let handoffTime = null, handoffSubmitted = false, selected = null, demonstration = null;
   let told = null, emerging = null, narrationSpace = null;
   const resources = createResourceBranches({ host: resourceHost });
@@ -97,7 +99,7 @@ if (renderer) {
     if (!list?.length || hit.concept.children?.length || hit.concept.explanation) return false;
     if (resources.key === hit.key) { resources.close(); return true; }
     resources.open({ layer: history.active, key: hit.key, concept: hit.concept, anchor: hit.anchor, depth: hit.depth,
-      resources: list, tint: `#${tintFor(hit.concept).getHexString()}`, width: innerWidth, height: innerHeight,
+      resources: list, tint: `#${tintFor(hit.concept, Boolean(handoff)).getHexString()}`, width: innerWidth, height: innerHeight,
       onStatus: text => { status.textContent = text; } });
     return true;
   }
@@ -136,7 +138,7 @@ if (renderer) {
     for (const id of chain) {
       const parent=history.active, concept=parent.definition.children.find(item=>item.id===id);
       const from=worldPose(parent.rigCamera,parent.frame), location=locateConcept(concept,0,parent.arc);
-      const child=createLayer(concept,labelHost,history.layers.length);
+      const child=createLayer(concept,labelHost,history.layers.length,Boolean(handoff));
       child.resize(innerWidth,innerHeight);
       const placement=frameAtConcept(parent.frame,location,from,child.rigCamera);
       child.frame=placement.frame;child.portal=placement.portal;child.returnPose=from;
@@ -163,7 +165,7 @@ if (renderer) {
     pose=departure;routeVisible(true);setPhase('journey');
     identity.hidden=false;identity.style.opacity='1';
     document.querySelector('#journey-note').textContent='One knowledge space · a different next step for each learner';
-    newJourney.hidden=false;comparisonPause.textContent=comparison.paused?'Resume flow':'Pause';
+    newJourney.hidden=Boolean(handoff);comparisonPause.textContent=comparison.paused?'Resume flow':'Pause';
     updateContext();updateComparison(0);
   }
   function updateComparison(dt) {
@@ -314,6 +316,7 @@ if (renderer) {
     landingSpace.hidden = true;
     landing.dispose();
     statement.textContent = '';
+    statement.dataset.rest = handoff.statement;
     statement.hidden = !handoff.statement;
     form.dataset.handoff = 'true';
     entrySpace.hidden = false;
@@ -335,6 +338,7 @@ if (renderer) {
     handoffTime += dt;
     const state = statementAt(handoffTime, handoff.statement.length, preference.matches);
     const shown = handoff.statement.slice(0, state.characters);
+    statement.dataset.rest = handoff.statement.slice(state.characters);
     if (statement.textContent !== shown) statement.textContent = shown;
     if (!state.submit) return;
     handoffSubmitted = true;
@@ -347,6 +351,7 @@ if (renderer) {
     if (handoffTime !== null && !handoffSubmitted && statement.textContent !== handoff.statement) {
       handoffTime = Math.max(handoffTime, handoff.statement.length * TYPE_INTERVAL);
       statement.textContent = handoff.statement;
+      statement.dataset.rest = '';
       return true;
     }
     if (told && !told.fading && told.shown < told.text.length) {
@@ -357,10 +362,6 @@ if (renderer) {
     return false;
   }
 
-  window.addEventListener('click', event => {
-    if (event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return;
-    if (skipTyping()) { event.preventDefault(); event.stopImmediatePropagation(); }
-  }, true);
   window.addEventListener('keydown', event => {
     if (event.code !== 'Space' || event.repeat || event.metaKey || event.ctrlKey || event.altKey ||
         event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return;
@@ -372,7 +373,7 @@ if (renderer) {
   // where they will end and nothing reflows as it types. Assistive technology
   // hears the whole sentence once, through the journey's status.
   function tell(text, eyebrow, composition) {
-    told = { text, composition, side: null, shown: -1, x: null, y: null, fading: 0 };
+    told = { text, composition, side: null, shown: -1, fading: 0 };
     narrationEyebrow.textContent = eyebrow;
     narration.hidden = false; narration.style.opacity = '1';
     showTold(0);
@@ -386,20 +387,21 @@ if (renderer) {
     narrationRest.textContent = told.text.slice(characters);
   }
 
-  // Positioned from the anchor it explains, on the side away from it, and
-  // eased there so a moving camera never drags the sentence around.
+  // Choose the caption's position once, before typing. Only a viewport resize
+  // recomputes it; camera/label movement must not rewrap or move a sentence.
   function placeTold(anchor, dt, presence = 1) {
-    const layout = { anchor, width: innerWidth, height: innerHeight, composition: told.composition, side: told.side };
-    const guess = narrationPlacement({ ...layout, textHeight: 0 });
-    if (narration.style.width !== `${guess.width}px`) narration.style.width = `${guess.width}px`;
-    const place = narrationPlacement({ ...layout, side: guess.side, textHeight: narration.offsetHeight });
-    told.side = place.side;
-    const ease = told.x === null || preference.matches ? 1 : 1 - Math.exp(-3.5 * dt);
-    told.x = told.x === null ? place.x : told.x + (place.x - told.x) * ease;
-    told.y = told.y === null ? place.y : told.y + (place.y - told.y) * ease;
-    narration.style.transform = `translate(${told.x.toFixed(1)}px, ${told.y.toFixed(1)}px)`;
+    if (!told.placement || told.viewportWidth !== innerWidth || told.viewportHeight !== innerHeight) {
+      const layout = { anchor, width: innerWidth, height: innerHeight, composition: told.composition, side: told.side };
+      const guess = narrationPlacement({ ...layout, textHeight: 0 });
+      narration.style.width = `${guess.width}px`;
+      told.placement = narrationPlacement({ ...layout, side: guess.side, textHeight: narration.offsetHeight });
+      told.side = told.placement.side;
+      told.viewportWidth = innerWidth; told.viewportHeight = innerHeight;
+    }
+    const place = told.placement;
+    narration.style.transform = `translate(${place.x.toFixed(1)}px, ${place.y.toFixed(1)}px)`;
     narration.style.opacity = presence.toFixed(3);
-    narrationSpace = { x: told.x, y: told.y, width: place.width, height: narration.offsetHeight, presence };
+    narrationSpace = { x: place.x, y: place.y, width: place.width, height: narration.offsetHeight, presence };
   }
 
   // A statement leaves by fading while the space carries on, including through
@@ -523,7 +525,7 @@ if (renderer) {
         if (list?.length && target) {
           demo.stage = 'resources'; demo.key = target.key; demo.resources = list; demo.opened = false;
           resources.open({ layer: active, key: target.key, concept: target.concept, anchor: target.anchor, depth: target.depth,
-            resources: list, tint: `#${tintFor(target.concept).getHexString()}`, width: innerWidth, height: innerHeight,
+            resources: list, tint: `#${tintFor(target.concept, Boolean(handoff)).getHexString()}`, width: innerWidth, height: innerHeight,
             onStatus: text => { status.textContent = text; }, hold: active.learningWeight });
         } else beginRepeats();
       }
@@ -594,7 +596,7 @@ if (renderer) {
     adaptiveNavigation = null; adaptiveSession = null;
     pendingAction = null; adaptiveCue.hidden = true;
     for (const layer of history.layers) layer.dispose();
-    history = new ExplorationHistory(createLayer(definition, labelHost));
+    history = new ExplorationHistory(createLayer(definition, labelHost, 0, Boolean(handoff)));
     history.active.resize(innerWidth, innerHeight);
     pose = history.active.advance(0, true);
     pointer = null; transition = null; returnTarget = null; sceneFocus = 0;
@@ -772,7 +774,7 @@ if (renderer) {
     if (state.done) {
       root.formation = null; entrySpace.hidden = true; seed.style.opacity = '0';
       if(pendingStory){const map=pendingStory;pendingStory=null;beginStory(map,pose);canvas.focus({preventScroll:true});return;}
-      newJourney.hidden = false; setPhase('journey'); updateContext();
+      newJourney.hidden = Boolean(handoff); setPhase('journey'); updateContext();
       if (handoff && firstConcept(root.definition)) demonstration = { stage: 'approach', targetId: firstConcept(root.definition), elapsed: 0 };
       status.textContent += ' Your knowledge space is ready.';
       canvas.focus({ preventScroll: true });
@@ -830,7 +832,7 @@ if (renderer) {
     atmosphere.material.uniforms.eye.value.copy(pose.position);
     atmosphere.material.uniforms.viewRotation.value.setFromMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(pose.quaternion));
     renderer.clear();
-    renderer.render(atmosphere.scene, atmosphere.camera);
+    if (!handoff) renderer.render(atmosphere.scene, atmosphere.camera);
     renderer.clearDepth();
     if(phase==='landing') {
       knowledgeField.camera.fov=landing.camera.fov;knowledgeField.camera.updateProjectionMatrix();
@@ -903,7 +905,7 @@ if (renderer) {
 
   function startEnter(hold) {
     const { parent, hit } = hold;
-    const child = createLayer(hit.concept, labelHost, history.layers.length);
+    const child = createLayer(hit.concept, labelHost, history.layers.length, Boolean(handoff));
     child.resize(innerWidth, innerHeight);
     const location = locateConcept(hit.concept, hit.cycle, parent.arc);
     const placement = frameAtConcept(parent.frame, location, pose, child.rigCamera);

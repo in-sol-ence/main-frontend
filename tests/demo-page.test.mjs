@@ -81,18 +81,22 @@ function _fixture(reducedMotion = false, sequence = false) {
   }
 }
 
-test('click and Space finish the current Demo text without skipping the next stage', async () => {
+test('click leaves typing running but finishes deletion; Space keeps its shortcut', async () => {
   const f = _fixture()
   await f.activate()
   await f.step()
+  const partial = f.text.textContent
   f.skipClick()
+  assert.equal(f.text.textContent, partial)
+  assert.equal(f.next.hidden, true)
+  assert.equal(f.skipSpace(), true)
   assert.equal(f.text.textContent, f.sentence)
   assert.equal(f.text.querySelector('.text-accent')?.textContent, demo.revealAfter)
   assert.equal(f.next.hidden, false)
   assert.equal(f.volume.classList.contains('is-visible'), true)
   f.click()
   assert.equal(f.next.hidden, true)
-  assert.equal(f.skipSpace(), true)
+  f.skipClick()
   assert.equal(f.text.textContent, '')
   assert.deepEqual(f.advances, [''])
 

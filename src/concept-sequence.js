@@ -36,6 +36,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
   let timer
   let revealed = false
   let emptySettled
+  let afterErase
 
   function _highlight() {
     if (!phrase || revealed || phrase.textContent !== conceptStages[index].phrase) return
@@ -60,7 +61,9 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
   function _type() {
     revealed = false
     phase = 'stage'
+    text.dataset.fullText = ''
     const previous = phrase.textContent
+    if (previous) phase = 'erasing-stage'
     typing?.destroy()
     phrase.textContent = previous
     if (motion.matches) {
@@ -73,14 +76,17 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
       strings: [conceptStages[index].phrase], typeSpeed: 65, backSpeed: 28,
       startDelay: 0, smartBackspace: false, loop: false, showCursor: false,
       autoInsertCss: false, contentType: 'null', onComplete: _highlight,
+      preStringTyped() { phase = 'stage' },
     })
   }
-  // The existing full-sentence erase, unchanged from the one Next already runs.
+  // Keep the erase continuation available for click-to-finish.
   function _erase(done) {
     phase = 'erasing'
+    afterErase = () => { afterErase = null; done() }
+    text.dataset.fullText = text.textContent
     if (motion.matches) {
       text.textContent = ''
-      done()
+      afterErase()
       return
     }
     const displayed = text.textContent
@@ -89,7 +95,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     typing = new window.Typed(text, {
       strings: [''], backSpeed: 28, startDelay: 0, smartBackspace: false,
       loop: false, showCursor: false, autoInsertCss: false, contentType: 'null',
-      onComplete: done,
+      onComplete: afterErase,
     })
   }
 
@@ -102,6 +108,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     characters.disconnect()
     _erase(() => {
       phase = 'closing'
+      text.dataset.fullText = closingSentence
       heading.setAttribute('aria-label', closingSentence)
       if (motion.matches) {
         text.innerHTML = coloredClosing
@@ -133,6 +140,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     emptySettled.then(() => { timer = setTimeout(_type, 700) })
   }
   motion.addEventListener('change', () => {
+    if (motion.matches && started && phase === 'erasing') { _skipTyping(); return }
     if (!motion.matches || !started || revealed) return
     clearTimeout(timer)
     if (!phrase) {
@@ -148,7 +156,15 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
 
   function _skipTyping() {
     if (!started || page.inert) return false
-    if (phase === 'shell') {
+    if (phase === 'erasing') {
+      typing?.destroy()
+      text.textContent = ''
+      afterErase()
+    } else if (phase === 'erasing-stage') {
+      typing?.destroy()
+      phrase.textContent = ''
+      _type()
+    } else if (phase === 'shell') {
       shellTyping?.destroy()
       text.innerHTML = shell
       _ready()
@@ -164,7 +180,8 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     return true
   }
 
-  page.addEventListener('click', event => {
+  page.parentElement.addEventListener('click', event => {
+    if (phase !== 'erasing' && phase !== 'erasing-stage') return
     if (event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return
     if (_skipTyping()) event.stopImmediatePropagation()
   })
@@ -178,6 +195,7 @@ export function initializeConceptSequence(presentation, handoff = createSpatialH
     if (started) return
     started = true
     phase = 'shell'
+    text.dataset.fullText = `${before}${after}`
     handoff.preload()
     emptySettled = presentation.update(Array(24).fill(0))
     heading.setAttribute('aria-label', `${before.trimEnd()} ${after.trimStart()}`)

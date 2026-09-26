@@ -13,7 +13,8 @@ export function hierarchyFor(concept) {
   };
 }
 
-export function tintFor(concept) {
+export function tintFor(concept, redTheme = false) {
+  if (redTheme) return new THREE.Color('#a3242e').lerp(new THREE.Color('#f04c4c'), Math.max(0, Math.min(1, concept.importance)));
   const color = new THREE.Color(domains[concept.domain].color);
   if (concept.secondaryDomain) color.lerp(new THREE.Color(domains[concept.secondaryDomain].color), .26);
   return color;

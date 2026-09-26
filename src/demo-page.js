@@ -10,6 +10,13 @@ export function initializeDemoPage(onAdvance) {
   const coloredSentence = sentence.replace(demo.revealAfter, `<span class="text-accent">${demo.revealAfter}</span>`)
   // Also reserves the full sentence's footprint through the heading's sizing copy.
   heading.setAttribute('aria-label', sentence)
+  text.dataset.fullText = sentence
+  // Reserve full-sentence endings; inline phrases flow with their visible text.
+  new MutationObserver(() => {
+    const full = text.dataset.fullText || ''
+    text.dataset.rest = full.startsWith(text.textContent) ? full.slice(text.textContent.length) : ''
+  }).observe(text, { childList: true, characterData: true, subtree: true,
+    attributes: true, attributeFilter: ['data-full-text'] })
   next.textContent = demo.nextButton
   const revealAt = sentence.indexOf(demo.revealAfter) + demo.revealAfter.length
   const motion = matchMedia('(prefers-reduced-motion: reduce)')
@@ -117,7 +124,8 @@ export function initializeDemoPage(onAdvance) {
     return false
   }
 
-  page.addEventListener('click', event => {
+  page.parentElement.addEventListener('click', event => {
+    if (phase !== 'erasing') return
     if (event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) return
     if (_skipTyping()) event.stopImmediatePropagation()
   })

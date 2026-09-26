@@ -14,25 +14,22 @@ async function _noOverflow(page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 }
 
-test('landing actions, mobile framing, introduction and reduced motion', async ({ page }, info) => {
+test.describe('desktop experience', () => {
+  test.beforeEach(({}, info) => { test.skip(info.project.name.includes('phone'), 'Small screens show the desktop notice') })
+
+test('landing actions, introduction and reduced motion', async ({ page }, info) => {
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('/')
   await expect(page.getByRole('button', { name: /^Learn more/ })).toBeEnabled()
   await expect(page.getByRole('link', { name: 'Try learning', exact: true })).toHaveCount(0)
   await _noOverflow(page)
-  if (info.project.name.includes('phone')) {
-    expect(await page.evaluate(() => document.querySelector('#skateboard').getBoundingClientRect().bottom <= document.querySelector('#home h1').getBoundingClientRect().top)).toBe(true)
-  }
   await page.getByRole('button', { name: /^Learn more/ }).click()
   await expect(page.locator('body')).toHaveAttribute('data-page', 'demo')
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeVisible()
   await expect(page.locator('#knowledge-volume')).toHaveClass(/is-visible/)
   await _noOverflow(page)
-  if (info.project.name.includes('phone')) {
-    await expect.poll(() => page.evaluate(() => document.querySelector('#knowledge-volume').getBoundingClientRect().top >= document.querySelector('.demo-heading').getBoundingClientRect().bottom)).toBe(true)
-  }
   await page.screenshot({ path: `test-results/${info.project.name}-intro.png`, scale: 'css' })
   await page.getByRole('button', { name: 'Next', exact: true }).click()
   await expect(page.locator('#spatial-stage')).toHaveClass(/is-entering/, { timeout: 35000 })
@@ -90,19 +87,6 @@ test('blocked video recovers into transfer, fallback and the next question', asy
   await expect(page.getByRole('heading')).toHaveText(bloom.questions[bloom.stages[stage.nextStageId].coreQuestionId].questionText)
 })
 
-test('narrow and landscape layouts keep questions and actions reachable', async ({ page }) => {
-  await page.goto('/learn/')
-  for (const [width, height] of [[320, 568], [844, 390], [768, 1024]]) {
-    await page.setViewportSize({ width, height })
-    await _noOverflow(page)
-    const button = page.locator('.answers button').last()
-    await button.scrollIntoViewIfNeeded()
-    await expect(button).toBeInViewport()
-    await page.getByRole('link', { name: 'Back to skatebored' }).scrollIntoViewIfNeeded()
-    await expect(page.getByRole('link', { name: 'Back to skatebored' })).toBeInViewport()
-  }
-})
-
 test('video readiness timeout recovers even after the player was constructed', async ({ page }) => {
   await page.addInitScript(() => {
     window.YT = { Player: class { destroy() {} }, PlayerState: { ENDED: 0 } }
@@ -143,4 +127,28 @@ test('video segment ends into transfer without granting mastery', async ({ page 
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).actions.map(action => action.type), storage)).toEqual(['answer', 'remediation_completed'])
   await _answer(page, bloom.questions[stage.transferQuestionId])
   await expect(page.getByRole('heading')).toHaveText(bloom.questions[bloom.stages[stage.nextStageId].coreQuestionId].questionText)
+})
+
+})
+
+test('small and short viewports show the desktop notice and restore the page on resize', async ({ page }, info) => {
+  for (const path of ['/', '/learn/']) {
+    await page.goto(path)
+    for (const reducedMotion of ['no-preference', 'reduce']) {
+      await page.emulateMedia({ reducedMotion })
+      for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], [1023, 900], [1440, 499]]) {
+        await page.setViewportSize({ width, height })
+        await expect(page.getByRole('heading', { name: 'Best on desktop', exact: true })).toBeVisible()
+        await expect(page.locator('#device-notice p')).toHaveText("We're still tuning the mobile experience. Open this on a laptop or desktop for now; full support is on the way!")
+        await expect(page.getByRole('button')).toHaveCount(0)
+        await expect(page.getByRole('link')).toHaveCount(0)
+        await _noOverflow(page)
+      }
+      await page.setViewportSize({ width: 390, height: 844 })
+      await page.screenshot({ path: `test-results/${info.project.name}-${path === '/' ? 'landing' : 'learn'}-notice-${reducedMotion}.png` })
+      await page.setViewportSize({ width: 1024, height: 500 })
+      await expect(page.locator('#device-notice')).toBeHidden()
+      await expect(page.getByRole('button').first()).toBeVisible()
+    }
+  }
 })

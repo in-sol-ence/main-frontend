@@ -1,6 +1,6 @@
 # Skatebored frontend handover
 
-Updated: 2026-09-24
+Updated: 2026-09-26
 
 ## Location and branch
 
@@ -1210,3 +1210,156 @@ are removed. The final camera journey remains unobstructed. The existing lesson
 is still available by its direct `/learn/` URL. This supersedes the earlier CTA
 notes. Production build, all 30 frontend tests, required syntax/whitespace
 checks, and four desktop/mobile navigation and lesson browser checks passed.
+
+
+## Desktop notice for unsupported viewports (2026-09-26)
+
+The landing/demo page and direct `/learn/` entry now show “Best on desktop”
+and the requested mobile-support message instead of their interactive content
+when the viewport is narrower than 1024 CSS pixels or shorter than 500 CSS
+pixels. This covers phones in both orientations, narrow tablets, and cramped
+windows. These explicit size limits are a layout guard, not runtime glitch
+detection. Resizing to a supported size restores the existing page without a
+reload. The standalone spatial study is unchanged.
+
+`copy/device-notice.js` owns the wording. `scripts/sync-copy.mjs` escapes and
+renders it into marked sections in both static HTML entries at build time,
+so the notice needs no JavaScript and has no typing or motion. Shared styles
+in `dist/style.css` preserve the black/cream palette and hide the underlying
+content from display, keyboard navigation, and the accessibility tree. The
+existing application remains mounted underneath.
+
+Browser coverage now checks the notice at phone, landscape, tablet, narrow,
+and short dimensions on both entries, with and without reduced motion, plus
+restoration at the 1024×500 boundary. Interactive lesson and journey checks
+run on desktop; their former phone cases are skipped because the notice now
+replaces that experience.
+
+Verification: production build, all 30 frontend tests, all four transition
+tests, required JavaScript syntax checks, and `git diff --check` pass.
+Chromium browser suite: seven passed, five obsolete phone-interaction cases
+intentionally skipped. Desktop and phone screenshots were visually inspected;
+notice coverage includes both reduced-motion settings. WebKit was not rerun.
+
+
+## Hide New journey in the embedded demo (2026-09-26)
+
+The spatial boot handoff now keeps the New journey control hidden when the
+frontend supplies a goal, including after construction and story setup.
+The existing standalone study retains its reset control. Generated spatial
+output is refreshed through the normal frontend build.
+
+Verification: build, all 30 frontend and 142 spatial tests, all spatial check
+scripts, required static JavaScript syntax checks, and whitespace checks pass.
+Chromium checks confirmed that the journey starts with New journey hidden at
+1440×900 (normal and reduced motion) and 390×844 (reduced motion).
+
+## Stable typewriter layout (2026-09-26)
+
+Landing headings reserve the tallest complete phrase before typing starts.
+The landing, Demo intro/closing, and concept phrase spans lay out their
+untyped remainder invisibly, so partially typed words keep their final line
+breaks. Concept erasure retains the previous phrase's layout until the next
+phrase starts. The existing copy, typing speeds, holds, skip controls, and
+reduced-motion behavior are retained.
+
+The handed-in spatial statement also reserves its untyped remainder, avoiding
+the centered form's jump when the sentence wraps onto a second line. Narration
+chooses its full-width position once per statement; moving concept labels no
+longer resize or reposition a caption during typing/reading. A viewport resize
+still recomputes placement. Existing fades and scene transitions remain.
+
+Browser regressions compare character coordinates and heading bounds at every
+prefix of landing phrases, intro/closing sentences, and concept names; a live
+journey check compares statement/caption bounds during typing and completion.
+
+Verification: production build, all 30 frontend tests, all 142 spatial tests,
+all spatial syntax scripts, four transition tests, required static syntax
+checks, and `git diff --check` pass. Full Chromium browser suite: nine passed,
+seven desktop-only cases skipped on phones (the mobile notice is tested).
+Character-position regressions and the live caption/statement regression pass;
+desktop intro and reduced-motion small-screen screenshots were inspected.
+
+## Single-line learner statement and skippable deletion (2026-09-26)
+
+The handed-in goal form uses the statement's intrinsic width, capped by the
+viewport, so “Let’s say John Doe wants to learn calculus.” stays on one line
+at supported desktop widths. The original font, centered placement, and
+invisible remainder remain; narrow standalone views can still wrap safely.
+
+Click or Space now finishes outgoing text deletion on the landing page,
+between concept phrases, before the closing sentence, and before the spatial
+handoff. Finishing a deletion starts the next text normally; another click can
+finish typing it. Demo clicks also work over the persistent knowledge canvas.
+Interactive buttons/links retain their actions. Canceled typing timers cannot
+repeat the handoff. The existing intro-deletion skip is preserved.
+
+Verification: build, all 31 frontend and 142 spatial tests, all spatial syntax
+scripts, four transition tests, static JavaScript syntax checks, and whitespace
+checks pass. Browser checks cover the statement's one-line bounds at 1024 and
+1440 pixels, stable typing placement, landing deletion, reduced-motion flow,
+and desktop/phone viewport notices. The 1024-pixel statement screenshot was
+visually inspected. Local interaction checks use Chromium's Metal backend;
+the default software renderer caused timing failures on this host.
+
+Final browser regression also passed every demo deletion, including a click
+over the knowledge canvas, through the closing sentence and single handoff.
+
+## Inline phrase text flows during replacement (2026-09-26)
+
+Concept phrases no longer reserve their erased or untyped characters. The
+surrounding sentence follows the visible phrase naturally, including wrapping,
+as “Integration by parts” and the other stages delete and retype. Removed the
+phrase's invisible remainder and its bookkeeping; full-sentence sizing stays
+in place. This supersedes the concept-specific fixed-layout behavior in the
+Stable typewriter layout section. Click/Space completion remains available.
+
+The existing layout browser regression now compares each concept prefix,
+including the empty phrase, against normal inline text flow at 1024 and 1440
+pixels, while retaining fixed-placement checks for whole sentences.
+
+Verification: rebuilt output, all 31 frontend tests, four transition tests,
+required JavaScript syntax checks, and whitespace checks pass. Five targeted
+Chromium browser checks passed, covering natural phrase flow, click-to-finish,
+reduced motion, and desktop/mobile notices; three desktop-only phone cases
+were skipped. Browser checks used the local Metal backend as noted above.
+
+## Clicks only finish deletion (2026-09-26)
+
+Clicking no longer completes text generation on the landing page, Demo intro,
+sentence shell, concept phrases, closing sentence, spatial statement, or
+journey narration. The existing landing and Demo click handlers only act while
+text is deleting; the spatial typing-only click handler is removed. This
+supersedes earlier click-to-complete-typing behavior. The Space shortcut and
+reduced-motion preference retain their existing behavior.
+
+Existing text interaction regressions now assert that clicks leave partial
+text unchanged and still finish deletion. Browser coverage also clicks during
+landing typing, the learner statement, and journey narration.
+
+Verification: rebuilt output, all 31 frontend and 142 spatial tests, all spatial
+syntax scripts, four transition tests, static syntax checks, and whitespace
+checks pass. Four targeted Chromium checks passed, covering typing clicks,
+deletion clicks, the complete demonstration, and reduced motion. The landing
+check dispatches its deletion click in the same browser frame that observes
+partial outgoing text, avoiding a race with the short deletion animation.
+
+
+## Black background and red learning path (2026-09-26)
+
+The website's existing goal handoff selects a black-and-red journey theme.
+The renderer clears to opaque black and omits the atmospheric background pass;
+the document, narration shadow, and parent iframe stage also use black.
+Opening field strands and the main ribbon shade from deep red to the site's
+#f04c4c accent. Concept markers, prerequisite connections, and resource branches
+use related red tones; the theme is carried through nested layers and pathway
+reconfiguration. Geometry, animation, route selection, and interaction stay
+unchanged. The standalone spatial front door retains its original theme.
+
+Verification: build, all 31 frontend and 142 spatial tests, all spatial syntax
+scripts, four transition tests, static syntax checks, and whitespace checks
+pass. Three temporary browser checks passed at 1440, 1024, and 390 pixels,
+including reduced motion and the mobile notice, with no shader or browser
+errors. Rendered opening and path screenshots were visually inspected: the
+background is black and the path and ambient strands are red. The temporary
+browser checks and local Metal configuration were removed after verification.

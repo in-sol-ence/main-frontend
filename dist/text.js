@@ -4,9 +4,24 @@ import { landing } from './copy/landing.js';
 const messages = landing.phrases.map(phrase => phrase.replace(/[[\]]/g, ''));
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const text = document.querySelector('#typed');
+// Reserve every phrase's height, and each current phrase's untyped ending.
+const sizing = document.createElement('span');
+sizing.className = 'landing-sizing';
+sizing.setAttribute('aria-hidden', 'true');
+for (const message of messages) {
+  const phrase = document.createElement('span');
+  phrase.textContent = message.replace(/\^\d+/g, '');
+  sizing.append(phrase);
+}
+text.closest('h1').prepend(sizing);
+let fullMessage = messages[0];
+new MutationObserver(() => {
+  text.dataset.rest = fullMessage.slice(text.textContent.length);
+}).observe(text, { childList: true, characterData: true, subtree: true });
 let typing;
 let firstMessage = 0;
 let resumeTimer;
+let deleting = null;
 // Character indices, including newlines; null inherits cream.
 const wordColors = [];
 for (const phrase of landing.phrases) {
@@ -47,6 +62,8 @@ function _startTyping(startAt = 0) {
   typing?.destroy();
   typing = null;
   firstMessage = startAt;
+  deleting = null;
+  fullMessage = messages[startAt].replace(/\^\d+/g, '');
   const colored = _coloredMessages();
   text.innerHTML = colored[startAt];
   if (reducedMotion.matches || typeof Typed === 'undefined') return;
@@ -62,7 +79,9 @@ function _startTyping(startAt = 0) {
     showCursor: true,
     cursorChar: '',
     autoInsertCss: false,
-    contentType: 'html'
+    contentType: 'html',
+    preStringTyped(index) { deleting = null; fullMessage = messages[(startAt + index) % messages.length].replace(/\^\d+/g, ''); },
+    onStringTyped(index) { deleting = index; }
   });
 }
 
@@ -73,6 +92,10 @@ function _skipTyping() {
   if (!typing || document.querySelector('#home').inert) return false;
   const current = (firstMessage + typing.arrayPos) % messages.length;
   if (text.textContent === messages[current]) return false;
+  if (deleting === typing.arrayPos) {
+    _startTyping((current + 1) % messages.length);
+    return true;
+  }
   typing.destroy();
   typing = null;
   text.innerHTML = _coloredMessages()[current];
@@ -81,6 +104,7 @@ function _skipTyping() {
 }
 
 document.querySelector('#home').addEventListener('click', event => {
+  if (!typing || deleting !== typing.arrayPos) return;
   if (!event.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]')) _skipTyping();
 });
 document.addEventListener('keydown', event => {

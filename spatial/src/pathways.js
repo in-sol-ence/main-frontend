@@ -35,7 +35,7 @@ export function pathwayGeometry(pathway, arc, lookup = defaultLookup) {
   return geometry;
 }
 
-export function createPathways({ scene, arc, pathways = defaultPathways, conceptById = defaultLookup }) {
+export function createPathways({ scene, arc, pathways = defaultPathways, conceptById = defaultLookup, redTheme = false }) {
   const group = new THREE.Group(); group.name = 'prerequisite-pathways'; scene.add(group);
   const geometry = new Map(pathways.map(pathway => [pathway.id, pathwayGeometry(pathway, arc, conceptById)]));
   const entries = [];
@@ -46,8 +46,8 @@ export function createPathways({ scene, arc, pathways = defaultPathways, concept
         uniforms: {
           resolution: { value: new THREE.Vector2() }, eye: { value: new THREE.Vector3() },
           strength: { value: 0 },
-          sourceTint: { value: tintFor(conceptById.get(pathway.source)).convertLinearToSRGB() },
-          targetTint: { value: tintFor(conceptById.get(pathway.target)).convertLinearToSRGB() },
+          sourceTint: { value: tintFor(conceptById.get(pathway.source), redTheme).convertLinearToSRGB() },
+          targetTint: { value: tintFor(conceptById.get(pathway.target), redTheme).convertLinearToSRGB() },
         },
         vertexShader: `attribute vec3 direction; attribute float side; attribute float progress;
           uniform vec2 resolution; varying float vSide; varying float vProgress; varying vec3 vPosition;

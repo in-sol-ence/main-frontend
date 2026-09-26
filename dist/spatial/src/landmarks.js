@@ -18,7 +18,7 @@ export function readingAttenuation(label, space) {
 
 // 3D placements and DOM typography share the same projected world anchor.
 // Hit testing shares these anchors; typography never becomes a floating panel.
-export function createLandmarks({ scene, labelHost, arc, concepts = defaultConcepts }) {
+export function createLandmarks({ scene, labelHost, arc, concepts = defaultConcepts, redTheme = false }) {
   const group = new THREE.Group();
   group.name = 'knowledge-landmarks';
   scene.add(group);
@@ -36,7 +36,7 @@ export function createLandmarks({ scene, labelHost, arc, concepts = defaultConce
   // Relocation occurs well outside the visible atmosphere, never on camera.
   for (let slot = 0; slot < 3; slot++) {
     for (const concept of concepts) {
-      const color = tintFor(concept);
+      const color = tintFor(concept, redTheme);
       const hierarchy = hierarchyFor(concept);
       const pointMaterial = new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false });
       const point = new THREE.Mesh(pointGeometry, pointMaterial);

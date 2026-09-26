@@ -78,12 +78,12 @@ function createRibbonGeometry() {
   return geometry;
 }
 
-export function createWorld() {
+export function createWorld(redTheme = false) {
   const scene = new THREE.Scene();
   const geometry = createRibbonGeometry();
   const material = new THREE.ShaderMaterial({
     side: THREE.FrontSide, transparent: true, depthWrite: false,
-    uniforms: { eye: { value: new THREE.Vector3() }, journeyStation: { value: 0 }, layerPresence: { value: 1 }, entryStation: { value: -1000000 }, formationCenter: { value: 0 }, formationRadius: { value: 1000000 }, formationBlend: { value: 1 }, domainPoint: { value: new THREE.Vector3() }, domainTint: { value: new THREE.Color() }, domainStrength: { value: 0 }, routeExit: { value: 1000000 } },
+    uniforms: { redTheme: { value: redTheme }, eye: { value: new THREE.Vector3() }, journeyStation: { value: 0 }, layerPresence: { value: 1 }, entryStation: { value: -1000000 }, formationCenter: { value: 0 }, formationRadius: { value: 1000000 }, formationBlend: { value: 1 }, domainPoint: { value: new THREE.Vector3() }, domainTint: { value: new THREE.Color() }, domainStrength: { value: 0 }, routeExit: { value: 1000000 } },
     vertexShader: `attribute vec3 aCenter; uniform float formationBlend; varying vec3 vPosition; varying vec3 vNormal; varying vec2 vUv;
       void main(){vec3 formed=aCenter+(position-aCenter)*mix(.06,1.,formationBlend); vec4 world=modelMatrix*vec4(formed,1.); vPosition=world.xyz;
         vNormal=mat3(modelMatrix)*normal; vUv=uv;
@@ -92,7 +92,7 @@ export function createWorld() {
       varying vec3 vPosition; varying vec3 vNormal; varying vec2 vUv; uniform vec3 eye; uniform float journeyStation; uniform float layerPresence; uniform float entryStation;
       uniform float formationCenter; uniform float formationRadius; uniform float formationBlend;
       uniform vec3 domainPoint; uniform vec3 domainTint; uniform float domainStrength;
-      uniform float routeExit;
+      uniform float routeExit; uniform bool redTheme;
       void main(){
         vec3 N=normalize(vNormal); if(!gl_FrontFacing) N=-N;
         vec3 V=normalize(eye-vPosition);
@@ -109,6 +109,10 @@ export function createWorld() {
         float domainPool=exp(-pow(length(vPosition-domainPoint)/12.,2.))*domainStrength;
         satin=mix(satin,satin*domainTint*1.24,domainPool*.13);
         satin+=vec3(.024,.025,.023)*domainPool;
+        if(redTheme){
+          float light=clamp(.3+.5*diffuse+.2*spec+.15*grazing+.15*reflectedSoftbox+.12*sin(vUv.y*25.1327),0.,1.);
+          satin=mix(vec3(.35,.025,.035),vec3(.941176,.298039,.298039),light);
+        }
         float distanceToEye=length(eye-vPosition);
         float visibility=exp(-pow(distanceToEye/91.,1.65));
         float nearFade=smoothstep(.35,1.2,distanceToEye);

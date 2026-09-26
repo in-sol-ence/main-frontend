@@ -3,6 +3,7 @@
 All wording a visitor reads in the demo lives here. Edit the text between the
 quotes, then run `npm run build` to publish it into `dist/`.
 
+- `device-notice.js`: the desktop-only notice on small or short viewports.
 - `landing.js`: the typed phrases on the first page and its two buttons.
 - `demo.js`: the 3D knowledge space: intro, Next, the four stages, closing line.
 - `journey.js`: the spatial path: the opening statement, the topic line, the

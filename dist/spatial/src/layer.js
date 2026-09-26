@@ -10,17 +10,17 @@ import { createPathways } from './pathways.js';
 import { createChoreography } from './choreography.js';
 import { identityFrame, worldPose, localPose } from './exploration.js';
 
-export function createLayer(definition, labelRoot, depth = 0) {
+export function createLayer(definition, labelRoot, depth = 0, redTheme = false) {
   definition = structuredClone(definition);
-  const arc = createArcTable(), world = createWorld(), focus = new LearnerFocus();
+  const arc = createArcTable(), world = createWorld(redTheme), focus = new LearnerFocus();
   const host = document.createElement('div'); host.className = 'knowledge-layer';
   host.dataset.layer = definition.id; labelRoot.append(host);
   const rigCamera = new THREE.PerspectiveCamera(53, 1, .08, 290);
   const viewCamera = rigCamera.clone(), rig = new CameraRig(rigCamera);
   const lookup = new Map(definition.children.map(concept => [concept.id, concept]));
   let choreography = createChoreography({ concepts: definition.children, arc });
-  const landmarks = createLandmarks({ scene: world.scene, labelHost: host, arc, concepts: definition.children });
-  let pathways = createPathways({ scene: world.scene, arc, pathways: definition.pathways, conceptById: lookup });
+  const landmarks = createLandmarks({ scene: world.scene, labelHost: host, arc, concepts: definition.children, redTheme });
+  let pathways = createPathways({ scene: world.scene, arc, pathways: definition.pathways, conceptById: lookup, redTheme });
   let reconfiguration = null, relationReveal = 1;
   const tangent = new THREE.Vector3(), ahead = new THREE.Vector3();
   const journey = new Journey({ startDistance: definition.startAt !== undefined ? definition.startAt * arc.length : definition.startDistance ?? 13, speedAt(distance) {
@@ -52,7 +52,7 @@ export function createLayer(definition, labelRoot, depth = 0) {
         journey.startDistance = Math.max(0, ((definition.startAt || 0) + (definition.routeShift || 0)) * arc.length);
         pathways.dispose();
         lookup.clear(); definition.children.forEach(node => lookup.set(node.id, node));
-        pathways = createPathways({ scene: world.scene, arc, pathways: definition.pathways, conceptById: lookup });
+        pathways = createPathways({ scene: world.scene, arc, pathways: definition.pathways, conceptById: lookup, redTheme });
       }
     },
     advance(dt, paused) {

@@ -160,7 +160,7 @@ h1 {
 
 /* The spatial journey is handed the same page, not a navigation. It is warmed
    behind the demo and cross-faded in with the existing 350ms reveal. */
-#spatial-stage { position: fixed; inset: 0; z-index: 5; background: #0b0e10; opacity: 0; pointer-events: none; transition: opacity 350ms ease; }
+#spatial-stage { position: fixed; inset: 0; z-index: 5; background: #000; opacity: 0; pointer-events: none; transition: opacity 350ms ease; }
 #spatial-stage.is-entering { opacity: 1; pointer-events: auto; }
 #spatial-stage iframe { display: block; width: 100%; height: 100%; border: 0; }
 @media (prefers-reduced-motion: reduce) { #spatial-stage { transition: none; } }
@@ -182,4 +182,35 @@ html, body { min-width: 0; }
   #pages { touch-action: pan-y !important; }
   .demo-page { padding-top: max(24px, env(safe-area-inset-top)); padding-bottom: max(80px, calc(env(safe-area-inset-bottom) + 64px)); }
   .demo-next { bottom: max(16px, env(safe-area-inset-bottom)); min-width: 48px; min-height: 48px; }
+}
+
+/* Replace unsupported viewport layouts with a static, accessible notice. */
+#device-notice { display: none; }
+@media (max-width: 1023px), (max-height: 499px) {
+  body > :not(#device-notice) { display: none !important; }
+  body { overflow: auto !important; }
+  #device-notice {
+    display: grid;
+    place-items: center;
+    min-height: 100svh;
+    padding: max(28px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  }
+  #device-notice > div { width: 100%; max-width: 32rem; }
+  #device-notice h2 {
+    margin: 0 0 20px;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -.045em;
+  }
+  #device-notice p { margin: 0; font-size: 1.125rem; line-height: 1.55; }
+}
+
+/* Lay out complete sentences while only the typed prefix is visible. */
+#home h1, .landing-sizing { display: grid; }
+#home h1 > span, .landing-sizing > span { grid-area: 1 / 1; }
+.landing-sizing { visibility: hidden; white-space: pre-wrap; }
+#typed::after, #demo-typed::after {
+  content: attr(data-rest);
+  visibility: hidden;
 }

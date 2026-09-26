@@ -64,7 +64,7 @@ export function discoveryPose(from,to,progress,focus=null) {
   return {position,quaternion};
 }
 
-export function createKnowledgeField() {
+export function createKnowledgeField(redTheme = false) {
   const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(53,1,.08,600),origin=openingPose();
   const frame=new THREE.Matrix4().compose(origin.position,origin.quaternion,new THREE.Vector3(1,1,1));
   const positions=[],next=[],along=[],sides=[],strands=[],colors=[],selected=[],selectedNext=[],life=[],indices=[];
@@ -80,11 +80,11 @@ export function createKnowledgeField() {
   for(const name of ['position','aPrevious','aNext','aLife'])geometry.attributes[name].setUsage(THREE.DynamicDrawUsage);
   geometry.setIndex(indices);
   const material=new THREE.ShaderMaterial({transparent:true,depthWrite:false,depthTest:true,side:THREE.DoubleSide,
-    uniforms:{time:{value:0},fieldFrame:{value:frame},resolution:{value:new THREE.Vector2(1280,720)},convergence:{value:0},presence:{value:1},selection:{value:0},softness:{value:0},handoff:{value:0},chosenLine:{value:29},prompt:{value:1},promptCenter:{value:new THREE.Vector2(.5,.5)},promptSize:{value:new THREE.Vector2(.3,.24)}},
+    uniforms:{redTheme:{value:redTheme},time:{value:0},fieldFrame:{value:frame},resolution:{value:new THREE.Vector2(1280,720)},convergence:{value:0},presence:{value:1},selection:{value:0},softness:{value:0},handoff:{value:0},chosenLine:{value:29},prompt:{value:1},promptCenter:{value:new THREE.Vector2(.5,.5)},promptSize:{value:new THREE.Vector2(.3,.24)}},
     vertexShader:`
       attribute vec3 aNext,aPrevious,aColor,aSelected,aSelectedNext;
       attribute float aAlong,aSide,aStrand,aLife;
-      uniform mat4 fieldFrame; uniform vec2 resolution;
+      uniform mat4 fieldFrame; uniform vec2 resolution; uniform bool redTheme;
       uniform float convergence,presence,selection,softness,handoff,chosenLine;
       varying vec3 vColor; varying float vAlpha,vSide,vBlur; varying vec2 vScreen;
       void main(){
@@ -122,7 +122,9 @@ export function createKnowledgeField() {
         // The very same selected strip stays until the aligned native ribbon
         // takes its weight. The two share one envelope, never independent fades.
         vAlpha=edge*fog*life*presence*strength*(1.-chosen*handoff)/(1.+blur*.85);
-        vColor=mix(aColor,vec3(.55,.56,.53),chosen*selection);vSide=aSide;vBlur=blur;
+        vColor=mix(aColor,vec3(.55,.56,.53),chosen*selection);
+        if(redTheme) vColor=mix(vec3(.35,.025,.035),vec3(.941176,.298039,.298039),(.3+.7*sin(aAlong*3.141593))*(.85+.15*sin(aStrand*1.71)));
+        vSide=aSide;vBlur=blur;
       }`,
     fragmentShader:`uniform float prompt; uniform vec2 promptCenter,promptSize;varying vec3 vColor;varying float vAlpha,vSide,vBlur;varying vec2 vScreen;
       void main(){vec2 q=(vScreen-promptCenter)/promptSize;float quiet=1.-prompt*.9*exp(-dot(q,q)*1.7);float edge=1.-smoothstep(mix(.12,0.,vBlur),1.,abs(vSide));gl_FragColor=vec4(vColor,vAlpha*edge*quiet);}`});

@@ -1,4 +1,4 @@
-import { c as j, j as D, r as k, K as z } from "./KnowledgeScene-DmcaLnKC.js";
+import { c as F, j as R, r as v, K as z } from "./KnowledgeScene-DmcaLnKC.js";
 const C = {
   // Used in the small per-concept notes, e.g. "John Doe already knows this."
   learner: "John Doe",
@@ -17,48 +17,48 @@ const C = {
   // reinforcement learning. The background decides which topics count as known.
   goal: "Learn calculus from the beginning",
   background: "I know algebra"
-}, F = C.goal, J = C.background, N = C.statement, I = "skatebored:spatial", G = 8e3;
-function W(o) {
+}, J = C.goal, N = C.background, G = C.statement, _ = "skatebored:spatial", W = 8e3;
+function V(a) {
   const n = (e) => Number.isFinite(e) ? Math.max(0, Math.min(1, e)) : 0.5;
-  return { x: n(o?.x), y: n(o?.y) };
+  return { x: n(a?.x), y: n(a?.y) };
 }
-function V() {
-  const o = document.querySelector("#spatial-stage"), n = document.querySelector("#spatial-frame"), e = document.querySelector("#pages");
+function Y() {
+  const a = document.querySelector("#spatial-stage"), n = document.querySelector("#spatial-frame"), e = document.querySelector("#pages");
   let t, p = !1;
-  const i = [], d = () => n.contentWindow?.postMessage({ type: `${I}:begin` }, location.origin);
+  const l = [], d = () => n.contentWindow?.postMessage({ type: `${_}:begin` }, location.origin);
   return {
     // Called while the concept sequence is still running, so the study's own
     // scene is already built and drawn by the time it is shown.
     preload() {
       if (t) return t;
-      t = new Promise((S) => {
-        const s = (c) => {
-          if (!(c.origin !== location.origin || c.source !== n.contentWindow)) {
-            if (c.data?.type === `${I}:finale` && p) {
-              const g = W(c.data.point);
-              for (const b of i) b(g);
-              i.length = 0;
+      t = new Promise((w) => {
+        const o = (u) => {
+          if (!(u.origin !== location.origin || u.source !== n.contentWindow)) {
+            if (u.data?.type === `${_}:finale` && p) {
+              const m = V(u.data.point);
+              for (const h of l) h(m);
+              l.length = 0;
               return;
             }
-            c.data?.type === `${I}:ready` && (clearTimeout(a), S(!0), p && d());
+            u.data?.type === `${_}:ready` && (clearTimeout(i), w(!0), p && d());
           }
-        }, a = setTimeout(() => S(!1), G);
-        addEventListener("message", s);
+        }, i = setTimeout(() => w(!1), W);
+        addEventListener("message", o);
       });
-      const m = `goal=${encodeURIComponent(F)}&background=${encodeURIComponent(J)}&statement=${encodeURIComponent(N)}&learner=${encodeURIComponent(C.learner)}&topicLine=${encodeURIComponent(C.topicLine)}&rationale=${encodeURIComponent(C.rationale)}&conceptsLabel=${encodeURIComponent(C.conceptsLabel)}&repeats=${encodeURIComponent(C.repeats)}&travelSpeed=2`;
-      return n.src = `./spatial/index.html?${m}`, t;
+      const g = `goal=${encodeURIComponent(J)}&background=${encodeURIComponent(N)}&statement=${encodeURIComponent(G)}&learner=${encodeURIComponent(C.learner)}&topicLine=${encodeURIComponent(C.topicLine)}&rationale=${encodeURIComponent(C.rationale)}&conceptsLabel=${encodeURIComponent(C.conceptsLabel)}&repeats=${encodeURIComponent(C.repeats)}&travelSpeed=2`;
+      return n.src = `./spatial/index.html?${g}`, t;
     },
     async enter() {
-      await this.preload(), o.removeAttribute("inert"), o.removeAttribute("aria-hidden"), o.classList.add("is-entering"), e.inert = !0, p = !0, d(), n.focus({ preventScroll: !0 });
+      await this.preload(), a.removeAttribute("inert"), a.removeAttribute("aria-hidden"), a.classList.add("is-entering"), e.inert = !0, p = !0, d(), n.focus({ preventScroll: !0 });
     },
     // Called with where the path vanishes, as fractions of the view. The
     // journey stays on screen; the page's layer rises over it.
-    onFinale(m) {
-      i.push(m);
+    onFinale(g) {
+      l.push(g);
     }
   };
 }
-const y = {
+const b = {
   intro: "Skatebored places mathematical ideas in an embedding space. This view shows three dimensions so you can see how they connect.",
   // The 3D space fades in the moment this part of the intro has been typed.
   // It must appear word for word in the intro above.
@@ -77,46 +77,69 @@ const y = {
   // The last screen before the spatial journey.
   closing: "Skatebored turns a complex syllabus into a learning path through this space.",
   closingEmphasis: "learning path"
-}, Y = [
+}, X = [
   ["Q1"],
   ["Q2"],
   ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8"],
   // Development sample: Python Random(20260922).sample(range(1, 25), 9), sorted; never randomized on render or visit.
   ["Q1", "Q2", "Q3", "Q4", "Q12", "Q17", "Q20", "Q22", "Q24"]
-], T = Y.map((o, n) => ({
-  phrase: y.stages[n],
-  ids: o,
-  mastery: Array.from({ length: 24 }, (e, t) => Number(o.includes(`Q${t + 1}`)))
-})), q = y.closing;
-function X(o, n = V()) {
-  const e = document.querySelector("#demo"), t = document.querySelector("#demo-typed"), [p, i] = y.conceptSentence.split("{phrase}"), d = (r) => r.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"), m = `${d(p)}<span id="concept-phrase"></span>${d(i)}`, S = q.replace(y.closingEmphasis, `<span class="text-accent">${d(y.closingEmphasis)}</span>`);
-  let s, a;
-  const c = e.querySelector("[data-page-heading]"), g = matchMedia("(prefers-reduced-motion: reduce)");
-  let b = !1, l = "idle", h = 0, f, w, x = !1, u;
-  function L() {
-    if (!s || x || s.textContent !== T[h].phrase) return;
-    x = !0, l = "settling";
-    const r = T[h];
-    c.setAttribute("aria-label", `${p}${r.phrase}${i}`), o.update(r.mastery).then(() => {
-      w = setTimeout(() => {
-        if (h === T.length - 1) {
-          O();
+], T = X.map((a, n) => ({
+  phrase: b.stages[n],
+  ids: a,
+  mastery: Array.from({ length: 24 }, (e, t) => Number(a.includes(`Q${t + 1}`)))
+})), M = b.closing;
+function Z(a, n = Y()) {
+  const e = document.querySelector("#demo"), t = document.querySelector("#demo-typed"), [p, l] = b.conceptSentence.split("{phrase}"), d = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"), g = `${d(p)}<span id="concept-phrase"></span>${d(l)}`, w = M.replace(b.closingEmphasis, `<span class="text-accent">${d(b.closingEmphasis)}</span>`);
+  let o, i;
+  const u = e.querySelector("[data-page-heading]"), m = matchMedia("(prefers-reduced-motion: reduce)");
+  let h = !1, r = "idle", y = 0, f, x, S = !1, c, L;
+  function k() {
+    if (!o || S || o.textContent !== T[y].phrase) return;
+    S = !0, r = "settling";
+    const s = T[y];
+    u.setAttribute("aria-label", `${p}${s.phrase}${l}`), a.update(s.mastery).then(() => {
+      x = setTimeout(() => {
+        if (y === T.length - 1) {
+          P();
           return;
         }
-        h++, _();
+        y++, $();
       }, 2e3);
     });
   }
-  function _() {
-    x = !1, l = "stage";
-    const r = s.textContent;
-    if (f?.destroy(), s.textContent = r, g.matches) {
-      s.textContent = T[h].phrase, L();
+  function $() {
+    S = !1, r = "stage", t.dataset.fullText = "";
+    const s = o.textContent;
+    if (s && (r = "erasing-stage"), f?.destroy(), o.textContent = s, m.matches) {
+      o.textContent = T[y].phrase, k();
       return;
     }
-    f = new window.Typed(s, {
-      strings: [T[h].phrase],
+    f = new window.Typed(o, {
+      strings: [T[y].phrase],
       typeSpeed: 65,
+      backSpeed: 28,
+      startDelay: 0,
+      smartBackspace: !1,
+      loop: !1,
+      showCursor: !1,
+      autoInsertCss: !1,
+      contentType: "null",
+      onComplete: k,
+      preStringTyped() {
+        r = "stage";
+      }
+    });
+  }
+  function q(s) {
+    if (r = "erasing", L = () => {
+      L = null, s();
+    }, t.dataset.fullText = t.textContent, m.matches) {
+      t.textContent = "", L();
+      return;
+    }
+    const j = t.textContent;
+    f?.destroy(), t.textContent = j, f = new window.Typed(t, {
+      strings: [""],
       backSpeed: 28,
       startDelay: 0,
       smartBackspace: !1,
@@ -127,35 +150,17 @@ function X(o, n = V()) {
       onComplete: L
     });
   }
-  function E(r) {
-    if (l = "erasing", g.matches) {
-      t.textContent = "", r();
-      return;
-    }
-    const H = t.textContent;
-    f?.destroy(), t.textContent = H, f = new window.Typed(t, {
-      strings: [""],
-      backSpeed: 28,
-      startDelay: 0,
-      smartBackspace: !1,
-      loop: !1,
-      showCursor: !1,
-      autoInsertCss: !1,
-      contentType: "null",
-      onComplete: r
-    });
+  function E() {
+    r = "holding", x = setTimeout(H, 2e3);
   }
-  function v() {
-    l = "holding", w = setTimeout(P, 2e3);
-  }
-  function O() {
-    M.disconnect(), E(() => {
-      if (l = "closing", c.setAttribute("aria-label", q), g.matches) {
-        t.innerHTML = S, v();
+  function P() {
+    D.disconnect(), q(() => {
+      if (r = "closing", t.dataset.fullText = M, u.setAttribute("aria-label", M), m.matches) {
+        t.innerHTML = w, E();
         return;
       }
       f?.destroy(), f = new window.Typed(t, {
-        strings: [S],
+        strings: [w],
         typeSpeed: 65,
         startDelay: 0,
         smartBackspace: !1,
@@ -163,53 +168,61 @@ function X(o, n = V()) {
         showCursor: !1,
         autoInsertCss: !1,
         contentType: "html",
-        onComplete: v
+        onComplete: E
       });
     });
   }
-  function P() {
-    E(() => {
-      l = "handed-off", c.removeAttribute("aria-label"), n.enter();
+  function H() {
+    q(() => {
+      r = "handed-off", u.removeAttribute("aria-label"), n.enter();
     });
   }
-  const M = new MutationObserver(L);
+  const D = new MutationObserver(k);
   function A() {
-    l = "waiting-stage", s = t.querySelector("#concept-phrase"), M.observe(s, { childList: !0, characterData: !0, subtree: !0 }), u.then(() => {
-      w = setTimeout(_, 700);
+    r = "waiting-stage", o = t.querySelector("#concept-phrase"), D.observe(o, { childList: !0, characterData: !0, subtree: !0 }), c.then(() => {
+      x = setTimeout($, 700);
     });
   }
-  g.addEventListener("change", () => {
-    if (!(!g.matches || !b || x)) {
-      if (clearTimeout(w), !s) {
-        a?.destroy(), t.innerHTML = m, A();
+  m.addEventListener("change", () => {
+    if (m.matches && h && r === "erasing") {
+      I();
+      return;
+    }
+    if (!(!m.matches || !h || S)) {
+      if (clearTimeout(x), !o) {
+        i?.destroy(), t.innerHTML = g, A();
         return;
       }
-      f?.destroy(), s.textContent = T[h].phrase, L();
+      f?.destroy(), o.textContent = T[y].phrase, k();
     }
   });
-  function Q() {
-    if (!b || e.inert) return !1;
-    if (l === "shell")
-      a?.destroy(), t.innerHTML = m, A();
-    else if (l === "stage")
-      f?.destroy(), s.textContent = T[h].phrase, L();
-    else if (l === "closing")
-      f?.destroy(), t.innerHTML = S, v();
+  function I() {
+    if (!h || e.inert) return !1;
+    if (r === "erasing")
+      f?.destroy(), t.textContent = "", L();
+    else if (r === "erasing-stage")
+      f?.destroy(), o.textContent = "", $();
+    else if (r === "shell")
+      i?.destroy(), t.innerHTML = g, A();
+    else if (r === "stage")
+      f?.destroy(), o.textContent = T[y].phrase, k();
+    else if (r === "closing")
+      f?.destroy(), t.innerHTML = w, E();
     else return !1;
     return !0;
   }
-  return e.addEventListener("click", (r) => {
-    r.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || Q() && r.stopImmediatePropagation();
-  }), document.addEventListener("keydown", (r) => {
-    r.code !== "Space" || r.repeat || r.metaKey || r.ctrlKey || r.altKey || r.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || Q() && (r.preventDefault(), r.stopImmediatePropagation());
+  return e.parentElement.addEventListener("click", (s) => {
+    r !== "erasing" && r !== "erasing-stage" || s.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || I() && s.stopImmediatePropagation();
+  }), document.addEventListener("keydown", (s) => {
+    s.code !== "Space" || s.repeat || s.metaKey || s.ctrlKey || s.altKey || s.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || I() && (s.preventDefault(), s.stopImmediatePropagation());
   }), function() {
-    if (!b) {
-      if (b = !0, l = "shell", n.preload(), u = o.update(Array(24).fill(0)), c.setAttribute("aria-label", `${p.trimEnd()} ${i.trimStart()}`), g.matches) {
-        t.innerHTML = m, A();
+    if (!h) {
+      if (h = !0, r = "shell", t.dataset.fullText = `${p}${l}`, n.preload(), c = a.update(Array(24).fill(0)), u.setAttribute("aria-label", `${p.trimEnd()} ${l.trimStart()}`), m.matches) {
+        t.innerHTML = g, A();
         return;
       }
-      a = new window.Typed(t, {
-        strings: [m],
+      i = new window.Typed(t, {
+        strings: [g],
         typeSpeed: 65,
         startDelay: 0,
         loop: !1,
@@ -221,29 +234,38 @@ function X(o, n = V()) {
     }
   };
 }
-function Z(o) {
-  const n = document.querySelector("#demo"), e = document.querySelector("#demo-typed"), t = n.querySelector("[data-page-heading]"), p = document.querySelector("#knowledge-volume"), i = document.querySelector("#demo-next"), d = y.intro, m = d.replace(y.revealAfter, `<span class="text-accent">${y.revealAfter}</span>`);
-  t.setAttribute("aria-label", d), i.textContent = y.nextButton;
-  const S = d.indexOf(y.revealAfter) + y.revealAfter.length, s = matchMedia("(prefers-reduced-motion: reduce)");
-  let a = "waiting", c;
-  function g() {
+function ee(a) {
+  const n = document.querySelector("#demo"), e = document.querySelector("#demo-typed"), t = n.querySelector("[data-page-heading]"), p = document.querySelector("#knowledge-volume"), l = document.querySelector("#demo-next"), d = b.intro, g = d.replace(b.revealAfter, `<span class="text-accent">${b.revealAfter}</span>`);
+  t.setAttribute("aria-label", d), e.dataset.fullText = d, new MutationObserver(() => {
+    const c = e.dataset.fullText || "";
+    e.dataset.rest = c.startsWith(e.textContent) ? c.slice(e.textContent.length) : "";
+  }).observe(e, {
+    childList: !0,
+    characterData: !0,
+    subtree: !0,
+    attributes: !0,
+    attributeFilter: ["data-full-text"]
+  }), l.textContent = b.nextButton;
+  const w = d.indexOf(b.revealAfter) + b.revealAfter.length, o = matchMedia("(prefers-reduced-motion: reduce)");
+  let i = "waiting", u;
+  function m() {
     p.classList.add("is-visible"), p.inert = !1, p.removeAttribute("aria-hidden");
   }
-  const b = new MutationObserver(() => {
-    a === "typing" && e.textContent.length >= S && (g(), b.disconnect());
+  const h = new MutationObserver(() => {
+    i === "typing" && e.textContent.length >= w && (m(), h.disconnect());
   });
-  b.observe(e, { childList: !0, characterData: !0, subtree: !0 });
-  function l() {
-    g(), a = "ready", i.hidden = !1, b.disconnect();
+  h.observe(e, { childList: !0, characterData: !0, subtree: !0 });
+  function r() {
+    m(), i = "ready", l.hidden = !1, h.disconnect();
   }
-  function h() {
-    if (!(n.inert && !n.dataset.entering || a !== "waiting")) {
-      if (a = "typing", f.disconnect(), s.matches) {
-        e.innerHTML = m, l();
+  function y() {
+    if (!(n.inert && !n.dataset.entering || i !== "waiting")) {
+      if (i = "typing", f.disconnect(), o.matches) {
+        e.innerHTML = g, r();
         return;
       }
-      c = new window.Typed(e, {
-        strings: [m],
+      u = new window.Typed(e, {
+        strings: [g],
         typeSpeed: 65,
         backSpeed: 28,
         startDelay: 0,
@@ -252,23 +274,23 @@ function Z(o) {
         showCursor: !1,
         autoInsertCss: !1,
         contentType: "html",
-        onComplete: l
+        onComplete: r
       });
     }
   }
-  const f = new MutationObserver(h);
-  f.observe(n, { attributes: !0, attributeFilter: ["inert", "data-entering"] }), h(), n.dataset.ready = "true";
-  function w() {
-    a = "empty", o();
+  const f = new MutationObserver(y);
+  f.observe(n, { attributes: !0, attributeFilter: ["inert", "data-entering"] }), y(), n.dataset.ready = "true";
+  function x() {
+    i = "empty", a();
   }
-  i.addEventListener("click", () => {
-    if (a !== "ready") return;
-    if (a = "erasing", i.hidden = !0, t.removeAttribute("aria-label"), t.focus({ preventScroll: !0 }), t.dataset.sizingText = d, s.matches) {
-      e.textContent = "", w();
+  l.addEventListener("click", () => {
+    if (i !== "ready") return;
+    if (i = "erasing", l.hidden = !0, t.removeAttribute("aria-label"), t.focus({ preventScroll: !0 }), t.dataset.sizingText = d, o.matches) {
+      e.textContent = "", x();
       return;
     }
-    const u = e.textContent;
-    c?.destroy(), e.textContent = u, c = new window.Typed(e, {
+    const c = e.textContent;
+    u?.destroy(), e.textContent = c, u = new window.Typed(e, {
       strings: [""],
       backSpeed: 28,
       startDelay: 0,
@@ -277,47 +299,47 @@ function Z(o) {
       showCursor: !1,
       autoInsertCss: !1,
       contentType: "null",
-      onComplete: w
+      onComplete: x
     });
-  }), s.addEventListener("change", () => {
-    !s.matches || a === "waiting" || a === "empty" || (c?.destroy(), a === "erasing" ? (e.textContent = "", w()) : (e.innerHTML = m, l()));
+  }), o.addEventListener("change", () => {
+    !o.matches || i === "waiting" || i === "empty" || (u?.destroy(), i === "erasing" ? (e.textContent = "", x()) : (e.innerHTML = g, r()));
   });
-  function x() {
-    return n.inert ? !1 : a === "typing" ? (c?.destroy(), e.innerHTML = m, l(), !0) : a === "erasing" ? (c?.destroy(), e.textContent = "", w(), !0) : !1;
+  function S() {
+    return n.inert ? !1 : i === "typing" ? (u?.destroy(), e.innerHTML = g, r(), !0) : i === "erasing" ? (u?.destroy(), e.textContent = "", x(), !0) : !1;
   }
-  n.addEventListener("click", (u) => {
-    u.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || x() && u.stopImmediatePropagation();
-  }), document.addEventListener("keydown", (u) => {
-    u.code !== "Space" || u.repeat || u.metaKey || u.ctrlKey || u.altKey || u.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || x() && (u.preventDefault(), u.stopImmediatePropagation());
+  n.parentElement.addEventListener("click", (c) => {
+    i === "erasing" && (c.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || S() && c.stopImmediatePropagation());
+  }), document.addEventListener("keydown", (c) => {
+    c.code !== "Space" || c.repeat || c.metaKey || c.ctrlKey || c.altKey || c.target.closest?.('button, a, input, textarea, select, [contenteditable="true"]') || S() && (c.preventDefault(), c.stopImmediatePropagation());
   });
 }
-const R = document.querySelector("#knowledge-volume"), K = document.querySelector("#knowledge-slot"), U = document.querySelector("#pages"), B = () => {
-  const o = K.getBoundingClientRect(), n = U.getBoundingClientRect();
-  Object.assign(R.style, {
-    left: `${o.left - n.left}px`,
-    top: `${o.top - n.top}px`,
-    width: `${o.width}px`,
-    height: `${o.height}px`
+const K = document.querySelector("#knowledge-volume"), O = document.querySelector("#knowledge-slot"), U = document.querySelector("#pages"), B = () => {
+  const a = O.getBoundingClientRect(), n = U.getBoundingClientRect();
+  Object.assign(K.style, {
+    left: `${a.left - n.left}px`,
+    top: `${a.top - n.top}px`,
+    width: `${a.width}px`,
+    height: `${a.height}px`
   });
-}, $ = new ResizeObserver(B);
-$.observe(K);
-$.observe(document.querySelector(".demo-intro"));
-$.observe(U);
+}, Q = new ResizeObserver(B);
+Q.observe(O);
+Q.observe(document.querySelector(".demo-intro"));
+Q.observe(U);
 document.querySelector("#demo").addEventListener("scroll", B, { passive: !0 });
-function ee() {
-  const [o, n] = k.useState([1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), e = k.useRef(null), t = k.useCallback((i) => new Promise((d) => {
-    e.current = { vector: i, resolve: d }, n(i);
-  }), []), p = k.useCallback((i) => {
-    if (e.current?.vector !== i) return;
+function te() {
+  const [a, n] = v.useState([1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), e = v.useRef(null), t = v.useCallback((l) => new Promise((d) => {
+    e.current = { vector: l, resolve: d }, n(l);
+  }), []), p = v.useCallback((l) => {
+    if (e.current?.vector !== l) return;
     const { resolve: d } = e.current;
     e.current = null, d();
   }, []);
-  return k.useEffect(() => {
-    Z(X({ update: t }));
-  }, [t]), /* @__PURE__ */ D.jsx(
+  return v.useEffect(() => {
+    ee(Z({ update: t }));
+  }, [t]), /* @__PURE__ */ R.jsx(
     z,
     {
-      mastery: o,
+      mastery: a,
       onMasterySettled: p,
       radius: 8,
       isolation: 45,
@@ -327,4 +349,4 @@ function ee() {
     }
   );
 }
-j.createRoot(R).render(/* @__PURE__ */ D.jsx(ee, {}));
+F.createRoot(K).render(/* @__PURE__ */ R.jsx(te, {}));

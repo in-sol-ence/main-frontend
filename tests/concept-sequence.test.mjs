@@ -79,17 +79,63 @@ function _fixture(reduced = false) {
   }
 }
 
-test('Space finishes the sentence shell and click finishes only the current concept', async () => {
+test('click cannot finish the shell or concept while Space keeps its shortcut', async () => {
   const f = _fixture()
   await f.activate()
+  f.skipClick()
+  assert.equal(f.sentence.textContent, '')
   assert.equal(f.skipSpace(), true)
   assert.equal(f.sentence.textContent, 'This is  in the embedding space.')
   await f.settleEmpty()
   await f.step()
+  const partial = f.phrase.textContent
   f.skipClick()
+  assert.equal(f.phrase.textContent, partial)
+  assert.equal(f.selections.length, 0)
+  assert.equal(f.skipSpace(), true)
   assert.equal(f.phrase.textContent, conceptStages[0].phrase)
   assert.equal(f.selections.length, 1)
   assert.equal(f.handoff.enters, 0)
+})
+
+test('click finishes each deletion without skipping the incoming text or repeating handoff', async () => {
+  const f = _fixture()
+  await f.activate()
+  f.skipSpace()
+  await f.settleEmpty()
+  await f.step()
+  f.skipSpace()
+  for (let index = 1; index < conceptStages.length; index++) {
+    await f.settle()
+    await f.step()
+    f.skipClick()
+    assert.equal(f.phrase.textContent, '')
+    assert.equal(f.selections.length, index)
+    while (!f.phrase.textContent) assert.ok(await f.step())
+    const partial = f.phrase.textContent
+    f.skipClick()
+    assert.equal(f.phrase.textContent, partial)
+    f.skipSpace()
+    assert.equal(f.phrase.textContent, conceptStages[index].phrase)
+    assert.equal(f.selections.length, index + 1)
+  }
+  f.leave()
+  await f.settle()
+  await f.step()
+  f.skipClick()
+  assert.equal(f.sentence.textContent, '')
+  assert.equal(f.handoff.enters, 0)
+  f.skipClick()
+  assert.equal(f.sentence.textContent, '')
+  f.skipSpace()
+  assert.equal(f.sentence.textContent, closingSentence)
+  await f.step()
+  assert.equal(f.skipSpace(), true)
+  assert.equal(f.sentence.textContent, '')
+  assert.equal(f.handoff.enters, 1)
+  f.skipClick()
+  while (await f.step()) {}
+  assert.equal(f.handoff.enters, 1)
 })
 
 for (const reduced of [false, true]) test(`sequence follows actual phrase and visual completion (reduced motion: ${reduced})`, async () => {
